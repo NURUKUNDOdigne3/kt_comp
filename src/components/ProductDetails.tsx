@@ -637,11 +637,26 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
         isOpen={is3DModalOpen}
         onClose={() => setIs3DModalOpen(false)}
         productName={product.name}
-        modelPath={`/models/${
-          ["Computers", "Phones", "Printers"].includes(product.category)
-            ? product.category.toLowerCase()
-            : "phones"
-        }/scene.gltf`}
+        sketchfabModelId={
+          product.category === "Computers" &&
+          product.brand.toLowerCase() === "apple"
+            ? "efab224280fd4c3993c808107f7c0b38"
+            : product.category === "Computers"
+            ? "efab224280fd4c3993c808107f7c0b38"
+            : product.category === "Phones"
+            ? "41a071ae12794b668502f58d1e0fd1a3"
+            : product.category === "Printers"
+            ? "aa232d8302ca44ee9f08adfef2f3f894"
+            : product.category === "Routers"
+            ? "ac86d8ae65a54f4aa99d7d624f71e5f4"
+            : product.category === "Speakers"
+            ? "661f85fe3e4048f59785b2a75ffa52f8"
+            : product.category === "Monitors"
+            ? "f84d24b6df3648d884fd9be9c8007dd4"
+            : "4e72a2078b3c4a75a821ab09830693fe"
+        }
+        artistName="Sketchfab"
+        artistUrl="https://sketchfab.com"
       />
     </>
   );
