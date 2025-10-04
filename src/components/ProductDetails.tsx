@@ -121,10 +121,13 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
     let categoryProducts = allProducts;
     if (product.category === "Computers") categoryProducts = products;
     else if (product.category === "Phones") categoryProducts = phoneProducts;
-    else if (product.category === "Printers") categoryProducts = printerProducts;
+    else if (product.category === "Printers")
+      categoryProducts = printerProducts;
     else if (product.category === "Routers") categoryProducts = routerProducts;
-    else if (product.category === "Speakers") categoryProducts = speakerProducts;
-    else if (product.category === "Monitors") categoryProducts = monitorProducts;
+    else if (product.category === "Speakers")
+      categoryProducts = speakerProducts;
+    else if (product.category === "Monitors")
+      categoryProducts = monitorProducts;
 
     // Filter out current product and prioritize same brand
     const sameBrand = categoryProducts.filter(
@@ -634,7 +637,11 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
         isOpen={is3DModalOpen}
         onClose={() => setIs3DModalOpen(false)}
         productName={product.name}
-        modelPath="/models/model/scene.gltf"
+        modelPath={`/models/${
+          ["Computers", "Phones", "Printers"].includes(product.category)
+            ? product.category.toLowerCase()
+            : "phones"
+        }/scene.gltf`}
       />
     </>
   );

@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import NProgressProvider from "@/components/NProgressProvider";
 import NProgressHandler from "@/components/NProgressHandler";
+import { Suspense } from "react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,7 +30,9 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <NProgressProvider />
+        <Suspense fallback={null}>
+          <NProgressProvider />
+        </Suspense>
         <NProgressHandler />
         {children}
       </body>

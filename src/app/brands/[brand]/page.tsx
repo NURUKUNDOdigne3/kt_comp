@@ -13,13 +13,14 @@ import Image from "next/image";
 import Header from "@/components/Header";
 
 interface BrandPageProps {
-  params: {
+  params: Promise<{
     brand: string;
-  };
+  }>;
 }
 
-export default function BrandPage({ params }: BrandPageProps) {
-  const brandSlug = params.brand.toLowerCase();
+export default async function BrandPage({ params }: BrandPageProps) {
+  const { brand } = await params;
+  const brandSlug = brand.toLowerCase();
   
   // Find brand info from brandData
   const brandInfo = brandData.find(

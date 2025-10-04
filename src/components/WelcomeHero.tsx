@@ -14,7 +14,7 @@ function MacBook() {
   // @ts-ignore
   const modelRef = useRef<THREE.Group>();
   const { camera } = useThree();
-  const { scene, animations } = useGLTF("/models/model/scene.gltf");
+  const { scene, animations } = useGLTF("/models/computers/scene.gltf");
   const mixer = useRef(new THREE.AnimationMixer(scene));
   const animationAction = useRef<THREE.AnimationAction | null>(null);
   const scrollProgress = useRef(0);

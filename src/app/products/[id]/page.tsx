@@ -92,9 +92,10 @@ const getProduct = (id: string) => {
 export async function generateMetadata({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }): Promise<Metadata> {
-  const product = getProduct(params.id);
+  const { id } = await params;
+  const product = getProduct(id);
 
   if (!product) {
     return {
@@ -114,8 +115,13 @@ export async function generateMetadata({
   };
 }
 
-export default function ProductPage({ params }: { params: { id: string } }) {
-  const product = getProduct(params.id);
+export default async function ProductPage({ 
+  params 
+}: { 
+  params: Promise<{ id: string }> 
+}) {
+  const { id } = await params;
+  const product = getProduct(id);
 
   if (!product) {
     notFound();

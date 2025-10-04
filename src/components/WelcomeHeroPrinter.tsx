@@ -14,7 +14,7 @@ function Printer() {
   // @ts-ignore
   const modelRef = useRef<THREE.Group>();
   const { camera } = useThree();
-  const { scene } = useGLTF("/models/printer/scene.gltf");
+  const { scene } = useGLTF("/models/printers/scene.gltf");
   const scrollProgress = useRef(0);
   const isDragging = useRef(false);
   const lastPointerX = useRef<number | null>(null);
