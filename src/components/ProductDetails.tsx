@@ -26,6 +26,14 @@ import { cn } from "@/lib/utils";
 import ProductCard from "@/components/ProductCard";
 import Header from "./Header";
 import Product3DModal from "./Product3DModal";
+import {
+  products,
+  phoneProducts,
+  printerProducts,
+  routerProducts,
+  speakerProducts,
+  monitorProducts,
+} from "@/lib/products";
 
 interface ProductVariant {
   id: string;
@@ -97,45 +105,40 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
     });
   };
 
-  // Mock related products
-  const relatedProducts = [
-    {
-      id: "1",
-      name: "Dell XPS 15 OLED",
-      brand: "Dell",
-      image: "/products/laptop-1.avif",
-      price: 1999000,
-      priceFormatted: "RWF 1,999,000",
-      description: "Intel Core i9, 32GB RAM",
-    },
-    {
-      id: "2",
-      name: "HP Spectre x360",
-      brand: "HP",
-      image: "/products/laptop-1.avif",
-      price: 1499000,
-      priceFormatted: "RWF 1,499,000",
-      description: "Intel Core i7, 16GB RAM",
-    },
-    {
-      id: "3",
-      name: "Lenovo ThinkPad X1",
-      brand: "Lenovo",
-      image: "/products/laptop-1.avif",
-      price: 1799000,
-      priceFormatted: "RWF 1,799,000",
-      description: "Intel Core i7, 16GB RAM",
-    },
-    {
-      id: "4",
-      name: "ASUS ZenBook Pro",
-      brand: "ASUS",
-      image: "/products/laptop-1.avif",
-      price: 2199000,
-      priceFormatted: "RWF 2,199,000",
-      description: "Intel Core i9, 32GB RAM",
-    },
-  ];
+  // Get similar products based on category
+  const getSimilarProducts = () => {
+    // Combine all products
+    const allProducts = [
+      ...products,
+      ...phoneProducts,
+      ...printerProducts,
+      ...routerProducts,
+      ...speakerProducts,
+      ...monitorProducts,
+    ];
+
+    // Determine which category array to use
+    let categoryProducts = allProducts;
+    if (product.category === "Computers") categoryProducts = products;
+    else if (product.category === "Phones") categoryProducts = phoneProducts;
+    else if (product.category === "Printers") categoryProducts = printerProducts;
+    else if (product.category === "Routers") categoryProducts = routerProducts;
+    else if (product.category === "Speakers") categoryProducts = speakerProducts;
+    else if (product.category === "Monitors") categoryProducts = monitorProducts;
+
+    // Filter out current product and prioritize same brand
+    const sameBrand = categoryProducts.filter(
+      (p) => p.brand === product.brand && p.id !== product.id
+    );
+    const otherBrands = categoryProducts.filter(
+      (p) => p.brand !== product.brand && p.id !== product.id
+    );
+
+    // Combine: same brand first, then others, limit to 4
+    return [...sameBrand, ...otherBrands].slice(0, 4);
+  };
+
+  const relatedProducts = getSimilarProducts();
 
   return (
     <>
