@@ -1,3 +1,4 @@
+"use client";
 import { AppSidebar } from "@/components/app-sidebar";
 import {
   Breadcrumb,
@@ -23,42 +24,55 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Search, Plus, Filter } from "lucide-react";
+import { Search, Plus, Filter, Pencil } from "lucide-react";
+import { useState } from "react";
+import { AddCategoryModal } from "@/components/AddCategoryModal";
+import { EditCategoryModal } from "@/components/EditCategoryModal";
 
 export default function CategoriesPage() {
   // Mock data for categories
-  const categories = [
+  const [categories, setCategories] = useState([
     {
       id: "computers",
       name: "Computers & Laptops",
+      description: "Desktops, laptops, and computer components",
       products: 45,
       status: "Active",
     },
     {
       id: "phones",
       name: "Smartphones",
+      description: "Mobile phones from various brands",
       products: 32,
       status: "Active",
     },
     {
       id: "printers",
       name: "Printers",
+      description: "Inkjet, laser, and multifunction printers",
       products: 18,
       status: "Active",
     },
     {
       id: "routers",
       name: "Routers & Networking",
+      description: "Wi-Fi routers and networking equipment",
       products: 15,
       status: "Active",
     },
     {
       id: "monitors",
       name: "Monitors",
+      description: "Computer monitors and displays",
       products: 12,
       status: "Active",
     },
-  ];
+  ]);
+
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<any>(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -70,6 +84,44 @@ export default function CategoriesPage() {
         return <Badge>{status}</Badge>;
     }
   };
+
+  const handleAddCategory = (newCategory: {
+    name: string;
+    description: string;
+    status: string;
+  }) => {
+    // In a real app, you would make an API call here
+    const category = {
+      id: newCategory.name.toLowerCase().replace(/\s+/g, "-"),
+      ...newCategory,
+      products: 0,
+    };
+    setCategories([...categories, category]);
+    setIsAddModalOpen(false);
+  };
+
+  const handleEditCategory = (category: any) => {
+    setSelectedCategory(category);
+    setIsEditModalOpen(true);
+  };
+
+  const handleSaveCategory = (updatedCategory: any) => {
+    // In a real app, you would make an API call here
+    setCategories(
+      categories.map((cat) =>
+        cat.id === updatedCategory.id ? updatedCategory : cat
+      )
+    );
+    setIsEditModalOpen(false);
+    setSelectedCategory(null);
+  };
+
+  // Filter categories based on search query
+  const filteredCategories = categories.filter(
+    (category) =>
+      category.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      category.description.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <SidebarProvider>
@@ -106,7 +158,7 @@ export default function CategoriesPage() {
                 <Filter className="mr-2 h-4 w-4" />
                 Filter
               </Button>
-              <Button size="sm">
+              <Button size="sm" onClick={() => setIsAddModalOpen(true)}>
                 <Plus className="mr-2 h-4 w-4" />
                 Add Category
               </Button>
@@ -123,6 +175,8 @@ export default function CategoriesPage() {
                     <Input
                       placeholder="Search categories..."
                       className="pl-8 w-full md:w-64"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
                     />
                   </div>
                 </div>
@@ -131,7 +185,7 @@ export default function CategoriesPage() {
             </CardHeader>
             <CardContent>
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {categories.map((category) => (
+                {filteredCategories.map((category) => (
                   <Card
                     key={category.id}
                     className="hover:shadow-md transition-shadow"
@@ -141,13 +195,21 @@ export default function CategoriesPage() {
                         <div>
                           <h3 className="font-semibold">{category.name}</h3>
                           <p className="text-sm text-muted-foreground mt-1">
+                            {category.description}
+                          </p>
+                          <p className="text-sm text-muted-foreground mt-1">
                             {category.products} products
                           </p>
                         </div>
                         {getStatusBadge(category.status)}
                       </div>
                       <div className="flex gap-2 mt-4">
-                        <Button variant="outline" size="sm">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleEditCategory(category)}
+                        >
+                          <Pencil className="h-4 w-4 mr-2" />
                           Edit
                         </Button>
                         <Button variant="outline" size="sm">
@@ -161,6 +223,17 @@ export default function CategoriesPage() {
             </CardContent>
           </Card>
         </div>
+        <AddCategoryModal
+          open={isAddModalOpen}
+          onOpenChange={setIsAddModalOpen}
+          onSave={handleAddCategory}
+        />
+        <EditCategoryModal
+          category={selectedCategory}
+          open={isEditModalOpen}
+          onOpenChange={setIsEditModalOpen}
+          onSave={handleSaveCategory}
+        />
       </SidebarInset>
     </SidebarProvider>
   );

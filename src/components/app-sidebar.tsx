@@ -43,7 +43,6 @@ const data = {
       title: "Dashboard",
       url: "/dashboard",
       icon: Home,
-      isActive: true,
     },
     {
       title: "Orders",
@@ -89,10 +88,7 @@ const data = {
           title: "Inventory",
           url: "/dashboard/products/inventory",
         },
-        {
-          title: "Add Product",
-          url: "/dashboard/products/add",
-        },
+        // Removed "Add Product" link since we're using a modal now
       ],
     },
     {

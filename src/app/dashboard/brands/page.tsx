@@ -1,3 +1,5 @@
+"use client";
+
 import { AppSidebar } from "@/components/app-sidebar";
 import {
   Breadcrumb,
@@ -23,42 +25,69 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Search, Plus, Filter, Image } from "lucide-react";
+import { Search, Plus, Filter, Image, Pencil } from "lucide-react";
+import { useState } from "react";
+import { AddBrandModal } from "@/components/AddBrandModal";
+import { EditBrandModal } from "@/components/EditBrandModal";
+import { useRouter } from "next/navigation";
 
 export default function BrandsPage() {
+  const router = useRouter();
+
   // Mock data for brands
-  const brands = [
+  const [brands, setBrands] = useState([
     {
       id: "apple",
       name: "Apple",
+      description: "Innovative technology products",
       products: 12,
       status: "Active",
+      website: "https://apple.com",
+      categories: ["Computers", "Phones"],
     },
     {
       id: "samsung",
       name: "Samsung",
+      description: "Electronics and mobile devices",
       products: 18,
       status: "Active",
+      website: "https://samsung.com",
+      categories: ["Phones", "Monitors"],
     },
     {
       id: "dell",
       name: "Dell",
+      description: "Computer systems and accessories",
       products: 9,
       status: "Active",
+      website: "https://dell.com",
+      categories: ["Computers", "Monitors"],
     },
     {
       id: "hp",
       name: "HP",
+      description: "Printing and computing solutions",
       products: 15,
       status: "Active",
+      website: "https://hp.com",
+      categories: ["Computers", "Printers"],
     },
     {
       id: "lenovo",
       name: "Lenovo",
+      description: "Computers and smart devices",
       products: 7,
       status: "Active",
+      website: "https://lenovo.com",
+      categories: ["Computers"],
     },
-  ];
+  ]);
+
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedBrand, setSelectedBrand] = useState<any>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -70,6 +99,52 @@ export default function BrandsPage() {
         return <Badge>{status}</Badge>;
     }
   };
+
+  const handleAddBrand = (newBrand: {
+    name: string;
+    description: string;
+    status: string;
+    website: string;
+    categories: string[];
+  }) => {
+    // In a real app, you would make an API call here
+    const brand = {
+      id: newBrand.name.toLowerCase().replace(/\s+/g, "-"),
+      ...newBrand,
+      products: 0,
+    };
+    setBrands([...brands, brand]);
+    setIsAddModalOpen(false);
+  };
+
+  const handleEditBrand = (brand: any) => {
+    setSelectedBrand(brand);
+    setIsEditModalOpen(true);
+  };
+
+  const handleSaveBrand = (updatedBrand: any) => {
+    // In a real app, you would make an API call here
+    setBrands(brands.map((b) => (b.id === updatedBrand.id ? updatedBrand : b)));
+    setIsEditModalOpen(false);
+    setSelectedBrand(null);
+  };
+
+  const handleViewProducts = (brandName: string) => {
+    // Navigate to products page with brand filter applied
+    router.push(`/dashboard/products?brand=${encodeURIComponent(brandName)}`);
+  };
+
+  // Filter brands based on search query and status
+  const filteredBrands = brands.filter((brand) => {
+    const matchesSearch =
+      brand.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      brand.description.toLowerCase().includes(searchQuery.toLowerCase());
+
+    const matchesStatus =
+      statusFilter === "all" || brand.status === statusFilter;
+
+    return matchesSearch && matchesStatus;
+  });
 
   return (
     <SidebarProvider>
@@ -96,11 +171,17 @@ export default function BrandsPage() {
           <div className="flex items-center justify-between">
             <h1 className="text-2xl font-bold">Brands</h1>
             <div className="flex gap-2">
-              <Button variant="outline" size="sm">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() =>
+                  setStatusFilter(statusFilter === "all" ? "Active" : "all")
+                }
+              >
                 <Filter className="mr-2 h-4 w-4" />
-                Filter
+                {statusFilter === "all" ? "Active Only" : "All Brands"}
               </Button>
-              <Button size="sm">
+              <Button size="sm" onClick={() => setIsAddModalOpen(true)}>
                 <Plus className="mr-2 h-4 w-4" />
                 Add Brand
               </Button>
@@ -117,6 +198,8 @@ export default function BrandsPage() {
                     <Input
                       placeholder="Search brands..."
                       className="pl-8 w-full md:w-64"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
                     />
                   </div>
                 </div>
@@ -127,7 +210,7 @@ export default function BrandsPage() {
             </CardHeader>
             <CardContent>
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {brands.map((brand) => (
+                {filteredBrands.map((brand) => (
                   <Card
                     key={brand.id}
                     className="hover:shadow-md transition-shadow"
@@ -143,13 +226,28 @@ export default function BrandsPage() {
                             {getStatusBadge(brand.status)}
                           </div>
                           <p className="text-sm text-muted-foreground mt-1">
+                            {brand.description}
+                          </p>
+                          <p className="text-sm text-muted-foreground mt-1">
                             {brand.products} products
                           </p>
+                          <p className="text-sm text-muted-foreground mt-1">
+                            {brand.categories.join(", ")}
+                          </p>
                           <div className="flex gap-2 mt-3">
-                            <Button variant="outline" size="sm">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleEditBrand(brand)}
+                            >
+                              <Pencil className="h-4 w-4 mr-2" />
                               Edit
                             </Button>
-                            <Button variant="outline" size="sm">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleViewProducts(brand.name)}
+                            >
                               View Products
                             </Button>
                           </div>
@@ -162,6 +260,17 @@ export default function BrandsPage() {
             </CardContent>
           </Card>
         </div>
+        <AddBrandModal
+          open={isAddModalOpen}
+          onOpenChange={setIsAddModalOpen}
+          onSave={handleAddBrand}
+        />
+        <EditBrandModal
+          brand={selectedBrand}
+          open={isEditModalOpen}
+          onOpenChange={setIsEditModalOpen}
+          onSave={handleSaveBrand}
+        />
       </SidebarInset>
     </SidebarProvider>
   );
