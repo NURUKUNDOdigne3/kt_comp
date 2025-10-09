@@ -1,3 +1,5 @@
+"use client";
+
 import { AppSidebar } from "@/components/app-sidebar";
 import {
   Breadcrumb,
@@ -22,23 +24,69 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
-  LineChart,
-  PieChart,
+  LineChart as LineChartIcon,
+  PieChart as PieChartIcon,
   TrendingUp,
   Download,
   Filter,
 } from "lucide-react";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  PieChart,
+  Pie,
+  Cell,
+} from "recharts";
+
+// Mock data for traffic sources
+const trafficSources = [
+  { source: "Direct", visitors: 12500, percentage: 35 },
+  { source: "Search", visitors: 8900, percentage: 25 },
+  { source: "Social Media", visitors: 6700, percentage: 19 },
+  { source: "Referrals", visitors: 4200, percentage: 12 },
+  { source: "Email", visitors: 3100, percentage: 9 },
+];
+
+const visitorTrends = [
+  { day: "Mon", visitors: 4500 },
+  { day: "Tue", visitors: 5200 },
+  { day: "Wed", visitors: 4800 },
+  { day: "Thu", visitors: 6100 },
+  { day: "Fri", visitors: 5500 },
+  { day: "Sat", visitors: 6700 },
+  { day: "Sun", visitors: 7200 },
+];
+
+const pageViews = [
+  { day: "Mon", views: 18000 },
+  { day: "Tue", views: 20800 },
+  { day: "Wed", views: 19200 },
+  { day: "Thu", views: 24400 },
+  { day: "Fri", views: 22000 },
+  { day: "Sat", views: 26800 },
+  { day: "Sun", views: 28800 },
+];
+
+const bounceRates = [
+  { day: "Mon", rate: 45.2 },
+  { day: "Tue", rate: 42.8 },
+  { day: "Wed", rate: 44.1 },
+  { day: "Thu", rate: 41.5 },
+  { day: "Fri", rate: 43.7 },
+  { day: "Sat", rate: 39.8 },
+  { day: "Sun", rate: 38.2 },
+];
+
+const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884D8"];
 
 export default function TrafficPage() {
-  // Mock data for traffic sources
-  const trafficSources = [
-    { source: "Direct", visitors: 12500, percentage: 35 },
-    { source: "Search", visitors: 8900, percentage: 25 },
-    { source: "Social Media", visitors: 6700, percentage: 19 },
-    { source: "Referrals", visitors: 4200, percentage: 12 },
-    { source: "Email", visitors: 3100, percentage: 9 },
-  ];
-
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -150,36 +198,192 @@ export default function TrafficPage() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <LineChart className="h-5 w-5" />
+                  <LineChartIcon className="h-5 w-5" />
                   Visitor Trends
                 </CardTitle>
                 <CardDescription>Daily visitor count over time</CardDescription>
               </CardHeader>
-              <CardContent>
-                <div className="h-80 flex items-center justify-center">
-                  <div className="text-muted-foreground">
-                    Visitor trends chart would go here
-                  </div>
-                </div>
+              <CardContent className="h-80">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart
+                    data={visitorTrends}
+                    margin={{
+                      top: 5,
+                      right: 30,
+                      left: 20,
+                      bottom: 5,
+                    }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="day" />
+                    <YAxis />
+                    <Tooltip
+                      formatter={(value) => [
+                        value.toLocaleString(),
+                        "Visitors",
+                      ]}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="visitors"
+                      stroke="#3b82f6"
+                      activeDot={{ r: 8 }}
+                      name="Visitors"
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <PieChart className="h-5 w-5" />
+                  <PieChartIcon className="h-5 w-5" />
                   Traffic Sources
                 </CardTitle>
                 <CardDescription>
                   Where your visitors are coming from
                 </CardDescription>
               </CardHeader>
-              <CardContent>
-                <div className="h-80 flex items-center justify-center">
-                  <div className="text-muted-foreground">
-                    Traffic sources chart would go here
-                  </div>
-                </div>
+              <CardContent className="h-80">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={trafficSources}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      outerRadius={80}
+                      fill="#8884d8"
+                      dataKey="visitors"
+                      label={({ source, percentage }) =>
+                        `${source} ${percentage}%`
+                      }
+                    >
+                      {trafficSources.map((entry, index) => (
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={COLORS[index % COLORS.length]}
+                        />
+                      ))}
+                    </Pie>
+                    <Tooltip
+                      formatter={(value) => [
+                        value.toLocaleString(),
+                        "Visitors",
+                      ]}
+                      labelFormatter={(label) => `Source: ${label}`}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-3">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <LineChartIcon className="h-5 w-5" />
+                  Page Views Trend
+                </CardTitle>
+                <CardDescription>Daily page views over time</CardDescription>
+              </CardHeader>
+              <CardContent className="h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart
+                    data={pageViews}
+                    margin={{
+                      top: 5,
+                      right: 30,
+                      left: 20,
+                      bottom: 5,
+                    }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="day" />
+                    <YAxis />
+                    <Tooltip
+                      formatter={(value) => [
+                        value.toLocaleString(),
+                        "Page Views",
+                      ]}
+                    />
+                    <Bar dataKey="views" fill="#10b981" name="Page Views" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <LineChartIcon className="h-5 w-5" />
+                  Bounce Rate Trend
+                </CardTitle>
+                <CardDescription>Daily bounce rate over time</CardDescription>
+              </CardHeader>
+              <CardContent className="h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart
+                    data={bounceRates}
+                    margin={{
+                      top: 5,
+                      right: 30,
+                      left: 20,
+                      bottom: 5,
+                    }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="day" />
+                    <YAxis />
+                    <Tooltip
+                      formatter={(value) => [`${value}%`, "Bounce Rate"]}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="rate"
+                      stroke="#f97316"
+                      strokeWidth={2}
+                      activeDot={{ r: 8 }}
+                      name="Bounce Rate"
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <TrendingUp className="h-5 w-5" />
+                  Traffic Distribution
+                </CardTitle>
+                <CardDescription>Visitors by traffic source</CardDescription>
+              </CardHeader>
+              <CardContent className="h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart
+                    data={trafficSources}
+                    margin={{
+                      top: 5,
+                      right: 30,
+                      left: 20,
+                      bottom: 5,
+                    }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="source" />
+                    <YAxis />
+                    <Tooltip
+                      formatter={(value) => [
+                        value.toLocaleString(),
+                        "Visitors",
+                      ]}
+                    />
+                    <Bar dataKey="visitors" fill="#8b5cf6" name="Visitors" />
+                  </BarChart>
+                </ResponsiveContainer>
               </CardContent>
             </Card>
           </div>

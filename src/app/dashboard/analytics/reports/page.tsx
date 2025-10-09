@@ -1,3 +1,5 @@
+"use client";
+
 import { AppSidebar } from "@/components/app-sidebar";
 import {
   Breadcrumb,
@@ -22,13 +24,55 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
-  BarChart,
   BarChartIcon,
-  LineChart,
-  PieChart,
+  LineChart as LineChartIcon,
+  PieChart as PieChartIcon,
   TrendingUp,
   Download,
 } from "lucide-react";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  LineChart,
+  Line,
+  PieChart,
+  Pie,
+  Cell,
+} from "recharts";
+
+// Mock data for reports
+const salesData = [
+  { month: "Jan", revenue: 4500000 },
+  { month: "Feb", revenue: 5200000 },
+  { month: "Mar", revenue: 4800000 },
+  { month: "Apr", revenue: 6100000 },
+  { month: "May", revenue: 5500000 },
+  { month: "Jun", revenue: 6700000 },
+];
+
+const customerGrowthData = [
+  { month: "Jan", customers: 1200 },
+  { month: "Feb", customers: 1450 },
+  { month: "Mar", customers: 1600 },
+  { month: "Apr", customers: 1850 },
+  { month: "May", customers: 2100 },
+  { month: "Jun", customers: 2400 },
+];
+
+const productPerformanceData = [
+  { name: "Computers", value: 35 },
+  { name: "Phones", value: 25 },
+  { name: "Printers", value: 15 },
+  { name: "Accessories", value: 15 },
+  { name: "Monitors", value: 10 },
+];
+
+const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884D8"];
 
 export default function ReportsPage() {
   return (
@@ -86,29 +130,65 @@ export default function ReportsPage() {
                   Detailed sales performance report
                 </CardDescription>
               </CardHeader>
-              <CardContent>
-                <div className="h-80 flex items-center justify-center">
-                  <div className="text-muted-foreground">
-                    Sales report visualization would go here
-                  </div>
-                </div>
+              <CardContent className="h-80">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart
+                    data={salesData}
+                    margin={{
+                      top: 5,
+                      right: 30,
+                      left: 20,
+                      bottom: 5,
+                    }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="month" />
+                    <YAxis />
+                    <Tooltip
+                      formatter={(value) => [
+                        `RWF ${value.toLocaleString()}`,
+                        "Revenue",
+                      ]}
+                      labelFormatter={(label) => `Month: ${label}`}
+                    />
+                    <Bar dataKey="revenue" fill="#3b82f6" name="Revenue" />
+                  </BarChart>
+                </ResponsiveContainer>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <LineChart className="h-5 w-5" />
+                  <LineChartIcon className="h-5 w-5" />
                   Customer Growth
                 </CardTitle>
                 <CardDescription>Customer acquisition trends</CardDescription>
               </CardHeader>
-              <CardContent>
-                <div className="h-80 flex items-center justify-center">
-                  <div className="text-muted-foreground">
-                    Customer growth chart would go here
-                  </div>
-                </div>
+              <CardContent className="h-80">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart
+                    data={customerGrowthData}
+                    margin={{
+                      top: 5,
+                      right: 30,
+                      left: 20,
+                      bottom: 5,
+                    }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="month" />
+                    <YAxis />
+                    <Tooltip />
+                    <Line
+                      type="monotone"
+                      dataKey="customers"
+                      stroke="#10b981"
+                      activeDot={{ r: 8 }}
+                      name="Customers"
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
               </CardContent>
             </Card>
           </div>
@@ -116,17 +196,36 @@ export default function ReportsPage() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <PieChart className="h-5 w-5" />
+                <PieChartIcon className="h-5 w-5" />
                 Product Performance
               </CardTitle>
               <CardDescription>Sales by product category</CardDescription>
             </CardHeader>
-            <CardContent>
-              <div className="h-80 flex items-center justify-center">
-                <div className="text-muted-foreground">
-                  Product performance chart would go here
-                </div>
-              </div>
+            <CardContent className="h-80">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={productPerformanceData}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={false}
+                    outerRadius={80}
+                    fill="#8884d8"
+                    dataKey="value"
+                    label={({ name, percent }) =>
+                      `${name} ${((percent as number) * 100).toFixed(0)}%`
+                    }
+                  >
+                    {productPerformanceData.map((entry, index) => (
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={COLORS[index % COLORS.length]}
+                      />
+                    ))}
+                  </Pie>
+                  <Tooltip formatter={(value) => [`${value}%`, "Percentage"]} />
+                </PieChart>
+              </ResponsiveContainer>
             </CardContent>
           </Card>
         </div>

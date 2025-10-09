@@ -1,3 +1,5 @@
+"use client";
+
 import { AppSidebar } from "@/components/app-sidebar";
 import {
   Breadcrumb,
@@ -21,25 +23,59 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { BarChartIcon, TrendingUp, Download, Filter } from "lucide-react";
 import {
   BarChart,
-  BarChartIcon,
-  TrendingUp,
-  Download,
-  Filter,
-} from "lucide-react";
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  LineChart,
+  Line,
+  AreaChart,
+  Area,
+} from "recharts";
+
+// Mock data for sales
+const salesData = [
+  { month: "Jan", revenue: 4500000 },
+  { month: "Feb", revenue: 5200000 },
+  { month: "Mar", revenue: 4800000 },
+  { month: "Apr", revenue: 6100000 },
+  { month: "May", revenue: 5500000 },
+  { month: "Jun", revenue: 6700000 },
+];
+
+const orderValueData = [
+  { month: "Jan", value: 820000 },
+  { month: "Feb", value: 845000 },
+  { month: "Mar", value: 810000 },
+  { month: "Apr", value: 865000 },
+  { month: "May", value: 835000 },
+  { month: "Jun", value: 845000 },
+];
+
+const conversionRateData = [
+  { month: "Jan", rate: 2.8 },
+  { month: "Feb", rate: 3.0 },
+  { month: "Mar", rate: 2.9 },
+  { month: "Apr", rate: 3.2 },
+  { month: "May", rate: 3.1 },
+  { month: "Jun", rate: 3.2 },
+];
+
+const growthData = [
+  { month: "Jan", growth: 15.2 },
+  { month: "Feb", growth: 16.8 },
+  { month: "Mar", growth: 14.5 },
+  { month: "Apr", growth: 18.7 },
+  { month: "May", growth: 17.3 },
+  { month: "Jun", growth: 18.7 },
+];
 
 export default function SalesPage() {
-  // Mock data for sales
-  const salesData = [
-    { month: "Jan", revenue: 4500000 },
-    { month: "Feb", revenue: 5200000 },
-    { month: "Mar", revenue: 4800000 },
-    { month: "Apr", revenue: 6100000 },
-    { month: "May", revenue: 5500000 },
-    { month: "Jun", revenue: 6700000 },
-  ];
-
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -157,14 +193,147 @@ export default function SalesPage() {
                 Revenue trends over the past 6 months
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <div className="h-80 flex items-center justify-center">
-                <div className="text-muted-foreground">
-                  Sales performance chart would go here
-                </div>
-              </div>
+            <CardContent className="h-80">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart
+                  data={salesData}
+                  margin={{
+                    top: 5,
+                    right: 30,
+                    left: 20,
+                    bottom: 5,
+                  }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="month" />
+                  <YAxis />
+                  <Tooltip
+                    formatter={(value) => [
+                      `RWF ${value.toLocaleString()}`,
+                      "Revenue",
+                    ]}
+                    labelFormatter={(label) => `Month: ${label}`}
+                  />
+                  <Bar dataKey="revenue" fill="#3b82f6" name="Revenue" />
+                </BarChart>
+              </ResponsiveContainer>
             </CardContent>
           </Card>
+
+          <div className="grid gap-4 md:grid-cols-3">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <TrendingUp className="h-5 w-5" />
+                  Order Value Trend
+                </CardTitle>
+                <CardDescription>Average order value over time</CardDescription>
+              </CardHeader>
+              <CardContent className="h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart
+                    data={orderValueData}
+                    margin={{
+                      top: 5,
+                      right: 30,
+                      left: 20,
+                      bottom: 5,
+                    }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="month" />
+                    <YAxis />
+                    <Tooltip
+                      formatter={(value) => [
+                        `RWF ${value.toLocaleString()}`,
+                        "Order Value",
+                      ]}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="value"
+                      stroke="#8b5cf6"
+                      activeDot={{ r: 8 }}
+                      name="Order Value"
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <TrendingUp className="h-5 w-5" />
+                  Conversion Rate
+                </CardTitle>
+                <CardDescription>Conversion rate over time</CardDescription>
+              </CardHeader>
+              <CardContent className="h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart
+                    data={conversionRateData}
+                    margin={{
+                      top: 5,
+                      right: 30,
+                      left: 20,
+                      bottom: 5,
+                    }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="month" />
+                    <YAxis />
+                    <Tooltip
+                      formatter={(value) => [`${value}%`, "Conversion Rate"]}
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey="rate"
+                      stroke="#ec4899"
+                      fill="#f9a8d4"
+                      name="Conversion Rate"
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <TrendingUp className="h-5 w-5" />
+                  Growth Trend
+                </CardTitle>
+                <CardDescription>Sales growth over time</CardDescription>
+              </CardHeader>
+              <CardContent className="h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart
+                    data={growthData}
+                    margin={{
+                      top: 5,
+                      right: 30,
+                      left: 20,
+                      bottom: 5,
+                    }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="month" />
+                    <YAxis />
+                    <Tooltip formatter={(value) => [`${value}%`, "Growth"]} />
+                    <Line
+                      type="monotone"
+                      dataKey="growth"
+                      stroke="#0ea5e9"
+                      strokeWidth={2}
+                      activeDot={{ r: 8 }}
+                      name="Growth"
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </SidebarInset>
     </SidebarProvider>

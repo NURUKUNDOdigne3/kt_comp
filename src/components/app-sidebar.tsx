@@ -2,20 +2,24 @@
 
 import * as React from "react";
 import {
-  ShoppingCart,
+  AudioWaveform,
+  BookOpen,
+  Bot,
+  Command,
+  Frame,
+  GalleryVerticalEnd,
+  Map,
+  PieChart,
+  Settings,
+  SquareTerminal,
+  Store,
   Package,
   Users,
-  BarChart3,
-  Settings,
-  Store,
-  Tag,
   TrendingUp,
-  CreditCard,
-  Truck,
+  BarChart3,
+  Tag,
   Headphones,
-  Home,
-  Smartphone,
-  Printer,
+  FileText,
 } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
@@ -42,12 +46,12 @@ const data = {
     {
       title: "Dashboard",
       url: "/dashboard",
-      icon: Home,
+      icon: SquareTerminal,
     },
     {
       title: "Orders",
       url: "/dashboard/orders",
-      icon: ShoppingCart,
+      icon: Package,
       items: [
         {
           title: "All Orders",
@@ -164,6 +168,17 @@ const data = {
       ],
     },
     {
+      title: "Logs",
+      url: "/dashboard/logs",
+      icon: FileText,
+      items: [
+        {
+          title: "Activity Logs",
+          url: "/dashboard/logs",
+        },
+      ],
+    },
+    {
       title: "Settings",
       url: "/dashboard/settings",
       icon: Settings,
@@ -171,6 +186,10 @@ const data = {
         {
           title: "General",
           url: "/dashboard/settings",
+        },
+        {
+          title: "User Profile",
+          url: "/dashboard/settings/profile",
         },
         {
           title: "Payments",
@@ -190,7 +209,7 @@ const data = {
   navSecondary: [
     {
       title: "Support",
-      url: "#",
+      url: "/dashboard/support",
       icon: Headphones,
     },
     {
@@ -208,12 +227,12 @@ const data = {
     {
       name: "Phones",
       url: "/phones",
-      icon: Smartphone,
+      icon: Package,
     },
     {
       name: "Printers",
       url: "/printers",
-      icon: Printer,
+      icon: Package,
     },
   ],
 };
