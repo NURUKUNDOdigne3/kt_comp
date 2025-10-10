@@ -1,215 +1,337 @@
 "use client";
 
-import { useState } from "react";
+import { AuthProvider } from "@/contexts/AuthContext";
+import { DashboardGuard } from "@/components/DashboardGuard";
+import { useDashboard } from "@/hooks/use-api";
+import { AppSidebar } from "@/components/app-sidebar";
 import {
-  User,
-  Truck,
-  Box,
-  MapPin,
-  Home,
-  ShoppingBag,
-  Settings,
-  Lock,
-  Bell,
-  UserCircle,
-  Search,
-  Menu,
-  X,
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
+import { Separator } from "@/components/ui/separator";
+import {
+  SidebarInset,
+  SidebarProvider,
+  SidebarTrigger,
+} from "@/components/ui/sidebar";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "../../components/ui/card";
+import {
+  DollarSign,
+  Package,
+  ShoppingCart,
+  Users,
+  TrendingUp,
+  CreditCard,
+  Loader2,
+  TrendingDown,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
 
-export default function DashboardPage() {
-  const [activeSection, setActiveSection] = useState("dashboard");
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+export default function Page() {
+  const { data: dashboard, isLoading } = useDashboard();
 
+  const formatCurrency = (value: number) => {
+    return `RWF ${value.toLocaleString()}`;
+  };
+
+  const formatGrowth = (growth: number) => {
+    const isPositive = growth >= 0;
+    return (
+      <span
+        className={`flex items-center gap-1 text-xs ${
+          isPositive ? "text-green-600" : "text-red-600"
+        }`}
+      >
+        {isPositive ? (
+          <TrendingUp className="h-3 w-3" />
+        ) : (
+          <TrendingDown className="h-3 w-3" />
+        )}
+        {isPositive ? "+" : ""}
+        {growth}% from last month
+      </span>
+    );
+  };
   return (
-    <div className="flex h-screen bg-gray-50">
-      {/* Sidebar */}
-      <aside className={cn(
-        "w-64 bg-white shadow-lg flex flex-col fixed inset-y-0 z-50 transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static",
-        isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
-      )}>
-        {/* Logo and title */}
-        <div className="p-6 border-b flex items-center justify-between">
-          <h1 className="text-xl font-bold text-gray-800">Logistics</h1>
-          <button
-            className="lg:hidden text-gray-500 hover:text-gray-700"
-            onClick={() => setIsMobileMenuOpen(false)}
-          >
-            <X className="h-6 w-6" />
-          </button>
-        </div>
-
-        {/* Key metrics */}
-        <div className="p-6 space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <p className="text-sm text-gray-600">Deliveries</p>
-              <p className="text-2xl font-bold text-gray-800">25.9k</p>
-            </div>
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <p className="text-sm text-gray-600">On the way</p>
-              <p className="text-2xl font-bold text-gray-800">4.6k</p>
-            </div>
-          </div>
-
-          {/* Delivery Process */}
-          <div className="space-y-2">
-            <p className="text-sm font-medium text-gray-800">Delivery Process</p>
-            <div className="w-full bg-gray-200 rounded-full h-2">
-              <div
-                className="bg-blue-600 h-2 rounded-full"
-                style={{ width: "30%" }}
-              ></div>
-            </div>
-            <p className="text-xs text-gray-600">Reached 30% from target</p>
-          </div>
-        </div>
-
-        {/* Pages */}
-        <div className="p-6">
-          <h3 className="text-sm font-medium text-gray-600 mb-4">Pages</h3>
-          <div className="grid grid-cols-2 gap-3">
-            <button
-              onClick={() => setActiveSection("profile")}
-              className={cn(
-                "flex flex-col items-center p-3 border border-gray-200 rounded-lg transition-colors",
-                activeSection === "profile" ? "bg-blue-50 border-blue-200" : "hover:bg-gray-50"
-              )}
-            >
-              <User className="w-6 h-6 text-gray-600" />
-              <span className="text-sm mt-1">User Profile</span>
-            </button>
-            <button
-              onClick={() => setActiveSection("vehicle")}
-              className={cn(
-                "flex flex-col items-center p-3 border border-gray-200 rounded-lg transition-colors",
-                activeSection === "vehicle" ? "bg-blue-50 border-blue-200" : "hover:bg-gray-50"
-              )}
-            >
-              <Truck className="w-6 h-6 text-gray-600" />
-              <span className="text-sm mt-1">Vehicle</span>
-            </button>
-            <button
-              onClick={() => setActiveSection("inventory")}
-              className={cn(
-                "flex flex-col items-center p-3 border border-gray-200 rounded-lg transition-colors",
-                activeSection === "inventory" ? "bg-blue-50 border-blue-200" : "hover:bg-gray-50"
-              )}
-            >
-              <Box className="w-6 h-6 text-gray-600" />
-              <span className="text-sm mt-1">Inventory</span>
-            </button>
-            <button
-              onClick={() => setActiveSection("tracking")}
-              className={cn(
-                "flex flex-col items-center p-3 border border-gray-200 rounded-lg transition-colors",
-                activeSection === "tracking" ? "bg-blue-50 border-blue-200" : "hover:bg-gray-50"
-              )}
-            >
-              <MapPin className="w-6 h-6 text-gray-600" />
-              <span className="text-sm mt-1">Tracking</span>
-            </button>
-            <button
-              onClick={() => setActiveSection("warehouse")}
-              className={cn(
-                "flex flex-col items-center p-3 border border-gray-200 rounded-lg transition-colors",
-                activeSection === "warehouse" ? "bg-blue-50 border-blue-200" : "hover:bg-gray-50"
-              )}
-            >
-              <Home className="w-6 h-6 text-gray-600" />
-              <span className="text-sm mt-1">Warehouse</span>
-            </button>
-            <button
-              onClick={() => setActiveSection("order")}
-              className={cn(
-                "flex flex-col items-center p-3 border border-gray-200 rounded-lg transition-colors",
-                activeSection === "order" ? "bg-blue-50 border-blue-200" : "hover:bg-gray-50"
-              )}
-            >
-              <ShoppingBag className="w-6 h-6 text-gray-600" />
-              <span className="text-sm mt-1">Order</span>
-            </button>
-          </div>
-        </div>
-
-        {/* Settings & Profile */}
-        <div className="p-6 pt-0">
-          <h3 className="text-sm font-medium text-gray-600 mb-4">Settings & Profile</h3>
-          <div className="space-y-2">
-            <button className="flex items-center w-full p-2 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-50 rounded">
-              <User className="w-4 h-4 mr-2" />
-              User Profile
-            </button>
-            <button className="flex items-center w-full p-2 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-50 rounded">
-              <Lock className="w-4 h-4 mr-2" />
-              Change Password
-            </button>
-            <button className="flex items-center w-full p-2 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-50 rounded">
-              <Bell className="w-4 h-4 mr-2" />
-              Notification Settings
-            </button>
-            <button className="flex items-center w-full p-2 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-50 rounded">
-              <Settings className="w-4 h-4 mr-2" />
-              App Settings
-            </button>
-          </div>
-        </div>
-      </aside>
-
-      {/* Main content */}
-      <main className="flex-1 overflow-hidden">
-        {/* Top bar */}
-        <header className="bg-white border-b px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <button
-                className="lg:hidden text-gray-500 hover:text-gray-700"
-                onClick={() => setIsMobileMenuOpen(true)}
-              >
-                <Menu className="h-6 w-6" />
-              </button>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Search className="h-5 w-5 text-gray-400" />
-                </div>
-                <input
-                  type="search"
-                  placeholder="Search..."
-                  className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-64"
+    <AuthProvider>
+      <DashboardGuard>
+        <SidebarProvider>
+          <AppSidebar />
+          <SidebarInset>
+            <header className="flex h-16 shrink-0 items-center gap-2">
+              <div className="flex items-center gap-2 px-4">
+                <SidebarTrigger className="-ml-1" />
+                <Separator
+                  orientation="vertical"
+                  className="mr-2 data-[orientation=vertical]:h-4"
                 />
+                <Breadcrumb>
+                  <BreadcrumbList>
+                    <BreadcrumbItem className="hidden md:block">
+                      <BreadcrumbLink href="/dashboard">
+                        Dashboard
+                      </BreadcrumbLink>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator className="hidden md:block" />
+                    <BreadcrumbItem>
+                      <BreadcrumbPage>Overview</BreadcrumbPage>
+                    </BreadcrumbItem>
+                  </BreadcrumbList>
+                </Breadcrumb>
               </div>
+            </header>
+            <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
+              {isLoading ? (
+                <div className="flex items-center justify-center py-12">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                </div>
+              ) : !dashboard ? (
+                <div className="text-center py-12">
+                  <p className="text-muted-foreground">
+                    Failed to load dashboard data
+                  </p>
+                </div>
+              ) : (
+                <>
+                  <div className="grid auto-rows-min gap-4 md:grid-cols-2 lg:grid-cols-4">
+                    <Card>
+                      <CardHeader className="relative">
+                        <CardTitle className="text-sm font-medium">
+                          Total Revenue
+                        </CardTitle>
+                        <DollarSign className="size-10 text-muted-foreground absolute right-4" />
+                      </CardHeader>
+                      <CardContent>
+                        <div className="text-2xl font-bold">
+                          {/* @ts-ignore */}
+                          {formatCurrency(dashboard.overview.totalRevenue)}
+                        </div>
+                        {/* @ts-ignore */}
+                        {formatGrowth(dashboard.overview.revenueGrowth)}
+                      </CardContent>
+                    </Card>
+                    <Card>
+                      <CardHeader className="relative">
+                        <CardTitle className="text-sm font-medium">
+                          Orders
+                        </CardTitle>
+                        <ShoppingCart className="size-10 text-muted-foreground absolute right-4" />
+                      </CardHeader>
+                      <CardContent>
+                        <div className="text-2xl font-bold">
+                          {/* @ts-ignore */}
+                          {dashboard.overview.totalOrders.toLocaleString()}
+                        </div>
+                        {/* @ts-ignore */}
+                        {formatGrowth(dashboard.overview.ordersGrowth)}
+                      </CardContent>
+                    </Card>
+                    <Card>
+                      <CardHeader className="relative">
+                        <CardTitle className="text-sm font-medium">
+                          Products
+                        </CardTitle>
+                        <Package className="size-10 text-muted-foreground absolute right-4" />
+                      </CardHeader>
+                      <CardContent>
+                        <div className="text-2xl font-bold">
+                          {/* @ts-ignore */}
+                          {dashboard.overview.totalProducts.toLocaleString()}
+                        </div>
+                        {/* @ts-ignore */}
+                        {formatGrowth(dashboard.overview.productsGrowth)}
+                      </CardContent>
+                    </Card>
+                    <Card>
+                      <CardHeader className="relative">
+                        <CardTitle className="text-sm font-medium">
+                          Active Customers
+                        </CardTitle>
+                        <Users className="size-10 text-muted-foreground absolute right-4" />
+                      </CardHeader>
+                      <CardContent>
+                        <div className="text-2xl font-bold">
+                          {/* @ts-ignore */}
+                          {dashboard.overview.activeCustomers.toLocaleString()}
+                        </div>
+                        {/* @ts-ignore */}
+                        {formatGrowth(dashboard.overview.customersGrowth)}
+                      </CardContent>
+                    </Card>
+                  </div>
+                  <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+                    <Card className="md:col-span-4">
+                      <CardHeader>
+                        <CardTitle>Sales Overview</CardTitle>
+                      </CardHeader>
+                      <CardContent className="h-[300px]">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <BarChart
+                            // @ts-ignore
+                            data={dashboard.salesData}
+                            margin={{
+                              top: 5,
+                              right: 30,
+                              left: 20,
+                              bottom: 5,
+                            }}
+                          >
+                            <CartesianGrid strokeDasharray="3 3" />
+                            <XAxis dataKey="month" />
+                            <YAxis />
+                            <Tooltip
+                              formatter={(value) => [
+                                `RWF ${value.toLocaleString()}`,
+                                "Revenue",
+                              ]}
+                              labelFormatter={(label) => `Month: ${label}`}
+                            />
+                            <Bar
+                              dataKey="revenue"
+                              fill="#3b82f6"
+                              name="Revenue"
+                            />
+                          </BarChart>
+                        </ResponsiveContainer>
+                      </CardContent>
+                    </Card>
+                    <Card className="md:col-span-3">
+                      <CardHeader>
+                        <CardTitle>Top Products</CardTitle>
+                        <CardDescription>
+                          Best selling products this month
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-4">
+                          {/* @ts-ignore */}
+                          {dashboard.topProducts.map(
+                            (product: any, index: number) => (
+                              <div key={index} className="flex items-center">
+                                <div className="ml-4 space-y-1">
+                                  <p className="text-sm font-medium leading-none">
+                                    {product.name}
+                                  </p>
+                                  <p className="text-sm text-muted-foreground">
+                                    {product.brand} • {product.quantity} sold
+                                  </p>
+                                </div>
+                                <div className="ml-auto font-medium">
+                                  {formatCurrency(product.revenue)}
+                                </div>
+                              </div>
+                            )
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                  <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+                    <Card className="md:col-span-4">
+                      <CardHeader>
+                        <CardTitle>Recent Orders</CardTitle>
+                        <CardDescription>
+                          Latest customer orders
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-4">
+                          {/* @ts-ignore */}
+                          {dashboard.recentOrders.map((order: any) => (
+                            <div key={order.id} className="flex items-center">
+                              <div className="ml-4 space-y-1">
+                                <p className="text-sm font-medium leading-none">
+                                  {order.orderNumber}
+                                </p>
+                                <p className="text-sm text-muted-foreground">
+                                  {order.customer} • {order.items} items
+                                </p>
+                              </div>
+                              <div className="ml-auto font-medium">
+                                {formatCurrency(order.total)}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </CardContent>
+                    </Card>
+                    <Card className="md:col-span-3">
+                      <CardHeader>
+                        <CardTitle>Store Performance</CardTitle>
+                        <CardDescription>
+                          Key metrics and insights
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center">
+                            <TrendingUp className="h-4 w-4 text-muted-foreground mr-2" />
+                            <span>Conversion Rate</span>
+                          </div>
+                          <span className="font-medium">
+                            {/* @ts-ignore */}
+                            {dashboard.performance.conversionRate}%
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center">
+                            <CreditCard className="h-4 w-4 text-muted-foreground mr-2" />
+                            <span>Avg. Order Value</span>
+                          </div>
+                          <span className="font-medium">
+                            {formatCurrency(
+                              // @ts-ignore
+                              dashboard.performance.averageOrderValue
+                            )}
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center">
+                            <Users className="h-4 w-4 text-muted-foreground mr-2" />
+                            <span>Customer Retention</span>
+                          </div>
+                          <span className="font-medium">
+                            {/* @ts-ignore */}
+                            {dashboard.performance.customerRetention}%
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center">
+                            <Package className="h-4 w-4 text-muted-foreground mr-2" />
+                            <span>Inventory Turnover</span>
+                          </div>
+                          <span className="font-medium">
+                            {/* @ts-ignore */}
+                            {dashboard.performance.inventoryTurnover}x
+                          </span>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </>
+              )}
             </div>
-            <div className="flex items-center space-x-4">
-              <button className="text-gray-500 hover:text-gray-700">
-                <Bell className="h-6 w-6" />
-              </button>
-              <button className="text-gray-500 hover:text-gray-700">
-                <UserCircle className="h-6 w-6" />
-              </button>
-            </div>
-          </div>
-        </header>
-
-        {/* Dashboard content */}
-        <div className="p-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {/* Content will be added based on active section */}
-            <div className="bg-white p-6 rounded-lg shadow">
-              <h2 className="text-lg font-semibold text-gray-800 mb-4">Recent Deliveries</h2>
-              {/* Add content here */}
-            </div>
-            <div className="bg-white p-6 rounded-lg shadow">
-              <h2 className="text-lg font-semibold text-gray-800 mb-4">Performance Metrics</h2>
-              {/* Add content here */}
-            </div>
-            <div className="bg-white p-6 rounded-lg shadow">
-              <h2 className="text-lg font-semibold text-gray-800 mb-4">Upcoming Tasks</h2>
-              {/* Add content here */}
-            </div>
-          </div>
-        </div>
-      </main>
-    </div>
+          </SidebarInset>
+        </SidebarProvider>
+      </DashboardGuard>
+    </AuthProvider>
   );
 }
