@@ -9,6 +9,7 @@ import {
   printerProducts,
   routerProducts,
 } from "@/lib/products";
+import { BrandMarquee } from "@/components/BrandMarquee";
 
 export default function Page() {
   return (
@@ -17,6 +18,9 @@ export default function Page() {
 
       {/* Epic Hero Section */}
       <EpicHeroSection />
+
+      {/* Brand Marquee */}
+      <BrandMarquee />
 
       {/* Computers Section */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12" id="computers">

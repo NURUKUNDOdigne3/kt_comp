@@ -1,0 +1,11 @@
+Model Information:
+* title:	JBL
+* source:	https://sketchfab.com/3d-models/jbl-4535614e594b47baa569f85e8778dc7d
+* author:	Ciasny (https://sketchfab.com/Ciasny)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "JBL" (https://sketchfab.com/3d-models/jbl-4535614e594b47baa569f85e8778dc7d) by Ciasny (https://sketchfab.com/Ciasny) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
