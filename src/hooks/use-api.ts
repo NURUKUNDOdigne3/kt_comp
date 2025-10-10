@@ -430,3 +430,12 @@ export function useSalesAnalytics(period?: string) {
 export function useDashboard() {
   return useApi("/api/dashboard");
 }
+
+export function useOrdersByStatus(status: string, page?: number, limit?: number) {
+  const queryParams = new URLSearchParams();
+  if (page) queryParams.append("page", page.toString());
+  if (limit) queryParams.append("limit", limit.toString());
+  
+  const url = `/api/orders?status=${status}${queryParams.toString() ? `&${queryParams.toString()}` : ""}`;
+  return useApi(url);
+}

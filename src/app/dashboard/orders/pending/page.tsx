@@ -1,3 +1,8 @@
+"use client";
+import { useState } from "react";
+import { AuthProvider } from "@/contexts/AuthContext";
+import { DashboardGuard } from "@/components/DashboardGuard";
+import { useOrdersByStatus } from "@/hooks/use-api";
 import { AppSidebar } from "@/components/app-sidebar";
 import {
   Breadcrumb,
@@ -31,37 +36,39 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Search, Download, Filter } from "lucide-react";
+import { Search, Download, Filter, Loader2, Eye } from "lucide-react";
 
 export default function PendingOrdersPage() {
-  // Mock data for pending orders
-  const orders = [
-    {
-      id: "KT-001250",
-      customer: "Alice Johnson",
-      date: "2025-10-09",
-      total: "RWF 1,899,000",
-      items: 1,
-    },
-    {
-      id: "KT-001249",
-      customer: "Bob Smith",
-      date: "2025-10-09",
-      total: "RWF 2,450,000",
-      items: 2,
-    },
-    {
-      id: "KT-001248",
-      customer: "Carol Williams",
-      date: "2025-10-08",
-      total: "RWF 950,000",
-      items: 1,
-    },
-  ];
+  const [searchQuery, setSearchQuery] = useState("");
+  const [page, setPage] = useState(1);
+  
+  const { data, isLoading } = useOrdersByStatus("PENDING", page, 20);
+
+  const formatCurrency = (value: number) => {
+    return `RWF ${value.toLocaleString()}`;
+  };
+
+  const formatDate = (date: string) => {
+    return new Date(date).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+  };
+
+  const filteredOrders = data?.orders?.filter((order: any) => {
+    return (
+      order.orderNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      order.user.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      order.user.email.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }) || [];
 
   return (
-    <SidebarProvider>
-      <AppSidebar />
+    <AuthProvider>
+      <DashboardGuard>
+        <SidebarProvider>
+          <AppSidebar />
       <SidebarInset>
         <header className="flex h-16 shrink-0 items-center gap-2">
           <div className="flex items-center gap-2 px-4">
@@ -88,16 +95,13 @@ export default function PendingOrdersPage() {
         </header>
         <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
           <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-bold">Pending Orders</h1>
-            <div className="flex gap-2">
-              <Button variant="outline" size="sm">
-                <Filter className="mr-2 h-4 w-4" />
-                Filter
-              </Button>
-              <Button variant="outline" size="sm">
-                <Download className="mr-2 h-4 w-4" />
-                Export
-              </Button>
+            <div>
+              <h1 className="text-2xl font-bold">Pending Orders</h1>
+              {data && (
+                <p className="text-sm text-muted-foreground mt-1">
+                  {data.pagination.total} pending orders
+                </p>
+              )}
             </div>
           </div>
 
@@ -111,6 +115,8 @@ export default function PendingOrdersPage() {
                     <Input
                       placeholder="Search orders..."
                       className="pl-8 w-full md:w-64"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
                     />
                   </div>
                 </div>
@@ -120,38 +126,102 @@ export default function PendingOrdersPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Order ID</TableHead>
-                    <TableHead>Customer</TableHead>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Items</TableHead>
-                    <TableHead>Total</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {orders.map((order) => (
-                    <TableRow key={order.id}>
-                      <TableCell className="font-medium">{order.id}</TableCell>
-                      <TableCell>{order.customer}</TableCell>
-                      <TableCell>{order.date}</TableCell>
-                      <TableCell>{order.items}</TableCell>
-                      <TableCell>{order.total}</TableCell>
-                      <TableCell className="text-right">
-                        <Button variant="ghost" size="sm">
-                          View
+              {isLoading ? (
+                <div className="flex items-center justify-center py-12">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                </div>
+              ) : !data || filteredOrders.length === 0 ? (
+                <div className="text-center py-12">
+                  <p className="text-muted-foreground">
+                    {searchQuery
+                      ? "No orders found matching your search"
+                      : "No pending orders"}
+                  </p>
+                </div>
+              ) : (
+                <>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Order ID</TableHead>
+                        <TableHead>Customer</TableHead>
+                        <TableHead>Date</TableHead>
+                        <TableHead>Items</TableHead>
+                        <TableHead>Total</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {filteredOrders.map((order: any) => (
+                        <TableRow key={order.id}>
+                          <TableCell className="font-medium">
+                            {order.orderNumber}
+                          </TableCell>
+                          <TableCell>
+                            <div>
+                              <p className="font-medium">
+                                {order.user.name || "N/A"}
+                              </p>
+                              <p className="text-sm text-muted-foreground">
+                                {order.user.email}
+                              </p>
+                            </div>
+                          </TableCell>
+                          <TableCell>{formatDate(order.createdAt)}</TableCell>
+                          <TableCell>{order.orderItems.length}</TableCell>
+                          <TableCell className="font-medium">
+                            {formatCurrency(order.totalAmount)}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() =>
+                                (window.location.href = `/dashboard/orders/${order.id}`)
+                              }
+                            >
+                              <Eye className="h-4 w-4 mr-1" />
+                              View
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                  
+                  {data.pagination.totalPages > 1 && (
+                    <div className="flex items-center justify-between mt-4">
+                      <p className="text-sm text-muted-foreground">
+                        Page {data.pagination.page} of {data.pagination.totalPages}
+                      </p>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setPage(page - 1)}
+                          disabled={page === 1}
+                        >
+                          Previous
                         </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setPage(page + 1)}
+                          disabled={page === data.pagination.totalPages}
+                        >
+                          Next
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </>
+              )}
             </CardContent>
           </Card>
         </div>
       </SidebarInset>
-    </SidebarProvider>
+        </SidebarProvider>
+      </DashboardGuard>
+    </AuthProvider>
   );
 }

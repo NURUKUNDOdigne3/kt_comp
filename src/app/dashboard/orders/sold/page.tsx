@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { DashboardGuard } from "@/components/DashboardGuard";
-import { useOrders } from "@/hooks/use-api";
+import { useOrdersByStatus } from "@/hooks/use-api";
 import { AppSidebar } from "@/components/app-sidebar";
 import {
   Breadcrumb,
@@ -36,21 +36,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Search, Download, Filter, Loader2, Eye } from "lucide-react";
+import { Search, Download, Filter, Loader2, Eye, DollarSign } from "lucide-react";
 
-export default function OrdersPage() {
+export default function SoldOrdersPage() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState<string>("all");
   const [page, setPage] = useState(1);
   
-  const { data, isLoading, mutate } = useOrders(page, 20);
+  const { data, isLoading } = useOrdersByStatus("SHIPPED", page, 20);
 
   const formatCurrency = (value: number) => {
     return `RWF ${value.toLocaleString()}`;
@@ -64,34 +56,13 @@ export default function OrdersPage() {
     });
   };
 
-  // Filter orders based on search and status
   const filteredOrders = data?.orders?.filter((order: any) => {
-    const matchesSearch =
+    return (
       order.orderNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
       order.user.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      order.user.email.toLowerCase().includes(searchQuery.toLowerCase());
-    
-    const matchesStatus = statusFilter === "all" || order.status === statusFilter;
-    
-    return matchesSearch && matchesStatus;
+      order.user.email.toLowerCase().includes(searchQuery.toLowerCase())
+    );
   }) || [];
-
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case "DELIVERED":
-        return <Badge variant="default">Delivered</Badge>;
-      case "PROCESSING":
-        return <Badge variant="secondary">Processing</Badge>;
-      case "SHIPPED":
-        return <Badge className="bg-blue-500">Shipped</Badge>;
-      case "PENDING":
-        return <Badge variant="destructive">Pending</Badge>;
-      case "CANCELLED":
-        return <Badge variant="outline">Cancelled</Badge>;
-      default:
-        return <Badge>{status}</Badge>;
-    }
-  };
 
   return (
     <AuthProvider>
@@ -109,8 +80,14 @@ export default function OrdersPage() {
                   <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
                 </BreadcrumbItem>
                 <BreadcrumbSeparator className="hidden md:block" />
+                <BreadcrumbItem className="hidden md:block">
+                  <BreadcrumbLink href="/dashboard/orders">
+                    Orders
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator className="hidden md:block" />
                 <BreadcrumbItem>
-                  <BreadcrumbPage>Orders</BreadcrumbPage>
+                  <BreadcrumbPage>Sold</BreadcrumbPage>
                 </BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb>
@@ -119,34 +96,19 @@ export default function OrdersPage() {
         <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold">Orders</h1>
+              <h1 className="text-2xl font-bold">Sold Orders</h1>
               {data && (
                 <p className="text-sm text-muted-foreground mt-1">
-                  {data.pagination.total} total orders
+                  {data.pagination.total} sold orders
                 </p>
               )}
-            </div>
-            <div className="flex gap-2">
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-[150px]">
-                  <SelectValue placeholder="Filter status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Status</SelectItem>
-                  <SelectItem value="PENDING">Pending</SelectItem>
-                  <SelectItem value="PROCESSING">Processing</SelectItem>
-                  <SelectItem value="SHIPPED">Shipped</SelectItem>
-                  <SelectItem value="DELIVERED">Delivered</SelectItem>
-                  <SelectItem value="CANCELLED">Cancelled</SelectItem>
-                </SelectContent>
-              </Select>
             </div>
           </div>
 
           <Card>
             <CardHeader>
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                <CardTitle>All Orders</CardTitle>
+                <CardTitle>Sold Orders</CardTitle>
                 <div className="flex items-center gap-2">
                   <div className="relative">
                     <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -160,7 +122,7 @@ export default function OrdersPage() {
                 </div>
               </div>
               <CardDescription>
-                Manage and track all customer orders
+                Orders that have been shipped and sold
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -171,9 +133,9 @@ export default function OrdersPage() {
               ) : !data || filteredOrders.length === 0 ? (
                 <div className="text-center py-12">
                   <p className="text-muted-foreground">
-                    {searchQuery || statusFilter !== "all"
-                      ? "No orders found matching your filters"
-                      : "No orders yet"}
+                    {searchQuery
+                      ? "No orders found matching your search"
+                      : "No sold orders yet"}
                   </p>
                 </div>
               ) : (
@@ -186,7 +148,6 @@ export default function OrdersPage() {
                         <TableHead>Date</TableHead>
                         <TableHead>Items</TableHead>
                         <TableHead>Total</TableHead>
-                        <TableHead>Status</TableHead>
                         <TableHead className="text-right">Actions</TableHead>
                       </TableRow>
                     </TableHeader>
@@ -211,7 +172,6 @@ export default function OrdersPage() {
                           <TableCell className="font-medium">
                             {formatCurrency(order.totalAmount)}
                           </TableCell>
-                          <TableCell>{getStatusBadge(order.status)}</TableCell>
                           <TableCell className="text-right">
                             <Button
                               variant="ghost"
@@ -229,7 +189,6 @@ export default function OrdersPage() {
                     </TableBody>
                   </Table>
                   
-                  {/* Pagination */}
                   {data.pagination.totalPages > 1 && (
                     <div className="flex items-center justify-between mt-4">
                       <p className="text-sm text-muted-foreground">
