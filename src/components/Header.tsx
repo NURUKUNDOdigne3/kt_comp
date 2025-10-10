@@ -23,7 +23,7 @@ import { useCart } from "@/contexts/CartContext";
 const categories = [
   { name: "All", href: "/", active: true },
   { name: "Computers", href: "/computers", active: false },
-  { name: "Phones", href: "/phones", active: false },
+  // { name: "Phones", href: "/phones", active: false },
   { name: "Printers", href: "/printers", active: false },
   { name: "Routers", href: "/routers", active: false },
   { name: "Speakers", href: "/speakers", active: false },
@@ -319,7 +319,8 @@ export default function Header() {
                       />
                     ) : user ? (
                       <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm font-semibold">
-                        {user.name?.charAt(0).toUpperCase() || user.email.charAt(0).toUpperCase()}
+                        {user.name?.charAt(0).toUpperCase() ||
+                          user.email.charAt(0).toUpperCase()}
                       </div>
                     ) : (
                       <User className="h-6 w-6" />
