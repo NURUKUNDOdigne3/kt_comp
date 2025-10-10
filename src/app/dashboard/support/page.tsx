@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { AuthProvider } from "@/contexts/AuthContext";
+import { DashboardGuard } from "@/components/DashboardGuard";
 import { AppSidebar } from "@/components/app-sidebar";
 import {
   Breadcrumb,
@@ -147,176 +149,199 @@ export default function FAQPage() {
   }));
 
   return (
-    <SidebarProvider>
-      <AppSidebar />
-      <SidebarInset>
-        <header className="flex h-16 shrink-0 items-center gap-2">
-          <div className="flex items-center gap-2 px-4">
-            <SidebarTrigger className="-ml-1" />
-            <Separator orientation="vertical" className="mr-2 h-4" />
-            <Breadcrumb>
-              <BreadcrumbList>
-                <BreadcrumbItem className="hidden md:block">
-                  <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator className="hidden md:block" />
-                <BreadcrumbItem>
-                  <BreadcrumbPage>Support</BreadcrumbPage>
-                </BreadcrumbItem>
-              </BreadcrumbList>
-            </Breadcrumb>
-          </div>
-        </header>
-        <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Headphones className="h-6 w-6" />
-              <h1 className="text-2xl font-bold">Support</h1>
-            </div>
-          </div>
-
-          {/* Search */}
-          <div className="px-4 lg:px-6">
-            <Card>
-              <CardContent className="pt-6">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-                  <Input
-                    placeholder="Search for help..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-9"
-                  />
+    <AuthProvider>
+      <DashboardGuard>
+        <SidebarProvider>
+          <AppSidebar />
+          <SidebarInset>
+            <header className="flex h-16 shrink-0 items-center gap-2">
+              <div className="flex items-center gap-2 px-4">
+                <SidebarTrigger className="-ml-1" />
+                <Separator orientation="vertical" className="mr-2 h-4" />
+                <Breadcrumb>
+                  <BreadcrumbList>
+                    <BreadcrumbItem className="hidden md:block">
+                      <BreadcrumbLink href="/dashboard">
+                        Dashboard
+                      </BreadcrumbLink>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator className="hidden md:block" />
+                    <BreadcrumbItem>
+                      <BreadcrumbPage>Support</BreadcrumbPage>
+                    </BreadcrumbItem>
+                  </BreadcrumbList>
+                </Breadcrumb>
+              </div>
+            </header>
+            <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Headphones className="h-6 w-6" />
+                  <h1 className="text-2xl font-bold">Support</h1>
                 </div>
-              </CardContent>
-            </Card>
-          </div>
+              </div>
 
-          <div className="grid gap-6 px-4 lg:grid-cols-3 lg:px-6">
-            {/* FAQ Section */}
-            <div className="lg:col-span-2 space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Frequently Asked Questions</CardTitle>
-                  <CardDescription>
-                    Quick answers to common questions
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {filteredFAQs.map(
-                    (category) =>
-                      category.questions.length > 0 && (
-                        <div key={category.category} className="mb-6 last:mb-0">
-                          <h3 className="mb-3 text-lg font-semibold">
-                            {category.category}
-                          </h3>
-                          <Accordion
-                            type="single"
-                            collapsible
-                            className="w-full"
-                          >
-                            {category.questions.map((faq, index) => (
-                              <AccordionItem
-                                key={index}
-                                value={`${category.category}-${index}`}
-                              >
-                                <AccordionTrigger className="text-left">
-                                  {faq.question}
-                                </AccordionTrigger>
-                                <AccordionContent>
-                                  <p className="text-muted-foreground">
-                                    {faq.answer}
-                                  </p>
-                                </AccordionContent>
-                              </AccordionItem>
-                            ))}
-                          </Accordion>
-                        </div>
-                      )
-                  )}
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Contact Support Sidebar */}
-            <div className="space-y-6">
-              {/* About Lerony */}
-              <Card>
-                <CardHeader>
-                  <div className="flex items-center gap-3">
-                    <div className="bg-blue-600 p-2 rounded-lg">
-                      <Sparkles className="h-6 w-6 text-white" />
+              {/* Search */}
+              <div className="px-4 lg:px-6">
+                <Card>
+                  <CardContent className="pt-6">
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                      <Input
+                        placeholder="Search for help..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="pl-9"
+                      />
                     </div>
-                    <div>
-                      <CardTitle>About Lerony</CardTitle>
-                      <CardDescription className="text-xs">
-                        Innovation in Business
+                  </CardContent>
+                </Card>
+              </div>
+
+              <div className="grid gap-6 px-4 lg:grid-cols-3 lg:px-6">
+                {/* FAQ Section */}
+                <div className="lg:col-span-2 space-y-6">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Frequently Asked Questions</CardTitle>
+                      <CardDescription>
+                        Quick answers to common questions
                       </CardDescription>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <p className="text-muted-foreground text-sm">
-                    Lerony is a leading technology company specializing in
-                    business management solutions. We empower organizations with
-                    innovative tools for customer management, analytics, and
-                    automation.
-                  </p>
-                  <Button variant="outline" className="w-full">
-                    <ExternalLink className="size-4 mr-2" />
-                    Visit Website
-                  </Button>
-                </CardContent>
-              </Card>
+                    </CardHeader>
+                    <CardContent>
+                      {filteredFAQs.map(
+                        (category) =>
+                          category.questions.length > 0 && (
+                            <div
+                              key={category.category}
+                              className="mb-6 last:mb-0"
+                            >
+                              <h3 className="mb-3 text-lg font-semibold">
+                                {category.category}
+                              </h3>
+                              <Accordion
+                                type="single"
+                                collapsible
+                                className="w-full"
+                              >
+                                {category.questions.map((faq, index) => (
+                                  <AccordionItem
+                                    key={index}
+                                    value={`${category.category}-${index}`}
+                                  >
+                                    <AccordionTrigger className="text-left">
+                                      {faq.question}
+                                    </AccordionTrigger>
+                                    <AccordionContent>
+                                      <p className="text-muted-foreground">
+                                        {faq.answer}
+                                      </p>
+                                    </AccordionContent>
+                                  </AccordionItem>
+                                ))}
+                              </Accordion>
+                            </div>
+                          )
+                      )}
+                    </CardContent>
+                  </Card>
+                </div>
 
-              {/* Contact Support */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Contact Support</CardTitle>
-                  <CardDescription>Get help from our team</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <Button variant="outline" className="w-full justify-start">
-                    <Mail className="size-4 mr-2" />
-                    support@lerony.com
-                  </Button>
-                  <Button variant="outline" className="w-full justify-start">
-                    <Phone className="size-4 mr-2" />
-                    +250 788 123 456
-                  </Button>
-                  <Button variant="outline" className="w-full justify-start">
-                    <MessageCircle className="size-4 mr-2" />
-                    Live Chat
-                  </Button>
-                </CardContent>
-              </Card>
+                {/* Contact Support Sidebar */}
+                <div className="space-y-6">
+                  {/* About Lerony */}
+                  <Card>
+                    <CardHeader>
+                      <div className="flex items-center gap-3">
+                        <div className="bg-blue-600 p-1 rounded-lg">
+                          <Image
+                            src="/lerony.png"
+                            alt="Lerony Logo"
+                            width={100}
+                            height={100}
+                          />
+                        </div>
+                        <div>
+                          <CardTitle>About Lerony</CardTitle>
+                          <CardDescription className="text-xs">
+                            Innovation in Business
+                          </CardDescription>
+                        </div>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      <p className="text-muted-foreground text-sm">
+                        Lerony is a leading technology company specializing in
+                        business management solutions. We empower organizations
+                        with innovative tools for customer management,
+                        analytics, and automation.
+                      </p>
+                      <Button variant="outline" className="w-full">
+                        <ExternalLink className="size-4 mr-2" />
+                        Visit Website
+                      </Button>
+                    </CardContent>
+                  </Card>
 
-              {/* Support Hours */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Support Hours</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">
-                      Monday - Friday
-                    </span>
-                    <span className="font-medium">8:00 AM - 6:00 PM</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Saturday</span>
-                    <span className="font-medium">9:00 AM - 2:00 PM</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Sunday</span>
-                    <span className="font-medium">Closed</span>
-                  </div>
-                </CardContent>
-              </Card>
+                  {/* Contact Support */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Contact Support</CardTitle>
+                      <CardDescription>Get help from our team</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      <Button
+                        variant="outline"
+                        className="w-full justify-start"
+                      >
+                        <Mail className="size-4 mr-2" />
+                        support@lerony.com
+                      </Button>
+                      <Button
+                        variant="outline"
+                        className="w-full justify-start"
+                      >
+                        <Phone className="size-4 mr-2" />
+                        +250 798 681 126
+                      </Button>
+                      <Button
+                        variant="outline"
+                        className="w-full justify-start"
+                      >
+                        <MessageCircle className="size-4 mr-2" />
+                        Live Chat
+                      </Button>
+                    </CardContent>
+                  </Card>
+
+                  {/* Support Hours */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Support Hours</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">
+                          Monday - Friday
+                        </span>
+                        <span className="font-medium">8:00 AM - 6:00 PM</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Saturday</span>
+                        <span className="font-medium">9:00 AM - 2:00 PM</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Sunday</span>
+                        <span className="font-medium">Closed</span>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-      </SidebarInset>
-    </SidebarProvider>
+          </SidebarInset>
+        </SidebarProvider>
+      </DashboardGuard>
+    </AuthProvider>
   );
 }

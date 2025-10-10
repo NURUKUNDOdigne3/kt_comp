@@ -16,7 +16,11 @@ model User {
   email     String   @unique
   password  String
   name      String?
+  phone     String?
+  avatar    String?
+  bio       String?
   role      UserRole @default(CUSTOMER)
+  lastLogin DateTime?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -193,4 +197,30 @@ model OrderItem {
 
   @@index([orderId])
   @@index([productId])
+}
+
+// AuditLog model for tracking system activities
+model AuditLog {
+  id          String   @id @default(cuid())
+  action      String   // e.g., "User Login", "Product Created", etc.
+  resource    String   // e.g., "Authentication", "Products", "Orders"
+  level       LogLevel @default(INFO)
+  description String?
+  metadata    Json?    // Additional data (IP, user agent, etc.)
+  userId      String?
+  userEmail   String?
+  ipAddress   String?
+  createdAt   DateTime @default(now())
+
+  @@index([level])
+  @@index([resource])
+  @@index([userId])
+  @@index([createdAt])
+}
+
+enum LogLevel {
+  INFO
+  SUCCESS
+  WARNING
+  ERROR
 }

@@ -347,3 +347,65 @@ export function useDeleteReview(id: string) {
     deleteRequest(`/api/reviews/${id}`)
   );
 }
+
+// Audit Logs hooks
+export function useAuditLogs(params?: {
+  search?: string;
+  level?: string;
+  resource?: string;
+  startDate?: string;
+  endDate?: string;
+  page?: number;
+  limit?: number;
+}) {
+  const queryParams = new URLSearchParams();
+  if (params?.search) queryParams.append("search", params.search);
+  if (params?.level) queryParams.append("level", params.level);
+  if (params?.resource) queryParams.append("resource", params.resource);
+  if (params?.startDate) queryParams.append("startDate", params.startDate);
+  if (params?.endDate) queryParams.append("endDate", params.endDate);
+  if (params?.page) queryParams.append("page", params.page.toString());
+  if (params?.limit) queryParams.append("limit", params.limit.toString());
+
+  const url = `/api/audit-logs${queryParams.toString() ? `?${queryParams.toString()}` : ""}`;
+  return useApi(url);
+}
+
+export function useAuditLog(id?: string) {
+  return useApi(id ? `/api/audit-logs/${id}` : null);
+}
+
+export function useDeleteAuditLog(id: string) {
+  return useSWRMutation(`/api/audit-logs/${id}`, () =>
+    deleteRequest(`/api/audit-logs/${id}`)
+  );
+}
+
+// Profile hooks
+export function useProfile() {
+  return useApi("/api/profile");
+}
+
+export function useUpdateProfile() {
+  return useSWRMutation("/api/profile", updateRequest);
+}
+
+export function useChangePassword() {
+  return useSWRMutation("/api/profile/password", async (url: string, { arg }: { arg: any }) => {
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+      body: JSON.stringify(arg),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || "Failed to change password");
+    }
+
+    return response.json();
+  });
+}

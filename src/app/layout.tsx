@@ -4,6 +4,7 @@ import "./globals.css";
 import NProgressProvider from "@/components/NProgressProvider";
 import NProgressHandler from "@/components/NProgressHandler";
 import { Suspense } from "react";
+import { Toaster } from "@/components/ui/sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -35,6 +36,7 @@ export default function RootLayout({
         </Suspense>
         <NProgressHandler />
         {children}
+        <Toaster richColors />
       </body>
     </html>
   );

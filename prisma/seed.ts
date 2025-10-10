@@ -15,10 +15,28 @@ async function main() {
       email: 'admin@ktcomputer.rw',
       password: adminPassword,
       name: 'Admin User',
+      phone: '+250 798 681 126',
+      bio: 'System Administrator for KT Computer Supply',
       role: 'ADMIN',
+      lastLogin: new Date(),
     },
   });
   console.log('✅ Admin user created:', admin.email);
+
+  // Create a customer user
+  const customerPassword = await bcrypt.hash('customer123', 12);
+  const customer = await prisma.user.upsert({
+    where: { email: 'customer@example.com' },
+    update: {},
+    create: {
+      email: 'customer@example.com',
+      password: customerPassword,
+      name: 'John Doe',
+      phone: '+250 788 123 456',
+      role: 'CUSTOMER',
+    },
+  });
+  console.log('✅ Customer user created:', customer.email);
 
   // Create categories
   const categories = [
@@ -185,10 +203,61 @@ async function main() {
     console.log(`✅ Product created: ${created.name}`);
   }
 
-  console.log('🎉 Database seeding completed successfully!');
+  // Create sample audit logs
+  const auditLogs = [
+    {
+      action: 'User Login',
+      resource: 'Authentication',
+      level: 'INFO' as const,
+      description: 'Admin user logged in successfully',
+      userEmail: admin.email,
+      userId: admin.id,
+      ipAddress: '192.168.1.100',
+    },
+    {
+      action: 'Product Created',
+      resource: 'Products',
+      level: 'SUCCESS' as const,
+      description: 'Created new product: MacBook Pro 14" M3 Pro',
+      userEmail: admin.email,
+      userId: admin.id,
+      ipAddress: '192.168.1.100',
+    },
+    {
+      action: 'Category Created',
+      resource: 'Categories',
+      level: 'SUCCESS' as const,
+      description: 'Created new category: Computers',
+      userEmail: admin.email,
+      userId: admin.id,
+      ipAddress: '192.168.1.100',
+    },
+    {
+      action: 'Brand Created',
+      resource: 'Brands',
+      level: 'SUCCESS' as const,
+      description: 'Created new brand: Apple',
+      userEmail: admin.email,
+      userId: admin.id,
+      ipAddress: '192.168.1.100',
+    },
+  ];
+
+  for (const log of auditLogs) {
+    await prisma.auditLog.create({
+      data: log,
+    });
+  }
+  console.log(`✅ Created ${auditLogs.length} audit log entries`);
+
+  console.log('\n🎉 Database seeding completed successfully!');
   console.log('\n📝 Login credentials:');
-  console.log('Email: admin@ktcomputer.rw');
-  console.log('Password: admin123');
+  console.log('Admin:');
+  console.log('  Email: admin@ktcomputer.rw');
+  console.log('  Password: admin123');
+  console.log('\nCustomer:');
+  console.log('  Email: customer@example.com');
+  console.log('  Password: customer123');
 }
 
 main()

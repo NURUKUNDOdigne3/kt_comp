@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { AuthProvider } from "@/contexts/AuthContext";
+import { DashboardGuard } from "@/components/DashboardGuard";
 import { AppSidebar } from "@/components/app-sidebar";
 import {
   Breadcrumb,
@@ -50,12 +52,10 @@ import {
   CheckCircle,
   Info,
   XCircle,
-  Calendar,
-  User,
-  Package,
-  ShoppingCart,
-  CreditCard,
-  Truck,
+  Loader2,
+  FileText,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -65,8 +65,16 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { useAuditLogs, useAuditLog } from "@/hooks/use-api";
 
-// Mock log data
+// Keep mock logs as fallback
 const mockLogs = [
   {
     id: 1,
@@ -200,64 +208,36 @@ const levelBadges = {
 };
 
 export default function LogsPage() {
-  const [logs, setLogs] = useState(mockLogs);
-  const [filteredLogs, setFilteredLogs] = useState(mockLogs);
   const [searchQuery, setSearchQuery] = useState("");
   const [levelFilter, setLevelFilter] = useState("all");
   const [resourceFilter, setResourceFilter] = useState("all");
-  const [dateFilter, setDateFilter] = useState("all");
+  const [page, setPage] = useState(1);
+  const [selectedLog, setSelectedLog] = useState<any>(null);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
 
-  // Get unique resources for filter dropdown
-  const resources = ["all", ...new Set(mockLogs.map((log) => log.resource))];
+  // Fetch data
+  const {
+    data: logsData,
+    isLoading,
+    mutate: refetchLogs,
+  } = useAuditLogs({
+    search: searchQuery,
+    level: levelFilter !== "all" ? levelFilter : undefined,
+    resource: resourceFilter !== "all" ? resourceFilter : undefined,
+    page,
+    limit: 50,
+  });
 
-  // Filter logs based on criteria
-  useEffect(() => {
-    let result = logs;
+  const { data: logDetails } = useAuditLog(selectedLog?.id);
 
-    // Apply search filter
-    if (searchQuery) {
-      result = result.filter(
-        (log) =>
-          log.user.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          log.action.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          log.description.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    }
+  const logs = logsData?.logs || [];
+  const resources = logsData?.resources || [];
+  const pagination = logsData?.pagination;
 
-    // Apply level filter
-    if (levelFilter !== "all") {
-      result = result.filter((log) => log.level === levelFilter);
-    }
-
-    // Apply resource filter
-    if (resourceFilter !== "all") {
-      result = result.filter((log) => log.resource === resourceFilter);
-    }
-
-    // Apply date filter (simplified for demo)
-    if (dateFilter !== "all") {
-      const today = new Date();
-      result = result.filter((log) => {
-        const logDate = new Date(log.timestamp);
-        switch (dateFilter) {
-          case "today":
-            return logDate.toDateString() === today.toDateString();
-          case "yesterday":
-            const yesterday = new Date(today);
-            yesterday.setDate(yesterday.getDate() - 1);
-            return logDate.toDateString() === yesterday.toDateString();
-          case "last7":
-            const sevenDaysAgo = new Date(today);
-            sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-            return logDate >= sevenDaysAgo;
-          default:
-            return true;
-        }
-      });
-    }
-
-    setFilteredLogs(result);
-  }, [searchQuery, levelFilter, resourceFilter, dateFilter, logs]);
+  const handleViewLog = (log: any) => {
+    setSelectedLog(log);
+    setIsViewModalOpen(true);
+  };
 
   const handleExportLogs = () => {
     // In a real app, this would export the logs to a file
@@ -265,18 +245,30 @@ export default function LogsPage() {
   };
 
   const getLevelIcon = (level: string) => {
-    const Icon = levelIcons[level as keyof typeof levelIcons] || Info;
+    const Icon = levelIcons[level.toLowerCase() as keyof typeof levelIcons] || Info;
     return <Icon className="h-4 w-4" />;
   };
 
+  const formatDate = (date: string) => {
+    return new Date(date).toLocaleString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
   return (
-    <SidebarProvider>
-      <AppSidebar />
-      <SidebarInset>
-        <header className="flex h-16 shrink-0 items-center gap-2">
-          <div className="flex items-center gap-2 px-4">
-            <SidebarTrigger className="-ml-1" />
-            <Separator orientation="vertical" className="mr-2 h-4" />
+    <AuthProvider>
+      <DashboardGuard>
+        <SidebarProvider>
+          <AppSidebar />
+          <SidebarInset>
+            <header className="flex h-16 shrink-0 items-center gap-2">
+              <div className="flex items-center gap-2 px-4">
+                <SidebarTrigger className="-ml-1" />
+                <Separator orientation="vertical" className="mr-2 data-[orientation=vertical]:h-4" />
             <Breadcrumb>
               <BreadcrumbList>
                 <BreadcrumbItem className="hidden md:block">
@@ -343,14 +335,14 @@ export default function LogsPage() {
                                   <SelectItem value="all">
                                     All Levels
                                   </SelectItem>
-                                  <SelectItem value="info">Info</SelectItem>
-                                  <SelectItem value="success">
+                                  <SelectItem value="INFO">Info</SelectItem>
+                                  <SelectItem value="SUCCESS">
                                     Success
                                   </SelectItem>
-                                  <SelectItem value="warning">
+                                  <SelectItem value="WARNING">
                                     Warning
                                   </SelectItem>
-                                  <SelectItem value="error">Error</SelectItem>
+                                  <SelectItem value="ERROR">Error</SelectItem>
                                 </SelectContent>
                               </Select>
                             </div>
@@ -366,42 +358,15 @@ export default function LogsPage() {
                                   <SelectValue placeholder="Resource" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                  {resources.map((resource) => (
+                                  <SelectItem value="all">All Resources</SelectItem>
+                                  {resources.map((resource: string) => (
                                     <SelectItem key={resource} value={resource}>
-                                      {resource === "all"
-                                        ? "All Resources"
-                                        : resource}
+                                      {resource}
                                     </SelectItem>
                                   ))}
                                 </SelectContent>
                               </Select>
                             </div>
-                          </div>
-                          <div>
-                            <label className="text-sm font-medium">
-                              Date Range
-                            </label>
-                            <Select
-                              value={dateFilter}
-                              onValueChange={setDateFilter}
-                            >
-                              <SelectTrigger>
-                                <SelectValue placeholder="Date Range" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="all">All Time</SelectItem>
-                                <SelectItem value="today">Today</SelectItem>
-                                <SelectItem value="yesterday">
-                                  Yesterday
-                                </SelectItem>
-                                <SelectItem value="last7">
-                                  Last 7 Days
-                                </SelectItem>
-                                <SelectItem value="last30">
-                                  Last 30 Days
-                                </SelectItem>
-                              </SelectContent>
-                            </Select>
                           </div>
                           <div className="flex justify-end gap-2">
                             <Button
@@ -410,8 +375,8 @@ export default function LogsPage() {
                               onClick={() => {
                                 setLevelFilter("all");
                                 setResourceFilter("all");
-                                setDateFilter("all");
                                 setSearchQuery("");
+                                setPage(1);
                               }}
                             >
                               Reset
@@ -428,51 +393,168 @@ export default function LogsPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Table className="overflow-x-auto">
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Timestamp</TableHead>
-                    <TableHead>Level</TableHead>
-                    <TableHead>User</TableHead>
-                    <TableHead>Action</TableHead>
-                    <TableHead>Resource</TableHead>
-                    <TableHead>Description</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredLogs.map((log) => (
-                    <TableRow key={log.id}>
-                      <TableCell className="font-medium">
-                        {log.timestamp}
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          {getLevelIcon(log.level)}
-                          {levelBadges[
-                            log.level as keyof typeof levelBadges
-                          ] || <Badge>{log.level}</Badge>}
-                        </div>
-                      </TableCell>
-                      <TableCell>{log.user}</TableCell>
-                      <TableCell>{log.action}</TableCell>
-                      <TableCell>{log.resource}</TableCell>
-                      <TableCell className="max-w-md truncate">
-                        {log.description}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <Button variant="ghost" size="sm">
-                          <Eye className="h-4 w-4" />
+              {isLoading ? (
+                <div className="flex items-center justify-center py-12">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                </div>
+              ) : logs.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-12 text-center">
+                  <FileText className="h-12 w-12 text-muted-foreground mb-4" />
+                  <h3 className="text-lg font-semibold">No logs found</h3>
+                  <p className="text-sm text-muted-foreground">
+                    {searchQuery || levelFilter !== "all" || resourceFilter !== "all"
+                      ? "Try adjusting your filters"
+                      : "No activity logs recorded yet"}
+                  </p>
+                </div>
+              ) : (
+                <>
+                  <div className="rounded-md border">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Timestamp</TableHead>
+                          <TableHead>Level</TableHead>
+                          <TableHead>User</TableHead>
+                          <TableHead>Action</TableHead>
+                          <TableHead>Resource</TableHead>
+                          <TableHead>Description</TableHead>
+                          <TableHead className="text-right">Actions</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {logs.map((log: any) => (
+                          <TableRow key={log.id}>
+                            <TableCell className="font-medium">
+                              {formatDate(log.createdAt)}
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex items-center gap-2">
+                                {getLevelIcon(log.level)}
+                                {levelBadges[
+                                  log.level.toLowerCase() as keyof typeof levelBadges
+                                ] || <Badge>{log.level}</Badge>}
+                              </div>
+                            </TableCell>
+                            <TableCell>{log.userEmail || "System"}</TableCell>
+                            <TableCell>{log.action}</TableCell>
+                            <TableCell>{log.resource}</TableCell>
+                            <TableCell className="max-w-md truncate">
+                              {log.description || "N/A"}
+                            </TableCell>
+                            <TableCell className="text-right">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleViewLog(log)}
+                              >
+                                <Eye className="h-4 w-4" />
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+
+                  {/* Pagination */}
+                  {pagination && pagination.totalPages > 1 && (
+                    <div className="flex items-center justify-between mt-4">
+                      <p className="text-sm text-muted-foreground">
+                        Showing {logs.length} of {pagination.total} logs
+                      </p>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setPage(page - 1)}
+                          disabled={page === 1}
+                        >
+                          <ChevronLeft className="h-4 w-4" />
+                          Previous
                         </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setPage(page + 1)}
+                          disabled={page === pagination.totalPages}
+                        >
+                          Next
+                          <ChevronRight className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </>
+              )}
             </CardContent>
           </Card>
         </div>
+
+        {/* View Log Details Modal */}
+        <Dialog open={isViewModalOpen} onOpenChange={setIsViewModalOpen}>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>Log Details</DialogTitle>
+              <DialogDescription>
+                View complete log information
+              </DialogDescription>
+            </DialogHeader>
+            {logDetails ? (
+              <div className="space-y-4">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Timestamp</p>
+                  <p className="text-sm mt-1">{formatDate(logDetails.createdAt)}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Level</p>
+                  <div className="mt-1">
+                    {levelBadges[
+                      logDetails.level.toLowerCase() as keyof typeof levelBadges
+                    ] || <Badge>{logDetails.level}</Badge>}
+                  </div>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">User</p>
+                  <p className="text-sm mt-1">{logDetails.userEmail || "System"}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Action</p>
+                  <p className="text-sm mt-1">{logDetails.action}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Resource</p>
+                  <p className="text-sm mt-1">{logDetails.resource}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Description</p>
+                  <p className="text-sm mt-1">{logDetails.description || "N/A"}</p>
+                </div>
+                {logDetails.ipAddress && (
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">IP Address</p>
+                    <p className="text-sm mt-1">{logDetails.ipAddress}</p>
+                  </div>
+                )}
+                {logDetails.metadata && (
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">Additional Data</p>
+                    <pre className="text-xs mt-1 bg-muted p-2 rounded overflow-auto">
+                      {JSON.stringify(logDetails.metadata, null, 2)}
+                    </pre>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="flex items-center justify-center py-12">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
       </SidebarInset>
     </SidebarProvider>
+      </DashboardGuard>
+    </AuthProvider>
   );
 }
