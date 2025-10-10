@@ -409,3 +409,24 @@ export function useChangePassword() {
     return response.json();
   });
 }
+
+// Analytics hooks
+export function useAnalytics(period?: string) {
+  const queryParams = new URLSearchParams();
+  if (period) queryParams.append("period", period);
+
+  const url = `/api/analytics${queryParams.toString() ? `?${queryParams.toString()}` : ""}`;
+  return useApi(url);
+}
+
+export function useSalesAnalytics(period?: string) {
+  const queryParams = new URLSearchParams();
+  if (period) queryParams.append("period", period);
+
+  const url = `/api/analytics/sales${queryParams.toString() ? `?${queryParams.toString()}` : ""}`;
+  return useApi(url);
+}
+
+export function useDashboard() {
+  return useApi("/api/dashboard");
+}

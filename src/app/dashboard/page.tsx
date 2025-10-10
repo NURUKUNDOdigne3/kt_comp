@@ -2,6 +2,7 @@
 
 import { AuthProvider } from "@/contexts/AuthContext";
 import { DashboardGuard } from "@/components/DashboardGuard";
+import { useDashboard } from "@/hooks/use-api";
 import { AppSidebar } from "@/components/app-sidebar";
 import {
   Breadcrumb,
@@ -31,6 +32,8 @@ import {
   Users,
   TrendingUp,
   CreditCard,
+  Loader2,
+  TrendingDown,
 } from "lucide-react";
 import {
   BarChart,
@@ -42,16 +45,31 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-// Mock data for charts
-const salesData = [
-  { month: "Jan", revenue: 4500000 },
-  { month: "Feb", revenue: 5200000 },
-  { month: "Mar", revenue: 4800000 },
-  { month: "Apr", revenue: 6100000 },
-  { month: "May", revenue: 5500000 },
-  { month: "Jun", revenue: 6700000 },
-];
 export default function Page() {
+  const { data: dashboard, isLoading } = useDashboard();
+
+  const formatCurrency = (value: number) => {
+    return `RWF ${value.toLocaleString()}`;
+  };
+
+  const formatGrowth = (growth: number) => {
+    const isPositive = growth >= 0;
+    return (
+      <span
+        className={`flex items-center gap-1 text-xs ${
+          isPositive ? "text-green-600" : "text-red-600"
+        }`}
+      >
+        {isPositive ? (
+          <TrendingUp className="h-3 w-3" />
+        ) : (
+          <TrendingDown className="h-3 w-3" />
+        )}
+        {isPositive ? "+" : ""}
+        {growth}% from last month
+      </span>
+    );
+  };
   return (
     <AuthProvider>
       <DashboardGuard>
@@ -79,6 +97,18 @@ export default function Page() {
             </div>
           </header>
           <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
+            {isLoading ? (
+              <div className="flex items-center justify-center py-12">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              </div>
+            ) : !dashboard ? (
+              <div className="text-center py-12">
+                <p className="text-muted-foreground">
+                  Failed to load dashboard data
+                </p>
+              </div>
+            ) : (
+              <>
             <div className="grid auto-rows-min gap-4 md:grid-cols-2 lg:grid-cols-4">
               <Card>
                 <CardHeader className="relative">
@@ -88,10 +118,10 @@ export default function Page() {
                   <DollarSign className="size-10 text-muted-foreground absolute right-4" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">RWF 45,231,890</div>
-                  <p className="text-xs text-muted-foreground">
-                    +20.1% from last month
-                  </p>
+                  <div className="text-2xl font-bold">
+                    {formatCurrency(dashboard.overview.totalRevenue)}
+                  </div>
+                  {formatGrowth(dashboard.overview.revenueGrowth)}
                 </CardContent>
               </Card>
               <Card>
@@ -100,10 +130,10 @@ export default function Page() {
                   <ShoppingCart className="size-10 text-muted-foreground absolute right-4" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">+12,234</div>
-                  <p className="text-xs text-muted-foreground">
-                    +18.2% from last month
-                  </p>
+                  <div className="text-2xl font-bold">
+                    {dashboard.overview.totalOrders.toLocaleString()}
+                  </div>
+                  {formatGrowth(dashboard.overview.ordersGrowth)}
                 </CardContent>
               </Card>
               <Card>
@@ -114,10 +144,10 @@ export default function Page() {
                   <Package className="size-10 text-muted-foreground absolute right-4" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">1,245</div>
-                  <p className="text-xs text-muted-foreground">
-                    +5.3% from last month
-                  </p>
+                  <div className="text-2xl font-bold">
+                    {dashboard.overview.totalProducts.toLocaleString()}
+                  </div>
+                  {formatGrowth(dashboard.overview.productsGrowth)}
                 </CardContent>
               </Card>
               <Card>
@@ -128,10 +158,10 @@ export default function Page() {
                   <Users className="size-10 text-muted-foreground absolute right-4" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">+5,732</div>
-                  <p className="text-xs text-muted-foreground">
-                    +12.4% from last month
-                  </p>
+                  <div className="text-2xl font-bold">
+                    {dashboard.overview.activeCustomers.toLocaleString()}
+                  </div>
+                  {formatGrowth(dashboard.overview.customersGrowth)}
                 </CardContent>
               </Card>
             </div>
@@ -143,7 +173,7 @@ export default function Page() {
                 <CardContent className="h-[300px]">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart
-                      data={salesData}
+                      data={dashboard.salesData}
                       margin={{
                         top: 5,
                         right: 30,
@@ -175,51 +205,21 @@ export default function Page() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    <div className="flex items-center">
-                      <div className="ml-4 space-y-1">
-                        <p className="text-sm font-medium leading-none">
-                          MacBook Pro 14" M3 Pro
-                        </p>
-                        <p className="text-sm text-muted-foreground">Apple</p>
+                    {dashboard.topProducts.map((product: any, index: number) => (
+                      <div key={index} className="flex items-center">
+                        <div className="ml-4 space-y-1">
+                          <p className="text-sm font-medium leading-none">
+                            {product.name}
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            {product.brand} • {product.quantity} sold
+                          </p>
+                        </div>
+                        <div className="ml-auto font-medium">
+                          {formatCurrency(product.revenue)}
+                        </div>
                       </div>
-                      <div className="ml-auto font-medium">RWF 2,399,000</div>
-                    </div>
-                    <div className="flex items-center">
-                      <div className="ml-4 space-y-1">
-                        <p className="text-sm font-medium leading-none">
-                          iPhone 15 Pro Max
-                        </p>
-                        <p className="text-sm text-muted-foreground">Apple</p>
-                      </div>
-                      <div className="ml-auto font-medium">RWF 1,299,000</div>
-                    </div>
-                    <div className="flex items-center">
-                      <div className="ml-4 space-y-1">
-                        <p className="text-sm font-medium leading-none">
-                          Samsung Galaxy S24 Ultra
-                        </p>
-                        <p className="text-sm text-muted-foreground">Samsung</p>
-                      </div>
-                      <div className="ml-auto font-medium">RWF 1,349,000</div>
-                    </div>
-                    <div className="flex items-center">
-                      <div className="ml-4 space-y-1">
-                        <p className="text-sm font-medium leading-none">
-                          Dell XPS 15 OLED
-                        </p>
-                        <p className="text-sm text-muted-foreground">Dell</p>
-                      </div>
-                      <div className="ml-auto font-medium">RWF 1,999,000</div>
-                    </div>
-                    <div className="flex items-center">
-                      <div className="ml-4 space-y-1">
-                        <p className="text-sm font-medium leading-none">
-                          HP LaserJet Pro M404dn
-                        </p>
-                        <p className="text-sm text-muted-foreground">HP</p>
-                      </div>
-                      <div className="ml-auto font-medium">RWF 450,000</div>
-                    </div>
+                    ))}
                   </div>
                 </CardContent>
               </Card>
@@ -232,61 +232,21 @@ export default function Page() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    <div className="flex items-center">
-                      <div className="ml-4 space-y-1">
-                        <p className="text-sm font-medium leading-none">
-                          Order #KT-001245
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          John Doe
-                        </p>
+                    {dashboard.recentOrders.map((order: any) => (
+                      <div key={order.id} className="flex items-center">
+                        <div className="ml-4 space-y-1">
+                          <p className="text-sm font-medium leading-none">
+                            {order.orderNumber}
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            {order.customer} • {order.items} items
+                          </p>
+                        </div>
+                        <div className="ml-auto font-medium">
+                          {formatCurrency(order.total)}
+                        </div>
                       </div>
-                      <div className="ml-auto font-medium">RWF 2,399,000</div>
-                    </div>
-                    <div className="flex items-center">
-                      <div className="ml-4 space-y-1">
-                        <p className="text-sm font-medium leading-none">
-                          Order #KT-001244
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          Jane Smith
-                        </p>
-                      </div>
-                      <div className="ml-auto font-medium">RWF 1,299,000</div>
-                    </div>
-                    <div className="flex items-center">
-                      <div className="ml-4 space-y-1">
-                        <p className="text-sm font-medium leading-none">
-                          Order #KT-001243
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          Robert Johnson
-                        </p>
-                      </div>
-                      <div className="ml-auto font-medium">RWF 849,000</div>
-                    </div>
-                    <div className="flex items-center">
-                      <div className="ml-4 space-y-1">
-                        <p className="text-sm font-medium leading-none">
-                          Order #KT-001242
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          Emily Williams
-                        </p>
-                      </div>
-                      <div className="ml-auto font-medium">RWF 549,000</div>
-                    </div>
-                    <div className="flex items-center">
-                      <div className="ml-4 space-y-1">
-                        <p className="text-sm font-medium leading-none">
-                          Order #KT-001241
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          Michael Brown
-                        </p>
-                      </div>
-                      <div className="ml-auto font-medium">RWF 3,299,000</div>
-                    </div>
+                    ))}
                   </div>
                 </CardContent>
               </Card>
@@ -301,32 +261,42 @@ export default function Page() {
                       <TrendingUp className="h-4 w-4 text-muted-foreground mr-2" />
                       <span>Conversion Rate</span>
                     </div>
-                    <span className="font-medium">3.2%</span>
+                    <span className="font-medium">
+                      {dashboard.performance.conversionRate}%
+                    </span>
                   </div>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center">
                       <CreditCard className="h-4 w-4 text-muted-foreground mr-2" />
                       <span>Avg. Order Value</span>
                     </div>
-                    <span className="font-medium">RWF 845,000</span>
+                    <span className="font-medium">
+                      {formatCurrency(dashboard.performance.averageOrderValue)}
+                    </span>
                   </div>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center">
                       <Users className="h-4 w-4 text-muted-foreground mr-2" />
                       <span>Customer Retention</span>
                     </div>
-                    <span className="font-medium">68.5%</span>
+                    <span className="font-medium">
+                      {dashboard.performance.customerRetention}%
+                    </span>
                   </div>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center">
                       <Package className="h-4 w-4 text-muted-foreground mr-2" />
                       <span>Inventory Turnover</span>
                     </div>
-                    <span className="font-medium">4.2x</span>
+                    <span className="font-medium">
+                      {dashboard.performance.inventoryTurnover}x
+                    </span>
                   </div>
                 </CardContent>
               </Card>
             </div>
+            </>
+            )}
           </div>
         </SidebarInset>
         </SidebarProvider>
