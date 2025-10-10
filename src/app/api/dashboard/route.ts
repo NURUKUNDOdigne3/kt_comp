@@ -184,7 +184,7 @@ export async function GET(request: NextRequest) {
     const recentOrdersData = recentOrders.map((order) => ({
       id: order.id,
       orderNumber: order.orderNumber,
-      customer: order.user.name || order.user.email,
+      customer: order.user?.name || order.user?.email || order.customerName || order.customerEmail,
       total: order.totalAmount,
       items: order.orderItems.length,
       status: order.status,

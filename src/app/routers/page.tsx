@@ -4,6 +4,7 @@ import ProductCard from "@/components/ProductCard";
 import FeaturedProductsCarousel from "@/components/FeaturedProductsCarousel";
 import { Suspense } from "react";
 import { prisma } from "@/lib/prisma";
+import Footer from "@/components/Footer";
 
 async function getRouterProducts() {
   try {
@@ -94,6 +95,7 @@ export default async function Page() {
           </div>
         )}
       </div>
+      <Footer />
     </main>
   );
 }

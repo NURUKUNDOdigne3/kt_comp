@@ -1,13 +1,14 @@
 import { NextRequest } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { getCurrentUser, isAdmin } from '@/lib/auth';
+import { getCurrentUserFromHeader } from '@/lib/auth';
 import { createOrderSchema } from '@/lib/validations';
 import { successResponse, errorResponse, unauthorizedResponse, forbiddenResponse } from '@/lib/api-response';
 
 // GET /api/orders - Get orders (all for admin, user's own for customers)
 export async function GET(request: NextRequest) {
   try {
-    const currentUser = await getCurrentUser();
+    const authHeader = request.headers.get('authorization');
+    const currentUser = getCurrentUserFromHeader(authHeader);
     if (!currentUser) {
       return unauthorizedResponse('Authentication required');
     }
@@ -74,104 +75,76 @@ export async function GET(request: NextRequest) {
 // POST /api/orders - Create a new order
 export async function POST(request: NextRequest) {
   try {
-    const currentUser = await getCurrentUser();
+    const authHeader = request.headers.get('authorization');
+    const currentUser = getCurrentUserFromHeader(authHeader);
+
     if (!currentUser) {
-      return unauthorizedResponse('Authentication required');
+      return unauthorizedResponse("Authentication required");
     }
 
-    const body = await request.json();
-    
-    // Validate input
-    const validation = createOrderSchema.safeParse(body);
+    // Get user details from database
+    const user = await prisma.user.findUnique({
+      where: { id: currentUser.userId },
+      select: { name: true, email: true, phone: true },
+    });
+
+    if (!user) {
+      return errorResponse("User not found", 404);
+    }
+
+    const validation = createOrderSchema.safeParse(await request.json());
+
     if (!validation.success) {
       return errorResponse(validation.error.issues[0].message);
     }
 
-    const { items, shippingAddress, city, phone, notes } = validation.data;
+    const { items, shippingAddress, phone, notes } = validation.data;
 
-    // Get products and calculate total
-    const productIds = items.map(item => item.productId);
+    // Fetch products and validate stock
+    const productIds = items.map((item) => item.productId);
     const products = await prisma.product.findMany({
       where: { id: { in: productIds } },
     });
 
-    if (products.length !== items.length) {
-      return errorResponse('Some products not found');
+    if (products.length !== productIds.length) {
+      return errorResponse("One or more products not found");
     }
 
-    // Check stock availability
-    for (const item of items) {
-      const product = products.find((p) => p.id === item.productId);
-      if (!product) {
-        return errorResponse(`Product ${item.productId} not found`);
-      }
-      if (!product.inStock || product.stockCount < item.quantity) {
-        return errorResponse(`Product ${product.name} is out of stock or insufficient quantity`);
-      }
-    }
-
-    // Calculate total amount
-    const totalAmount = items.reduce((sum, item) => {
-      const product = products.find((p) => p.id === item.productId)!;
-      return sum + (product.price * item.quantity);
-    }, 0);
-
-    // Generate order number
-    const orderNumber = `ORD-${Date.now()}-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
-
-    // Create order with items in a transaction
-    const order = await prisma.$transaction(async (tx: any) => {
-      const newOrder = await tx.order.create({
-        data: {
-          orderNumber,
-          userId: currentUser.userId,
-          totalAmount,
-          shippingAddress,
-          city,
-          phone,
-          notes,
-          status: 'PENDING',
-          orderItems: {
-            create: items.map((item) => {
-              const product = products.find((p) => p.id === item.productId)!;
-              return {
-                productId: item.productId,
-                quantity: item.quantity,
-                price: product.price,
-              };
-            }),
+    // Create order with items
+    const order = await prisma.order.create({
+      data: {
+        userId: currentUser.userId,
+        customerName: user.name || user.email.split('@')[0], // Use email username if name is not set
+        customerEmail: user.email,
+        customerPhone: phone || user.phone || 'N/A', // Provide a default value if no phone number is available
+        shippingAddress,
+        notes,
+        totalAmount: items.reduce((total, item) => {
+          const product = products.find((p) => p.id === item.productId);
+          return total + (product?.price || 0) * item.quantity;
+        }, 0),
+        orderItems: {
+          create: items.map((item) => {
+            const product = products.find((p) => p.id === item.productId)!;
+            return {
+              productId: item.productId,
+              name: product.name,
+              quantity: item.quantity,
+              price: product.price,
+            };
+          }),
+        },
+      },
+      include: {
+        orderItems: {
+          include: {
+            product: true,
           },
         },
-        include: {
-          orderItems: {
-            include: {
-              product: true,
-            },
-          },
-        },
-      });
-
-      // Update product stock
-      for (const item of items) {
-        await tx.product.update({
-          where: { id: item.productId },
-          data: {
-            stockCount: {
-              decrement: item.quantity,
-            },
-          },
-        });
-      }
-
-      // Clear user's cart
-      await tx.cartItem.deleteMany({
-        where: { userId: currentUser.userId },
-      });
-
-      return newOrder;
+      },
     });
 
-    return successResponse(order, 'Order created successfully', 201);
+    return successResponse(order, 'Order created successfully');
   } catch (error) {
     console.error('Create order error:', error);
     return errorResponse('Failed to create order', 500);

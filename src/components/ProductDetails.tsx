@@ -37,6 +37,7 @@ import {
 } from "@/lib/products";
 import { useCart } from "@/contexts/CartContext";
 import { toast } from "sonner";
+import Footer from "./Footer";
 
 interface ProductVariant {
   id: string;
@@ -142,12 +143,15 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
       });
     }
 
-    toast.success(`Added ${quantity} ${quantity === 1 ? 'item' : 'items'} to cart!`, {
-      action: {
-        label: "View Cart",
-        onClick: () => setIsCartOpen(true),
-      },
-    });
+    toast.success(
+      `Added ${quantity} ${quantity === 1 ? "item" : "items"} to cart!`,
+      {
+        action: {
+          label: "View Cart",
+          onClick: () => setIsCartOpen(true),
+        },
+      }
+    );
   };
 
   // Fetch reviews
@@ -181,7 +185,23 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
   ];
   const relatedProducts = allProducts
     .filter((p) => p.brand === product.brand && p.id !== product.id)
-    .slice(0, 4);
+    .slice(0, 4)
+    .map((p) => ({
+      ...p,
+      slug: p.id, // Use id as slug
+      images: [p.image], // Convert image to images array
+      brand: {
+        id: p.brand.toLowerCase().replace(/\s+/g, "-"),
+        name: p.brand,
+        slug: p.brand.toLowerCase().replace(/\s+/g, "-"),
+      },
+      // Infer category from product type
+      category: {
+        id: "products",
+        name: "Products",
+        slug: "products",
+      },
+    }));
 
   const handleReviewSubmitted = () => {
     fetchReviews();
@@ -575,7 +595,10 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                     {/* Rating Breakdown */}
                     <div className="space-y-2">
                       {[5, 4, 3, 2, 1].map((rating) => {
-                        const count = reviewData?.ratingBreakdown[rating as keyof typeof reviewData.ratingBreakdown] || 0;
+                        const count =
+                          reviewData?.ratingBreakdown[
+                            rating as keyof typeof reviewData.ratingBreakdown
+                          ] || 0;
                         const percentage = reviewData?.totalReviews
                           ? Math.round((count / reviewData.totalReviews) * 100)
                           : 0;
@@ -607,9 +630,14 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                   ) : reviewData && reviewData.reviews.length > 0 ? (
                     <div className="space-y-4">
                       {reviewData.reviews.map((review) => {
-                        const timeAgo = new Date(review.createdAt).toLocaleDateString();
+                        const timeAgo = new Date(
+                          review.createdAt
+                        ).toLocaleDateString();
                         return (
-                          <div key={review.id} className="border-b border-gray-200 pb-4">
+                          <div
+                            key={review.id}
+                            className="border-b border-gray-200 pb-4"
+                          >
                             <div className="flex items-start justify-between mb-2">
                               <div>
                                 <div className="flex items-center gap-2 mb-1">
@@ -633,7 +661,9 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                                     Verified Buyer
                                   </span>
                                 </div>
-                                <p className="text-xs text-gray-500">{timeAgo}</p>
+                                <p className="text-xs text-gray-500">
+                                  {timeAgo}
+                                </p>
                               </div>
                             </div>
                             {review.comment && (
@@ -647,7 +677,9 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                     </div>
                   ) : (
                     <div className="text-center py-12">
-                      <p className="text-gray-500">No reviews yet. Be the first to review this product!</p>
+                      <p className="text-gray-500">
+                        No reviews yet. Be the first to review this product!
+                      </p>
                     </div>
                   )}
                 </div>
@@ -693,27 +725,9 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
         productId={product.id}
         productName={product.name}
         onReviewSubmitted={handleReviewSubmitted}
-        sketchfabModelId={
-          product.category === "Computers" &&
-          product.brand.toLowerCase() === "apple"
-            ? "efab224280fd4c3993c808107f7c0b38"
-            : product.category === "Computers"
-            ? "efab224280fd4c3993c808107f7c0b38"
-            : product.category === "Phones"
-            ? "41a071ae12794b668502f58d1e0fd1a3"
-            : product.category === "Printers"
-            ? "aa232d8302ca44ee9f08adfef2f3f894"
-            : product.category === "Routers"
-            ? "ac86d8ae65a54f4aa99d7d624f71e5f4"
-            : product.category === "Speakers"
-            ? "661f85fe3e4048f59785b2a75ffa52f8"
-            : product.category === "Monitors"
-            ? "f84d24b6df3648d884fd9be9c8007dd4"
-            : "4e72a2078b3c4a75a821ab09830693fe"
-        }
-        artistName="Sketchfab"
-        artistUrl="https://sketchfab.com"
       />
+
+      <Footer />
     </>
   );
 }

@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { getCurrentUser, isAdmin } from '@/lib/auth';
+import { getCurrentUserFromHeader } from '@/lib/auth';
 import { updateOrderStatusSchema } from '@/lib/validations';
 import { successResponse, errorResponse, notFoundResponse, unauthorizedResponse, forbiddenResponse } from '@/lib/api-response';
 
@@ -10,7 +10,9 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const currentUser = await getCurrentUser();
+    const authHeader = request.headers.get("authorization");
+    const currentUser = getCurrentUserFromHeader(authHeader);
+    
     if (!currentUser) {
       return unauthorizedResponse('Authentication required');
     }
@@ -62,8 +64,10 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const admin = await isAdmin();
-    if (!admin) {
+    const authHeader = request.headers.get("authorization");
+    const currentUser = getCurrentUserFromHeader(authHeader);
+    
+    if (!currentUser || currentUser.role !== 'ADMIN') {
       return forbiddenResponse('Admin access required');
     }
 
@@ -111,7 +115,9 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const currentUser = await getCurrentUser();
+    const authHeader = request.headers.get("authorization");
+    const currentUser = getCurrentUserFromHeader(authHeader);
+    
     if (!currentUser) {
       return unauthorizedResponse('Authentication required');
     }

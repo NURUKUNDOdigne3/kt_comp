@@ -61,8 +61,10 @@ export default function ProcessingOrdersPage() {
     data?.orders?.filter((order: any) => {
       return (
         order.orderNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        order.user.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        order.user.email.toLowerCase().includes(searchQuery.toLowerCase())
+        order.user?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        order.user?.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        order.customerName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        order.customerEmail?.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }) || [];
 
@@ -168,10 +170,10 @@ export default function ProcessingOrdersPage() {
                               <TableCell>
                                 <div>
                                   <p className="font-medium">
-                                    {order.user.name || "N/A"}
+                                    {order.user?.name || order.customerName || "N/A"}
                                   </p>
                                   <p className="text-sm text-muted-foreground">
-                                    {order.user.email}
+                                    {order.user?.email || order.customerEmail}
                                   </p>
                                 </div>
                               </TableCell>

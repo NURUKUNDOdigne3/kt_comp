@@ -165,7 +165,7 @@ export async function GET(request: NextRequest) {
     const recentOrders = orders.slice(0, 10).map((order) => ({
       id: order.id,
       orderNumber: order.orderNumber,
-      customer: order.user.name || order.user.email,
+      customer: order.user?.name || order.user?.email || order.customerName || order.customerEmail,
       total: order.totalAmount,
       status: order.status,
       items: order.orderItems.length,

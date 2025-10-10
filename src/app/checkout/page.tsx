@@ -20,6 +20,7 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
+import Footer from "@/components/Footer";
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -314,7 +315,8 @@ export default function CheckoutPage() {
                               Qty: {item.quantity}
                             </p>
                             <p className="text-sm font-medium">
-                              RWF {(item.price * item.quantity).toLocaleString()}
+                              RWF{" "}
+                              {(item.price * item.quantity).toLocaleString()}
                             </p>
                           </div>
                         </div>
@@ -388,6 +390,7 @@ export default function CheckoutPage() {
           </div>
         </div>
       </div>
+      <Footer />
     </>
   );
 }

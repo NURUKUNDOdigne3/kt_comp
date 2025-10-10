@@ -1,3 +1,4 @@
+import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 
 export default function TermsOfServicePage() {
@@ -122,16 +123,7 @@ export default function TermsOfServicePage() {
           </div>
         </div>
       </main>
-      <footer className="bg-gray-100 py-8 px-4 md:px-6">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center text-muted-foreground">
-            <p>
-              © {new Date().getFullYear()} KT Computer Supply. All rights
-              reserved.
-            </p>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

@@ -4,6 +4,7 @@ import FeaturedProductsCarousel from "@/components/FeaturedProductsCarousel";
 import { Suspense } from "react";
 import WelcomeHeroPrinter from "@/components/WelcomeHeroPrinter";
 import { prisma } from "@/lib/prisma";
+import Footer from "@/components/Footer";
 
 async function getPrinterProducts() {
   try {
@@ -99,6 +100,7 @@ export default async function Page() {
           </div>
         )}
       </div>
+      <Footer />
     </main>
   );
 }

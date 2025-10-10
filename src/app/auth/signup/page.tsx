@@ -15,6 +15,7 @@ import { Eye, EyeOff, AlertCircle, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Footer from "@/components/Footer";
 
 interface FormData {
   firstName: string;
@@ -151,239 +152,250 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-50">
-      <div className="w-full max-w-md p-4">
-        <Card className="border-none shadow-lg">
-          <CardHeader className="flex flex-col items-center space-y-1.5 pb-4 pt-6">
-            <h2 className="text-2xl font-semibold text-foreground">
-              <span className="text-blue-700 font-bold">KT</span>ComputerSupply
-            </h2>
-            <div className="space-y-1 flex flex-col items-center">
-              <h2 className="text-lg font-semibold text-foreground">
-                Create an account
+    <>
+      <div className="flex items-center justify-center min-h-screen bg-gray-50">
+        <div className="w-full max-w-md p-4">
+          <Card className="border-none shadow-lg">
+            <CardHeader className="flex flex-col items-center space-y-1.5 pb-4 pt-6">
+              <h2 className="text-2xl font-semibold text-foreground">
+                <span className="text-blue-700 font-bold">KT</span>
+                ComputerSupply
               </h2>
-              <p className="text-muted-foreground">
-                Welcome! Create an account to get started.
-              </p>
-            </div>
-          </CardHeader>
-          <form onSubmit={handleSubmit}>
-            <CardContent className="space-y-4 px-8">
-              {/* Success Message */}
-              {success && (
-                <div className="flex items-center gap-2 p-4 bg-green-50 border border-green-200 rounded-lg">
-                  <CheckCircle2 className="h-5 w-5 text-green-600" />
-                  <p className="text-sm text-green-600">
-                    Account created successfully! Redirecting...
-                  </p>
-                </div>
-              )}
+              <div className="space-y-1 flex flex-col items-center">
+                <h2 className="text-lg font-semibold text-foreground">
+                  Create an account
+                </h2>
+                <p className="text-muted-foreground">
+                  Welcome! Create an account to get started.
+                </p>
+              </div>
+            </CardHeader>
+            <form onSubmit={handleSubmit}>
+              <CardContent className="space-y-4 px-8">
+                {/* Success Message */}
+                {success && (
+                  <div className="flex items-center gap-2 p-4 bg-green-50 border border-green-200 rounded-lg">
+                    <CheckCircle2 className="h-5 w-5 text-green-600" />
+                    <p className="text-sm text-green-600">
+                      Account created successfully! Redirecting...
+                    </p>
+                  </div>
+                )}
 
-              {/* Error Message */}
-              {error && (
-                <div className="flex items-center gap-2 p-4 bg-red-50 border border-red-200 rounded-lg">
-                  <AlertCircle className="h-5 w-5 text-red-600" />
-                  <p className="text-sm text-red-600">{error}</p>
-                </div>
-              )}
+                {/* Error Message */}
+                {error && (
+                  <div className="flex items-center gap-2 p-4 bg-red-50 border border-red-200 rounded-lg">
+                    <AlertCircle className="h-5 w-5 text-red-600" />
+                    <p className="text-sm text-red-600">{error}</p>
+                  </div>
+                )}
 
-              {/* Name Fields */}
-              <div className="grid grid-cols-2 gap-4">
+                {/* Name Fields */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="firstName">First name *</Label>
+                    <Input
+                      id="firstName"
+                      value={formData.firstName}
+                      onChange={handleInputChange}
+                      disabled={isLoading}
+                      className={formErrors.firstName ? "border-red-500" : ""}
+                    />
+                    {formErrors.firstName && (
+                      <p className="text-xs text-red-500">
+                        {formErrors.firstName}
+                      </p>
+                    )}
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="lastName">Last name *</Label>
+                    <Input
+                      id="lastName"
+                      value={formData.lastName}
+                      onChange={handleInputChange}
+                      disabled={isLoading}
+                      className={formErrors.lastName ? "border-red-500" : ""}
+                    />
+                    {formErrors.lastName && (
+                      <p className="text-xs text-red-500">
+                        {formErrors.lastName}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Email Field */}
                 <div className="space-y-2">
-                  <Label htmlFor="firstName">First name *</Label>
+                  <Label htmlFor="email">Email address *</Label>
                   <Input
-                    id="firstName"
-                    value={formData.firstName}
+                    id="email"
+                    type="email"
+                    value={formData.email}
                     onChange={handleInputChange}
                     disabled={isLoading}
-                    className={formErrors.firstName ? "border-red-500" : ""}
+                    className={formErrors.email ? "border-red-500" : ""}
                   />
-                  {formErrors.firstName && (
-                    <p className="text-xs text-red-500">
-                      {formErrors.firstName}
-                    </p>
+                  {formErrors.email && (
+                    <p className="text-xs text-red-500">{formErrors.email}</p>
                   )}
                 </div>
+
+                {/* Phone Field */}
                 <div className="space-y-2">
-                  <Label htmlFor="lastName">Last name *</Label>
+                  <Label htmlFor="phone">Phone number (Optional)</Label>
                   <Input
-                    id="lastName"
-                    value={formData.lastName}
+                    id="phone"
+                    type="tel"
+                    value={formData.phone}
                     onChange={handleInputChange}
                     disabled={isLoading}
-                    className={formErrors.lastName ? "border-red-500" : ""}
+                    placeholder="+250 XXX XXX XXX"
                   />
-                  {formErrors.lastName && (
-                    <p className="text-xs text-red-500">
-                      {formErrors.lastName}
-                    </p>
-                  )}
                 </div>
-              </div>
 
-              {/* Email Field */}
-              <div className="space-y-2">
-                <Label htmlFor="email">Email address *</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  disabled={isLoading}
-                  className={formErrors.email ? "border-red-500" : ""}
-                />
-                {formErrors.email && (
-                  <p className="text-xs text-red-500">{formErrors.email}</p>
-                )}
-              </div>
-
-              {/* Phone Field */}
-              <div className="space-y-2">
-                <Label htmlFor="phone">Phone number (Optional)</Label>
-                <Input
-                  id="phone"
-                  type="tel"
-                  value={formData.phone}
-                  onChange={handleInputChange}
-                  disabled={isLoading}
-                  placeholder="+250 XXX XXX XXX"
-                />
-              </div>
-
-              {/* Password Field */}
-              <div className="space-y-2">
-                <Label htmlFor="password">Password *</Label>
-                <div className="relative">
-                  <Input
-                    id="password"
-                    type={showPassword ? "text" : "password"}
-                    value={formData.password}
-                    onChange={handleInputChange}
-                    disabled={isLoading}
-                    className={
-                      formErrors.password ? "border-red-500 pr-10" : "pr-10"
-                    }
-                  />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="absolute right-0 top-0 h-full px-3 text-muted-foreground hover:bg-transparent"
-                    onClick={() => setShowPassword(!showPassword)}
-                    disabled={isLoading}
-                  >
-                    {showPassword ? (
-                      <EyeOff className="h-4 w-4" />
-                    ) : (
-                      <Eye className="h-4 w-4" />
-                    )}
-                  </Button>
-                </div>
-                {formErrors.password && (
-                  <p className="text-xs text-red-500">{formErrors.password}</p>
-                )}
-              </div>
-
-              {/* Confirm Password Field */}
-              <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Confirm Password *</Label>
-                <div className="relative">
-                  <Input
-                    id="confirmPassword"
-                    type={showConfirmPassword ? "text" : "password"}
-                    value={formData.confirmPassword}
-                    onChange={handleInputChange}
-                    disabled={isLoading}
-                    className={
-                      formErrors.confirmPassword
-                        ? "border-red-500 pr-10"
-                        : "pr-10"
-                    }
-                  />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="absolute right-0 top-0 h-full px-3 text-muted-foreground hover:bg-transparent"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    disabled={isLoading}
-                  >
-                    {showConfirmPassword ? (
-                      <EyeOff className="h-4 w-4" />
-                    ) : (
-                      <Eye className="h-4 w-4" />
-                    )}
-                  </Button>
-                </div>
-                {formErrors.confirmPassword && (
-                  <p className="text-xs text-red-500">
-                    {formErrors.confirmPassword}
-                  </p>
-                )}
-              </div>
-
-              {/* Terms Checkbox */}
-              <div className="space-y-2">
-                <div className="flex items-start space-x-2">
-                  <Checkbox
-                    id="terms"
-                    checked={agreedToTerms}
-                    onCheckedChange={(checked: boolean) => {
-                      setAgreedToTerms(checked);
-                      if (formErrors.terms) {
-                        setFormErrors((prev) => ({
-                          ...prev,
-                          terms: undefined,
-                        }));
+                {/* Password Field */}
+                <div className="space-y-2">
+                  <Label htmlFor="password">Password *</Label>
+                  <div className="relative">
+                    <Input
+                      id="password"
+                      type={showPassword ? "text" : "password"}
+                      value={formData.password}
+                      onChange={handleInputChange}
+                      disabled={isLoading}
+                      className={
+                        formErrors.password ? "border-red-500 pr-10" : "pr-10"
                       }
-                    }}
-                    disabled={isLoading}
-                  />
-                  <label
-                    htmlFor="terms"
-                    className="text-sm text-muted-foreground leading-tight"
-                  >
-                    I agree to the{" "}
-                    <Link
-                      href="/terms"
-                      className="text-primary hover:underline"
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="absolute right-0 top-0 h-full px-3 text-muted-foreground hover:bg-transparent"
+                      onClick={() => setShowPassword(!showPassword)}
+                      disabled={isLoading}
                     >
-                      Terms
-                    </Link>{" "}
-                    and{" "}
-                    <Link
-                      href="/privacy"
-                      className="text-primary hover:underline"
-                    >
-                      Privacy Policy
-                    </Link>
-                  </label>
+                      {showPassword ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
+                    </Button>
+                  </div>
+                  {formErrors.password && (
+                    <p className="text-xs text-red-500">
+                      {formErrors.password}
+                    </p>
+                  )}
                 </div>
-                {formErrors.terms && (
-                  <p className="text-xs text-red-500">{formErrors.terms}</p>
-                )}
-              </div>
 
-              {/* Submit Button */}
-              <Button
-                type="submit"
-                className="w-full bg-primary text-primary-foreground"
-                disabled={isLoading || success}
-              >
-                {isLoading ? "Creating account..." : "Create account"}
-              </Button>
-            </CardContent>
-          </form>
-          <CardFooter className="flex justify-center border-t py-4">
-            <p className="text-center text-sm text-muted-foreground">
-              Already have an account?{" "}
-              <Link href="/auth/login" className="text-primary hover:underline">
-                Sign in
-              </Link>
-            </p>
-          </CardFooter>
-        </Card>
+                {/* Confirm Password Field */}
+                <div className="space-y-2">
+                  <Label htmlFor="confirmPassword">Confirm Password *</Label>
+                  <div className="relative">
+                    <Input
+                      id="confirmPassword"
+                      type={showConfirmPassword ? "text" : "password"}
+                      value={formData.confirmPassword}
+                      onChange={handleInputChange}
+                      disabled={isLoading}
+                      className={
+                        formErrors.confirmPassword
+                          ? "border-red-500 pr-10"
+                          : "pr-10"
+                      }
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="absolute right-0 top-0 h-full px-3 text-muted-foreground hover:bg-transparent"
+                      onClick={() =>
+                        setShowConfirmPassword(!showConfirmPassword)
+                      }
+                      disabled={isLoading}
+                    >
+                      {showConfirmPassword ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
+                    </Button>
+                  </div>
+                  {formErrors.confirmPassword && (
+                    <p className="text-xs text-red-500">
+                      {formErrors.confirmPassword}
+                    </p>
+                  )}
+                </div>
+
+                {/* Terms Checkbox */}
+                <div className="space-y-2">
+                  <div className="flex items-start space-x-2">
+                    <Checkbox
+                      id="terms"
+                      checked={agreedToTerms}
+                      onCheckedChange={(checked: boolean) => {
+                        setAgreedToTerms(checked);
+                        if (formErrors.terms) {
+                          setFormErrors((prev) => ({
+                            ...prev,
+                            terms: undefined,
+                          }));
+                        }
+                      }}
+                      disabled={isLoading}
+                    />
+                    <label
+                      htmlFor="terms"
+                      className="text-sm text-muted-foreground leading-tight"
+                    >
+                      I agree to the{" "}
+                      <Link
+                        href="/terms"
+                        className="text-primary hover:underline"
+                      >
+                        Terms
+                      </Link>{" "}
+                      and{" "}
+                      <Link
+                        href="/privacy"
+                        className="text-primary hover:underline"
+                      >
+                        Privacy Policy
+                      </Link>
+                    </label>
+                  </div>
+                  {formErrors.terms && (
+                    <p className="text-xs text-red-500">{formErrors.terms}</p>
+                  )}
+                </div>
+
+                {/* Submit Button */}
+                <Button
+                  type="submit"
+                  className="w-full bg-primary text-primary-foreground"
+                  disabled={isLoading || success}
+                >
+                  {isLoading ? "Creating account..." : "Create account"}
+                </Button>
+              </CardContent>
+            </form>
+            <CardFooter className="flex justify-center border-t py-4">
+              <p className="text-center text-sm text-muted-foreground">
+                Already have an account?{" "}
+                <Link
+                  href="/auth/login"
+                  className="text-primary hover:underline"
+                >
+                  Sign in
+                </Link>
+              </p>
+            </CardFooter>
+          </Card>
+        </div>
       </div>
-    </div>
+      <Footer />
+    </>
   );
 }

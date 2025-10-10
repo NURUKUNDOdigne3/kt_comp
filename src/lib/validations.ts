@@ -62,7 +62,6 @@ export const createOrderSchema = z.object({
     )
     .min(1, "Order must have at least one item"),
   shippingAddress: z.string().min(5, "Shipping address is required"),
-  city: z.string().min(2, "City is required"),
   phone: z.string().min(10, "Valid phone number is required"),
   notes: z.string().optional(),
 });

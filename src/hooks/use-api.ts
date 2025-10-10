@@ -43,6 +43,7 @@ export function useApi<T>(url: string | null, config?: SWRConfiguration) {
   const { data, error, isLoading, mutate } = useSWR<{
     success: boolean;
     data: T;
+    message?: string;
   }>(url, fetcher, config);
 
   return {
@@ -118,7 +119,39 @@ export function useOrders(params?: { page?: number; limit?: number }) {
   }`;
 
   return useApi<{
-    orders: any[];
+    orders: Array<{
+      id: string;
+      orderNumber: string;
+      customerName: string;
+      customerEmail: string;
+      customerPhone: string;
+      shippingAddress: string;
+      totalAmount: number;
+      status: string;
+      paymentStatus: string;
+      notes?: string | null;
+      createdAt: string;
+      updatedAt: string;
+      userId?: string | null;
+      user?: {
+        id: string;
+        email: string;
+        name: string | null;
+      } | null;
+      orderItems: Array<{
+        id: string;
+        name: string;
+        quantity: number;
+        price: number;
+        productId: string;
+        product: {
+          id: string;
+          name: string;
+          brand?: { name: string } | null;
+          category?: { name: string } | null;
+        };
+      }>;
+    }>;
     pagination: {
       page: number;
       limit: number;
@@ -382,8 +415,8 @@ export function useDeleteAuditLog(id: string) {
 }
 
 // Profile hooks
-export function useProfile() {
-  return useApi("/api/profile");
+export function useProfile<T = any>() {
+  return useApi<T>("/api/profile");
 }
 
 export function useUpdateProfile() {
@@ -437,5 +470,45 @@ export function useOrdersByStatus(status: string, page?: number, limit?: number)
   if (limit) queryParams.append("limit", limit.toString());
   
   const url = `/api/orders?status=${status}${queryParams.toString() ? `&${queryParams.toString()}` : ""}`;
-  return useApi(url);
+  return useApi<{
+    orders: Array<{
+      id: string;
+      orderNumber: string;
+      customerName: string;
+      customerEmail: string;
+      customerPhone: string;
+      shippingAddress: string;
+      totalAmount: number;
+      status: string;
+      paymentStatus: string;
+      notes?: string | null;
+      createdAt: string;
+      updatedAt: string;
+      userId?: string | null;
+      user?: {
+        id: string;
+        email: string;
+        name: string | null;
+      } | null;
+      orderItems: Array<{
+        id: string;
+        name: string;
+        quantity: number;
+        price: number;
+        productId: string;
+        product: {
+          id: string;
+          name: string;
+          brand?: { name: string } | null;
+          category?: { name: string } | null;
+        };
+      }>;
+    }>;
+    pagination: {
+      page: number;
+      limit: number;
+      total: number;
+      totalPages: number;
+    };
+  }>(url);
 }

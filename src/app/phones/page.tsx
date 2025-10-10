@@ -4,6 +4,7 @@ import FeaturedProductsCarousel from "@/components/FeaturedProductsCarousel";
 import { Suspense } from "react";
 import WelcomeHeroPhone from "@/components/WelcomeHeroPhone";
 import { prisma } from "@/lib/prisma";
+import Footer from "@/components/Footer";
 
 async function getPhoneProducts() {
   try {
@@ -98,6 +99,8 @@ export default async function Page() {
           </div>
         )}
       </div>
+
+      <Footer />
     </main>
   );
 }

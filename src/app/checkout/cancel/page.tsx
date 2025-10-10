@@ -6,6 +6,7 @@ import Header from "@/components/Header";
 import { XCircle, ArrowLeft, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import Footer from "@/components/Footer";
 
 export default function CheckoutCancelPage() {
   const router = useRouter();
@@ -55,6 +56,7 @@ export default function CheckoutCancelPage() {
           </Card>
         </div>
       </div>
+      <Footer />
     </>
   );
 }

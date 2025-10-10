@@ -54,8 +54,21 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 
+interface Profile {
+  id: string;
+  email: string;
+  name: string | null;
+  phone: string | null;
+  avatar: string | null;
+  bio: string | null;
+  role: string;
+  lastLogin: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export default function UserProfilePage() {
-  const { data: profile, isLoading, mutate: refetchProfile } = useProfile();
+  const { data: profile, isLoading, mutate: refetchProfile } = useProfile<Profile>();
   const { trigger: updateProfile, isMutating: isUpdating } = useUpdateProfile();
   const { trigger: changePassword, isMutating: isChangingPassword } = useChangePassword();
 
@@ -75,7 +88,7 @@ export default function UserProfilePage() {
 
   // Update form when profile loads
   useEffect(() => {
-    if (profile) {
+    if (profile?.name !== undefined) {
       setProfileForm({
         name: profile.name || "",
         phone: profile.phone || "",
@@ -251,34 +264,23 @@ export default function UserProfilePage() {
                                   name: e.target.value,
                                 })
                               }
+                              placeholder="Enter your full name"
                             />
                           </div>
                           <div className="space-y-2">
-                            <Label htmlFor="email">Email</Label>
+                            <Label htmlFor="phone">Phone Number</Label>
                             <Input
-                              id="email"
-                              type="email"
-                              value={profile.email}
-                              disabled
-                              className="bg-muted"
+                              id="phone"
+                              value={profileForm.phone}
+                              onChange={(e) =>
+                                setProfileForm({
+                                  ...profileForm,
+                                  phone: e.target.value,
+                                })
+                              }
+                              placeholder="Enter your phone number"
                             />
-                            <p className="text-xs text-muted-foreground">
-                              Email cannot be changed
-                            </p>
                           </div>
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="phone">Phone Number</Label>
-                          <Input
-                            id="phone"
-                            value={profileForm.phone}
-                            onChange={(e) =>
-                              setProfileForm({
-                                ...profileForm,
-                                phone: e.target.value,
-                              })
-                            }
-                          />
                         </div>
                         <div className="space-y-2">
                           <Label htmlFor="bio">Bio</Label>
@@ -291,16 +293,22 @@ export default function UserProfilePage() {
                                 bio: e.target.value,
                               })
                             }
+                            placeholder="Tell us about yourself"
                             rows={4}
                           />
                         </div>
                         <Button type="submit" disabled={isUpdating}>
                           {isUpdating ? (
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            <>
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                              Updating...
+                            </>
                           ) : (
-                            <Save className="mr-2 h-4 w-4" />
+                            <>
+                              <Save className="mr-2 h-4 w-4" />
+                              Save Changes
+                            </>
                           )}
-                          Save Changes
                         </Button>
                       </form>
                     </CardContent>
@@ -333,45 +341,55 @@ export default function UserProfilePage() {
                                 currentPassword: e.target.value,
                               })
                             }
+                            placeholder="Enter your current password"
                           />
                         </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="newPassword">New Password</Label>
-                          <Input
-                            id="newPassword"
-                            type="password"
-                            value={securityForm.newPassword}
-                            onChange={(e) =>
-                              setSecurityForm({
-                                ...securityForm,
-                                newPassword: e.target.value,
-                              })
-                            }
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="confirmPassword">
-                            Confirm New Password
-                          </Label>
-                          <Input
-                            id="confirmPassword"
-                            type="password"
-                            value={securityForm.confirmPassword}
-                            onChange={(e) =>
-                              setSecurityForm({
-                                ...securityForm,
-                                confirmPassword: e.target.value,
-                              })
-                            }
-                          />
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <Label htmlFor="newPassword">New Password</Label>
+                            <Input
+                              id="newPassword"
+                              type="password"
+                              value={securityForm.newPassword}
+                              onChange={(e) =>
+                                setSecurityForm({
+                                  ...securityForm,
+                                  newPassword: e.target.value,
+                                })
+                              }
+                              placeholder="Enter new password"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="confirmPassword">
+                              Confirm New Password
+                            </Label>
+                            <Input
+                              id="confirmPassword"
+                              type="password"
+                              value={securityForm.confirmPassword}
+                              onChange={(e) =>
+                                setSecurityForm({
+                                  ...securityForm,
+                                  confirmPassword: e.target.value,
+                                })
+                              }
+                              placeholder="Confirm new password"
+                            />
+                          </div>
                         </div>
                         <Button type="submit" disabled={isChangingPassword}>
                           {isChangingPassword ? (
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            <>
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                              Updating Password...
+                            </>
                           ) : (
-                            <Lock className="mr-2 h-4 w-4" />
+                            <>
+                              <Lock className="mr-2 h-4 w-4" />
+                              Change Password
+                            </>
                           )}
-                          Update Password
                         </Button>
                       </form>
                     </CardContent>

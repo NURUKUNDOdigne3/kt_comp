@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import Header from "@/components/Header";
 import { prisma } from "@/lib/prisma";
+import Footer from "@/components/Footer";
 
 async function getBrandsData() {
   try {
@@ -115,6 +116,7 @@ export default async function BrandsPage() {
           </div>
         </div>
       </div>
+      <Footer />
     </>
   );
 }

@@ -107,11 +107,12 @@ model Product {
 
 // Review model
 model Review {
-  id        String   @id @default(cuid())
-  rating    Int      // 1-5 stars
+  id        String       @id @default(cuid())
+  rating    Int         // 1-5 stars
   comment   String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  status    ReviewStatus @default(PENDING)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
 
   // Foreign keys
   productId String
@@ -123,6 +124,13 @@ model Review {
 
   @@index([productId])
   @@index([userId])
+  @@index([status])
+}
+
+enum ReviewStatus {
+  PENDING
+  APPROVED
+  REJECTED
 }
 
 // Cart model

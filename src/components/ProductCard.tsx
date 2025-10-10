@@ -53,9 +53,12 @@ export default function ProductCard({
   onAddToCart,
   onToggleWishlist,
 }: ProductCardProps) {
+  const { addItem, setIsCartOpen } = useCart();
+
   // Handle both database and legacy product formats
   const name = product.name;
   const brandName = typeof product.brand === 'string' ? product.brand : (product.brand?.name || 'Unknown Brand');
+  const categoryName = typeof product.category === 'string' ? product.category : (product.category?.name || 'Products');
   const image = product.images?.[0] || product.image || '/placeholder-product.png';
   const price = product.price;
   const oldPrice = product.compareAtPrice || product.oldPrice;
@@ -69,6 +72,32 @@ export default function ProductCard({
     oldPrice && oldPrice > price
       ? Math.round(((oldPrice - price) / oldPrice) * 100)
       : undefined;
+
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    // Add to cart
+    addItem({
+      productId: product.id,
+      name: product.name,
+      price: product.price,
+      image: image,
+      brand: brandName,
+      category: categoryName,
+    });
+
+    // Show success toast
+    toast.success(`${product.name} added to cart!`, {
+      action: {
+        label: "View Cart",
+        onClick: () => setIsCartOpen(true),
+      },
+    });
+
+    // Call optional callback
+    onAddToCart?.(product);
+  };
 
   return (
     <Link
@@ -102,10 +131,7 @@ export default function ProductCard({
         {/* Hover actions */}
         <div className="pointer-events-none absolute inset-x-0 bottom-3 flex items-center justify-center gap-2 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
           <button
-            onClick={(e) => {
-              e.preventDefault();
-              onAddToCart?.(product);
-            }}
+            onClick={handleAddToCart}
             className="pointer-events-auto inline-flex items-center gap-2 rounded-full bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
           >
             <ShoppingCart className="h-4 w-4" /> Add to cart

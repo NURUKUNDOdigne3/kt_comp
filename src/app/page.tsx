@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { BrandMarquee } from "@/components/BrandMarquee";
 import { prisma } from "@/lib/prisma";
+import Footer from "@/components/Footer";
 
 async function getProductsByCategory(categorySlug: string, limit: number = 8) {
   try {
@@ -34,7 +35,7 @@ async function getProductsByCategory(categorySlug: string, limit: number = 8) {
         },
       },
       take: limit,
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
     });
 
     return products;
@@ -46,14 +47,15 @@ async function getProductsByCategory(categorySlug: string, limit: number = 8) {
 
 export default async function Page() {
   // Fetch products for each category in parallel
-  const [computers, phones, printers, routers, speakers, monitors] = await Promise.all([
-    getProductsByCategory('computers', 8),
-    getProductsByCategory('phones', 8),
-    getProductsByCategory('printers', 8),
-    getProductsByCategory('routers', 8),
-    getProductsByCategory('speakers', 8),
-    getProductsByCategory('monitors', 8),
-  ]);
+  const [computers, phones, printers, routers, speakers, monitors] =
+    await Promise.all([
+      getProductsByCategory("computers", 8),
+      getProductsByCategory("phones", 8),
+      getProductsByCategory("printers", 8),
+      getProductsByCategory("routers", 8),
+      getProductsByCategory("speakers", 8),
+      getProductsByCategory("monitors", 8),
+    ]);
   return (
     <main>
       <Header />
@@ -65,7 +67,10 @@ export default async function Page() {
       <BrandMarquee />
 
       {/* Computers Section */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12" id="computers">
+      <div
+        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12"
+        id="computers"
+      >
         <div className="flex items-end justify-between mb-6">
           <div>
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -87,13 +92,18 @@ export default async function Page() {
           <FeaturedProductsCarousel products={computers} />
         ) : (
           <div className="flex flex-col items-center justify-center py-12 text-center">
-            <p className="text-gray-500 dark:text-gray-400">No computers available at the moment.</p>
+            <p className="text-gray-500 dark:text-gray-400">
+              No computers available at the moment.
+            </p>
           </div>
         )}
       </div>
 
       {/* Phones Section */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 bg-gray-50 dark:bg-gray-900" id="phones">
+      <div
+        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 bg-gray-50 dark:bg-gray-900"
+        id="phones"
+      >
         <div className="flex items-end justify-between mb-6">
           <div>
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -115,13 +125,18 @@ export default async function Page() {
           <FeaturedProductsCarousel products={phones} />
         ) : (
           <div className="flex flex-col items-center justify-center py-12 text-center">
-            <p className="text-gray-500 dark:text-gray-400">No phones available at the moment.</p>
+            <p className="text-gray-500 dark:text-gray-400">
+              No phones available at the moment.
+            </p>
           </div>
         )}
       </div>
 
       {/* Printers Section */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12" id="printers">
+      <div
+        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12"
+        id="printers"
+      >
         <div className="flex items-end justify-between mb-6">
           <div>
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -143,13 +158,18 @@ export default async function Page() {
           <FeaturedProductsCarousel products={printers} />
         ) : (
           <div className="flex flex-col items-center justify-center py-12 text-center">
-            <p className="text-gray-500 dark:text-gray-400">No printers available at the moment.</p>
+            <p className="text-gray-500 dark:text-gray-400">
+              No printers available at the moment.
+            </p>
           </div>
         )}
       </div>
 
       {/* Routers Section */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 bg-gray-50 dark:bg-gray-900" id="routers">
+      <div
+        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 bg-gray-50 dark:bg-gray-900"
+        id="routers"
+      >
         <div className="flex items-end justify-between mb-6">
           <div>
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -171,13 +191,18 @@ export default async function Page() {
           <FeaturedProductsCarousel products={routers} />
         ) : (
           <div className="flex flex-col items-center justify-center py-12 text-center">
-            <p className="text-gray-500 dark:text-gray-400">No routers available at the moment.</p>
+            <p className="text-gray-500 dark:text-gray-400">
+              No routers available at the moment.
+            </p>
           </div>
         )}
       </div>
 
       {/* Speakers Section */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12" id="speakers">
+      <div
+        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12"
+        id="speakers"
+      >
         <div className="flex items-end justify-between mb-6">
           <div>
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -199,13 +224,18 @@ export default async function Page() {
           <FeaturedProductsCarousel products={speakers} />
         ) : (
           <div className="flex flex-col items-center justify-center py-12 text-center">
-            <p className="text-gray-500 dark:text-gray-400">No speakers available at the moment.</p>
+            <p className="text-gray-500 dark:text-gray-400">
+              No speakers available at the moment.
+            </p>
           </div>
         )}
       </div>
 
       {/* Monitors Section */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 bg-gray-50 dark:bg-gray-900" id="monitors">
+      <div
+        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 bg-gray-50 dark:bg-gray-900"
+        id="monitors"
+      >
         <div className="flex items-end justify-between mb-6">
           <div>
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -227,10 +257,13 @@ export default async function Page() {
           <FeaturedProductsCarousel products={monitors} />
         ) : (
           <div className="flex flex-col items-center justify-center py-12 text-center">
-            <p className="text-gray-500 dark:text-gray-400">No monitors available at the moment.</p>
+            <p className="text-gray-500 dark:text-gray-400">
+              No monitors available at the moment.
+            </p>
           </div>
         )}
       </div>
+      <Footer />
     </main>
   );
 }

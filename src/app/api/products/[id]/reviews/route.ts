@@ -5,7 +5,7 @@ import {
   errorResponse,
   unauthorizedResponse,
 } from "@/lib/api-response";
-import { getUserFromHeader } from "@/lib/auth";
+import { getCurrentUserFromHeader } from "@/lib/auth";
 
 // GET /api/products/[id]/reviews - Get reviews for a specific product
 export async function GET(
@@ -62,9 +62,9 @@ export async function POST(
 ) {
   try {
     const authHeader = request.headers.get("authorization");
-    const user = getUserFromHeader(authHeader);
+    const currentUser = getCurrentUserFromHeader(authHeader);
 
-    if (!user) {
+    if (!currentUser) {
       return unauthorizedResponse("Please login to write a review");
     }
 
@@ -90,7 +90,7 @@ export async function POST(
     const existingReview = await prisma.review.findFirst({
       where: {
         productId,
-        userId: user.id,
+        userId: currentUser.userId,
       },
     });
 
@@ -104,7 +104,7 @@ export async function POST(
         rating,
         comment: comment || null,
         productId,
-        userId: user.id,
+        userId: currentUser.userId,
       },
       include: {
         user: {
@@ -117,26 +117,27 @@ export async function POST(
       },
     });
 
-    // Update product rating and review count
-    const allReviews = await prisma.review.findMany({
+    // Update product rating
+    const allProductReviews = await prisma.review.findMany({
       where: { productId },
       select: { rating: true },
     });
 
-    const averageRating =
-      allReviews.reduce((sum, r) => sum + r.rating, 0) / allReviews.length;
+    const newAverageRating =
+      allProductReviews.reduce((sum, r) => sum + r.rating, 0) /
+      allProductReviews.length;
 
     await prisma.product.update({
       where: { id: productId },
       data: {
-        rating: Number(averageRating.toFixed(1)),
-        reviewCount: allReviews.length,
+        rating: newAverageRating,
+        reviewCount: allProductReviews.length,
       },
     });
 
-    return successResponse(review, "Review submitted successfully", 201);
+    return successResponse(review, "Review created successfully", 201);
   } catch (error) {
     console.error("Create review error:", error);
-    return errorResponse("Failed to submit review", 500);
+    return errorResponse("Failed to create review", 500);
   }
 }

@@ -3,6 +3,7 @@ import ProductCard from "@/components/ProductCard";
 import Image from "next/image";
 import Header from "@/components/Header";
 import { prisma } from "@/lib/prisma";
+import Footer from "@/components/Footer";
 
 interface BrandPageProps {
   params: Promise<{
@@ -81,29 +82,34 @@ export default async function BrandPage({ params }: BrandPageProps) {
               {brand.products.length === 1 ? "product" : "products"} available
             </p>
             <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-              Categories: {Object.keys(productsByCategory).map((c) => c.charAt(0).toUpperCase() + c.slice(1)).join(", ")}
+              Categories:{" "}
+              {Object.keys(productsByCategory)
+                .map((c) => c.charAt(0).toUpperCase() + c.slice(1))
+                .join(", ")}
             </p>
           </div>
         </div>
 
         {/* Products by Category */}
         {brand.products.length > 0 ? (
-          Object.entries(productsByCategory).map(([categorySlug, categoryProducts]) => {
-            if (categoryProducts.length === 0) return null;
-            
-            return (
-              <div key={categorySlug} className="mb-12">
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 capitalize">
-                  {categoryProducts[0]?.category?.name || categorySlug}
-                </h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                  {categoryProducts.map((product) => (
-                    <ProductCard key={product.id} product={product} />
-                  ))}
+          Object.entries(productsByCategory).map(
+            ([categorySlug, categoryProducts]) => {
+              if (categoryProducts.length === 0) return null;
+
+              return (
+                <div key={categorySlug} className="mb-12">
+                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 capitalize">
+                    {categoryProducts[0]?.category?.name || categorySlug}
+                  </h2>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    {categoryProducts.map((product) => (
+                      <ProductCard key={product.id} product={product} />
+                    ))}
+                  </div>
                 </div>
-              </div>
-            );
-          })
+              );
+            }
+          )
         ) : (
           <div className="flex flex-col items-center justify-center py-12 text-center">
             <p className="text-gray-500 dark:text-gray-400">
@@ -112,6 +118,8 @@ export default async function BrandPage({ params }: BrandPageProps) {
           </div>
         )}
       </div>
+
+      <Footer />
     </>
   );
 }
@@ -122,7 +130,7 @@ export async function generateStaticParams() {
     const brands = await prisma.brand.findMany({
       select: { slug: true },
     });
-    
+
     return brands.map((brand) => ({
       brand: brand.slug,
     }));

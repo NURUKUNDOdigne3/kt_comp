@@ -4,6 +4,7 @@ import FeaturedProductsCarousel from "@/components/FeaturedProductsCarousel";
 import { Suspense } from "react";
 import { prisma } from "@/lib/prisma";
 import WelcomeHeroMonitor from "@/components/WelcomeHeroMonitor";
+import Footer from "@/components/Footer";
 
 async function getMonitorProducts() {
   try {
@@ -96,6 +97,7 @@ export default async function Page() {
           </div>
         )}
       </div>
+      <Footer />
     </main>
   );
 }
