@@ -147,31 +147,38 @@ model CartItem {
 
 // Order model
 model Order {
-  id              String      @id @default(cuid())
-  orderNumber     String      @unique
-  status          OrderStatus @default(PENDING)
-  totalAmount     Int         // Total in RWF
+  id              String        @id @default(cuid())
+  orderNumber     String        @unique @default(cuid())
+  status          OrderStatus   @default(PENDING)
+  paymentStatus   PaymentStatus @default(PENDING)
+  totalAmount     Int           // Total in RWF
   shippingAddress String
-  city            String
-  phone           String
+  customerName    String
+  customerEmail   String
+  customerPhone   String
   notes           String?
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
+  stripeSessionId String?       @unique
+  paidAt          DateTime?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
 
   // Foreign keys
-  userId String
+  userId String?
 
   // Relations
-  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user       User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
   orderItems OrderItem[]
 
   @@index([userId])
   @@index([orderNumber])
   @@index([status])
+  @@index([paymentStatus])
+  @@index([stripeSessionId])
 }
 
 enum OrderStatus {
   PENDING
+  CONFIRMED
   PROCESSING
   IN_TRANSIT
   OUT_FOR_DELIVERY
@@ -179,9 +186,17 @@ enum OrderStatus {
   CANCELLED
 }
 
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
+
 // OrderItem model
 model OrderItem {
   id        String   @id @default(cuid())
+  name      String   // Product name at time of order
   quantity  Int
   price     Int      // Price at time of order
   createdAt DateTime @default(now())

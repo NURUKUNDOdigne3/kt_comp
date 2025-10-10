@@ -5,6 +5,7 @@ import NProgressProvider from "@/components/NProgressProvider";
 import NProgressHandler from "@/components/NProgressHandler";
 import { Suspense } from "react";
 import { Toaster } from "@/components/ui/sonner";
+import { CartProvider } from "@/contexts/CartContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,12 +32,14 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Suspense fallback={null}>
-          <NProgressProvider />
-        </Suspense>
-        <NProgressHandler />
-        {children}
-        <Toaster richColors />
+        <CartProvider>
+          <Suspense fallback={null}>
+            <NProgressProvider />
+          </Suspense>
+          <NProgressHandler />
+          {children}
+          <Toaster richColors />
+        </CartProvider>
       </body>
     </html>
   );

@@ -18,6 +18,7 @@ import {
 import { usePathname } from "next/navigation";
 import { CartDrawer } from "./CartDrawer";
 import { brandData } from "../lib/brands";
+import { useCart } from "@/contexts/CartContext";
 
 const categories = [
   { name: "All", href: "/", active: true },
@@ -47,6 +48,7 @@ export default function Header() {
   const [user, setUser] = useState<UserData | null>(null);
   const pathname = usePathname();
   const userMenuRef = useRef<HTMLDivElement>(null);
+  const { itemCount, setIsCartOpen } = useCart();
 
   useEffect(() => {
     // Check if current path is a brand page
@@ -125,7 +127,6 @@ export default function Header() {
   }));
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isNavigationVisible, setIsNavigationVisible] = useState(true);
-  const [isCartOpen, setIsCartOpen] = useState(false);
   const [isHeaderVisible, setIsHeaderVisible] = useState(true);
 
   const categoriesRef = useRef(null);
@@ -244,9 +245,11 @@ export default function Header() {
                   aria-label="Cart"
                 >
                   <ShoppingCart className="h-5 w-5" />
-                  <span className="absolute top-1 right-1 text-white bg-blue-500 text-xs w-4 h-4 flex items-center justify-center rounded-full">
-                    0
-                  </span>
+                  {itemCount > 0 && (
+                    <span className="absolute top-1 right-1 text-white bg-blue-500 text-xs w-4 h-4 flex items-center justify-center rounded-full">
+                      {itemCount}
+                    </span>
+                  )}
                 </button>
               </div>
             </div>
@@ -380,9 +383,11 @@ export default function Header() {
                   className="text-gray-700 hover:text-blue-600 transition-colors p-2 rounded-full hover:bg-gray-100 relative"
                 >
                   <ShoppingCart className="h-6 w-6" />
-                  <span className="absolute top-0 right-0 -mt-1 -mr-1 bg-blue-600 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
-                    0
-                  </span>
+                  {itemCount > 0 && (
+                    <span className="absolute top-0 right-0 -mt-1 -mr-1 bg-blue-600 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
+                      {itemCount}
+                    </span>
+                  )}
                 </button>
               </div>
             </div>
@@ -556,19 +561,19 @@ export default function Header() {
                   <User className="h-5 w-5 mr-2" aria-hidden="true" />
                   Account
                 </Link>
-                <Link
-                  href="/cart"
+                <button
+                  onClick={() => setIsCartOpen(true)}
                   className="flex-1 flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <ShoppingCart className="h-5 w-5 mr-2" aria-hidden="true" />
-                  Cart (0)
-                </Link>
+                  Cart ({itemCount})
+                </button>
               </div>
             </div>
           </nav>
         </div>
       </header>
-      <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
+      <CartDrawer />
     </>
   );
 }

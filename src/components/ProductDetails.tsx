@@ -35,6 +35,8 @@ import {
   speakerProducts,
   monitorProducts,
 } from "@/lib/products";
+import { useCart } from "@/contexts/CartContext";
+import { toast } from "sonner";
 
 interface ProductVariant {
   id: string;
@@ -113,6 +115,8 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
     "description" | "specs" | "reviews"
   >("description");
 
+  const { addItem, setIsCartOpen } = useCart();
+
   const discount = product.oldPrice
     ? Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100)
     : 0;
@@ -126,11 +130,23 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
   };
 
   const handleAddToCart = () => {
-    // In a real app, this would add to cart state/API
-    console.log("Adding to cart:", {
-      product,
-      quantity,
-      variant: selectedVariant,
+    // Add items to cart based on quantity
+    for (let i = 0; i < quantity; i++) {
+      addItem({
+        productId: product.id,
+        name: product.name,
+        price: product.price,
+        image: product.images[0] || "/placeholder-product.png",
+        brand: product.brand,
+        category: product.category,
+      });
+    }
+
+    toast.success(`Added ${quantity} ${quantity === 1 ? 'item' : 'items'} to cart!`, {
+      action: {
+        label: "View Cart",
+        onClick: () => setIsCartOpen(true),
+      },
     });
   };
 

@@ -4,6 +4,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { Heart, ShoppingCart, Star, Package } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useCart } from "@/contexts/CartContext";
+import { toast } from "sonner";
 
 export type Product = {
   id: string;
