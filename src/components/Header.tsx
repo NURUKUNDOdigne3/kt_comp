@@ -12,10 +12,13 @@ import {
   Camera,
   ChevronUpIcon,
   Mic,
+  LogIn,
+  UserPlus,
 } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { CartDrawer } from "./CartDrawer";
 import { brandData } from "../lib/brands";
+import { useCart } from "@/contexts/CartContext";
 
 const categories = [
   { name: "All", href: "/", active: true },
@@ -30,10 +33,22 @@ const categories = [
 
 // Brand data with categories
 
+interface UserData {
+  id: string;
+  email: string;
+  name: string | null;
+  avatar: string | null;
+  role: string;
+}
+
 export default function Header() {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeBrand, setActiveBrand] = useState<string | null>(null);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [user, setUser] = useState<UserData | null>(null);
   const pathname = usePathname();
+  const userMenuRef = useRef<HTMLDivElement>(null);
+  const { itemCount, setIsCartOpen } = useCart();
 
   useEffect(() => {
     // Check if current path is a brand page
@@ -44,6 +59,38 @@ export default function Header() {
       setActiveBrand(null);
     }
   }, [pathname]);
+
+  // Check for logged in user
+  useEffect(() => {
+    const userData = localStorage.getItem("user");
+    if (userData) {
+      try {
+        setUser(JSON.parse(userData));
+      } catch (error) {
+        console.error("Failed to parse user data:", error);
+      }
+    }
+  }, []);
+
+  // Close user menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        userMenuRef.current &&
+        !userMenuRef.current.contains(event.target as Node)
+      ) {
+        setIsUserMenuOpen(false);
+      }
+    };
+
+    if (isUserMenuOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isUserMenuOpen]);
 
   // Get current category from pathname
   const getCurrentCategory = () => {
@@ -80,7 +127,6 @@ export default function Header() {
   }));
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isNavigationVisible, setIsNavigationVisible] = useState(true);
-  const [isCartOpen, setIsCartOpen] = useState(false);
   const [isHeaderVisible, setIsHeaderVisible] = useState(true);
 
   const categoriesRef = useRef(null);
@@ -199,9 +245,11 @@ export default function Header() {
                   aria-label="Cart"
                 >
                   <ShoppingCart className="h-5 w-5" />
-                  <span className="absolute top-1 right-1 text-white bg-blue-500 text-xs w-4 h-4 flex items-center justify-center rounded-full">
-                    0
-                  </span>
+                  {itemCount > 0 && (
+                    <span className="absolute top-1 right-1 text-white bg-blue-500 text-xs w-4 h-4 flex items-center justify-center rounded-full">
+                      {itemCount}
+                    </span>
+                  )}
                 </button>
               </div>
             </div>
@@ -254,21 +302,92 @@ export default function Header() {
               </div>
 
               <div className="flex items-center space-x-6">
-                <button
-                  type="button"
-                  className="text-gray-700 hover:text-blue-600 transition-colors p-2 rounded-full hover:bg-gray-100"
-                >
-                  <User className="h-6 w-6" />
-                </button>
+                {/* User Menu Dropdown */}
+                <div className="relative" ref={userMenuRef}>
+                  <button
+                    type="button"
+                    onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                    className="text-gray-700 hover:text-blue-600 transition-colors p-2 rounded-full hover:bg-gray-100 flex items-center justify-center"
+                  >
+                    {user && user.avatar ? (
+                      <Image
+                        src={user.avatar}
+                        alt={user.name || "User"}
+                        width={32}
+                        height={32}
+                        className="rounded-full object-cover"
+                      />
+                    ) : user ? (
+                      <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm font-semibold">
+                        {user.name?.charAt(0).toUpperCase() || user.email.charAt(0).toUpperCase()}
+                      </div>
+                    ) : (
+                      <User className="h-6 w-6" />
+                    )}
+                  </button>
+
+                  {/* Dropdown Menu */}
+                  {isUserMenuOpen && !user && (
+                    <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+                      <Link
+                        href="/auth/login"
+                        className="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                        onClick={() => setIsUserMenuOpen(false)}
+                      >
+                        <LogIn className="h-4 w-4" />
+                        <span>Login</span>
+                      </Link>
+                      <Link
+                        href="/auth/signup"
+                        className="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                        onClick={() => setIsUserMenuOpen(false)}
+                      >
+                        <UserPlus className="h-4 w-4" />
+                        <span>Sign Up</span>
+                      </Link>
+                    </div>
+                  )}
+
+                  {/* Logged In Menu */}
+                  {isUserMenuOpen && user && (
+                    <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+                      <Link
+                        href="/account"
+                        className="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                        onClick={() => setIsUserMenuOpen(false)}
+                      >
+                        <User className="h-4 w-4" />
+                        <span>My Account</span>
+                      </Link>
+                      <button
+                        onClick={() => {
+                          // Logout: clear localStorage and reset state
+                          localStorage.removeItem("auth_token");
+                          localStorage.removeItem("user");
+                          setUser(null);
+                          setIsUserMenuOpen(false);
+                          window.location.href = "/";
+                        }}
+                        className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors text-left"
+                      >
+                        <LogIn className="h-4 w-4" />
+                        <span>Logout</span>
+                      </button>
+                    </div>
+                  )}
+                </div>
+                {/* Cart Button */}
                 <button
                   type="button"
                   onClick={() => setIsCartOpen(true)}
                   className="text-gray-700 hover:text-blue-600 transition-colors p-2 rounded-full hover:bg-gray-100 relative"
                 >
                   <ShoppingCart className="h-6 w-6" />
-                  <span className="absolute top-0 right-0 -mt-1 -mr-1 bg-blue-600 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
-                    0
-                  </span>
+                  {itemCount > 0 && (
+                    <span className="absolute top-0 right-0 -mt-1 -mr-1 bg-blue-600 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
+                      {itemCount}
+                    </span>
+                  )}
                 </button>
               </div>
             </div>
@@ -442,19 +561,19 @@ export default function Header() {
                   <User className="h-5 w-5 mr-2" aria-hidden="true" />
                   Account
                 </Link>
-                <Link
-                  href="/cart"
+                <button
+                  onClick={() => setIsCartOpen(true)}
                   className="flex-1 flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <ShoppingCart className="h-5 w-5 mr-2" aria-hidden="true" />
-                  Cart (0)
-                </Link>
+                  Cart ({itemCount})
+                </button>
               </div>
             </div>
           </nav>
         </div>
       </header>
-      <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
+      <CartDrawer />
     </>
   );
 }

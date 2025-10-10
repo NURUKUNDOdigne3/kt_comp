@@ -4,18 +4,36 @@ import Image from "next/image";
 import Link from "next/link";
 import { Heart, ShoppingCart, Star, Package } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useCart } from "@/contexts/CartContext";
+import { toast } from "sonner";
 
 export type Product = {
   id: string;
   name: string;
-  brand: string;
-  image: string;
+  slug: string;
+  description: string | null;
   price: number;
-  oldPrice?: number;
+  compareAtPrice?: number | null;
+  images: string[];
+  stockQuantity?: number;
+  featured?: boolean;
+  brand?: {
+    id: string;
+    name: string;
+    slug: string;
+    logo?: string | null;
+  } | null;
+  category?: {
+    id: string;
+    name: string;
+    slug: string;
+  } | null;
+  // Legacy fields for backward compatibility
+  image?: string | null;
+  oldPrice?: number | null;
   priceFormatted?: string;
   oldPriceFormatted?: string;
-  description?: string; // e.g., "Intel Core i7, 16GB RAM, 512GB SSD"
-  badge?: string; // e.g., "New", "Hot", "Sale"
+  badge?: string | null;
   rating?: number;
   reviewCount?: number;
   stockCount?: number;
@@ -35,22 +53,51 @@ export default function ProductCard({
   onAddToCart,
   onToggleWishlist,
 }: ProductCardProps) {
-  const {
-    name,
-    brand,
-    image,
-    price,
-    oldPrice,
-    priceFormatted,
-    oldPriceFormatted,
-    description,
-    badge,
-  } = product;
+  const { addItem, setIsCartOpen } = useCart();
+
+  // Handle both database and legacy product formats
+  const name = product.name;
+  const brandName = typeof product.brand === 'string' ? product.brand : (product.brand?.name || 'Unknown Brand');
+  const categoryName = typeof product.category === 'string' ? product.category : (product.category?.name || 'Products');
+  const image = product.images?.[0] || product.image || '/placeholder-product.png';
+  const price = product.price;
+  const oldPrice = product.compareAtPrice || product.oldPrice;
+  const priceFormatted = product.priceFormatted || `RWF ${price.toLocaleString()}`;
+  const oldPriceFormatted = product.oldPriceFormatted || (oldPrice ? `RWF ${oldPrice.toLocaleString()}` : undefined);
+  const description = product.description;
+  const badge = product.badge || (product.featured ? 'Featured' : undefined);
+  const inStock = (product.stockQuantity ?? 0) > 0 || product.inStock !== false;
 
   const discount =
     oldPrice && oldPrice > price
       ? Math.round(((oldPrice - price) / oldPrice) * 100)
       : undefined;
+
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    // Add to cart
+    addItem({
+      productId: product.id,
+      name: product.name,
+      price: product.price,
+      image: image,
+      brand: brandName,
+      category: categoryName,
+    });
+
+    // Show success toast
+    toast.success(`${product.name} added to cart!`, {
+      action: {
+        label: "View Cart",
+        onClick: () => setIsCartOpen(true),
+      },
+    });
+
+    // Call optional callback
+    onAddToCart?.(product);
+  };
 
   return (
     <Link
@@ -74,7 +121,7 @@ export default function ProductCard({
           </span>
         )}
         <Image
-          src={image}
+          src={image || '/placeholder-product.png'}
           alt={name}
           fill
           sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
@@ -84,10 +131,7 @@ export default function ProductCard({
         {/* Hover actions */}
         <div className="pointer-events-none absolute inset-x-0 bottom-3 flex items-center justify-center gap-2 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
           <button
-            onClick={(e) => {
-              e.preventDefault();
-              onAddToCart?.(product);
-            }}
+            onClick={handleAddToCart}
             className="pointer-events-auto inline-flex items-center gap-2 rounded-full bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
           >
             <ShoppingCart className="h-4 w-4" /> Add to cart
@@ -107,7 +151,9 @@ export default function ProductCard({
 
       {/* Content */}
       <div className="space-y-2 p-4">
-        <div className="text-xs font-medium text-gray-500">{brand}</div>
+        <div className="text-xs font-medium text-gray-500">
+          {brandName}
+        </div>
         <div className="line-clamp-2 text-sm font-semibold text-gray-900">
           {name}
         </div>

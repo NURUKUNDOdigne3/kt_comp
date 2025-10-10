@@ -1,0 +1,249 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User model for authentication and authorization
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String?
+  phone     String?
+  avatar    String?
+  bio       String?
+  role      UserRole @default(CUSTOMER)
+  lastLogin DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  orders    Order[]
+  reviews   Review[]
+  cartItems CartItem[]
+
+  @@index([email])
+}
+
+enum UserRole {
+  ADMIN
+  CUSTOMER
+}
+
+// Category model
+model Category {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  slug        String    @unique
+  description String?
+  image       String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // Relations
+  products Product[]
+
+  @@index([slug])
+}
+
+// Brand model
+model Brand {
+  id        String    @id @default(cuid())
+  name      String    @unique
+  slug      String    @unique
+  logo      String?
+  website   String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  // Relations
+  products Product[]
+
+  @@index([slug])
+}
+
+// Product model
+model Product {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String?
+  price       Int      // Price in RWF (Rwanda Francs)
+  oldPrice    Int?     // Original price for discounts
+  image       String?
+  images      String[] // Multiple product images
+  badge       String?  // "New", "Hot", "Sale", etc.
+  rating      Float    @default(0)
+  reviewCount Int      @default(0)
+  stockCount  Int      @default(0)
+  inStock     Boolean  @default(true)
+  featured    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Foreign keys
+  brandId    String
+  categoryId String
+
+  // Relations
+  brand      Brand        @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  category   Category     @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  reviews    Review[]
+  orderItems OrderItem[]
+  cartItems  CartItem[]
+
+  @@index([slug])
+  @@index([brandId])
+  @@index([categoryId])
+  @@index([featured])
+}
+
+// Review model
+model Review {
+  id        String       @id @default(cuid())
+  rating    Int         // 1-5 stars
+  comment   String?
+  status    ReviewStatus @default(PENDING)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  // Foreign keys
+  productId String
+  userId    String
+
+  // Relations
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([productId])
+  @@index([userId])
+  @@index([status])
+}
+
+enum ReviewStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+// Cart model
+model CartItem {
+  id        String   @id @default(cuid())
+  quantity  Int      @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Foreign keys
+  productId String
+  userId    String
+
+  // Relations
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, productId])
+  @@index([userId])
+  @@index([productId])
+}
+
+// Order model
+model Order {
+  id              String        @id @default(cuid())
+  orderNumber     String        @unique @default(cuid())
+  status          OrderStatus   @default(PENDING)
+  paymentStatus   PaymentStatus @default(PENDING)
+  totalAmount     Int           // Total in RWF
+  shippingAddress String
+  customerName    String
+  customerEmail   String
+  customerPhone   String
+  notes           String?
+  stripeSessionId String?       @unique
+  paidAt          DateTime?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  // Foreign keys
+  userId String?
+
+  // Relations
+  user       User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
+  orderItems OrderItem[]
+
+  @@index([userId])
+  @@index([orderNumber])
+  @@index([status])
+  @@index([paymentStatus])
+  @@index([stripeSessionId])
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PROCESSING
+  IN_TRANSIT
+  OUT_FOR_DELIVERY
+  DELIVERED
+  CANCELLED
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+// OrderItem model
+model OrderItem {
+  id        String   @id @default(cuid())
+  name      String   // Product name at time of order
+  quantity  Int
+  price     Int      // Price at time of order
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Foreign keys
+  orderId   String
+  productId String
+
+  // Relations
+  order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Restrict)
+
+  @@index([orderId])
+  @@index([productId])
+}
+
+// AuditLog model for tracking system activities
+model AuditLog {
+  id          String   @id @default(cuid())
+  action      String   // e.g., "User Login", "Product Created", etc.
+  resource    String   // e.g., "Authentication", "Products", "Orders"
+  level       LogLevel @default(INFO)
+  description String?
+  metadata    Json?    // Additional data (IP, user agent, etc.)
+  userId      String?
+  userEmail   String?
+  ipAddress   String?
+  createdAt   DateTime @default(now())
+
+  @@index([level])
+  @@index([resource])
+  @@index([userId])
+  @@index([createdAt])
+}
+
+enum LogLevel {
+  INFO
+  SUCCESS
+  WARNING
+  ERROR
+}

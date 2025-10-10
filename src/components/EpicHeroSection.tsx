@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Truck, Shield, HeadphonesIcon, Award } from "lucide-react";
@@ -8,7 +8,35 @@ import Image from "next/image";
 
 gsap.registerPlugin(ScrollTrigger);
 
+const productImages = [
+  {
+    src: "https://macfinder.co.uk/wp-content/uploads/2023/12/img-MacBook-Pro-Retina-14-Inch-96139-scaled.jpg",
+    alt: "MacBook Pro",
+  },
+  {
+    src: "https://eworkshop.co.za/cdn/shop/files/iPhone15ProMax256GB-NaturalTitanium.png?v=1726073287&width=1946",
+    alt: "Iphone 15 pro max",
+  },
+  {
+    src: "https://m.media-amazon.com/images/I/61si2lzARfL.jpg",
+    alt: "Epson workforc",
+  },
+  {
+    src: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSrXkPX67HY7CIyMamvPTeYWZ7SWYaOevYUMA&s",
+    alt: "TP-Link Archer",
+  },
+  {
+    src: "https://uploads-eu-west-1.insided.com/sonos-en/attachment/67246f05-a47d-4e5f-8b53-4724bf52c644.png",
+    alt: "Sonos Roam",
+  },
+  {
+    src: "https://m.media-amazon.com/images/I/81iPNmdC-vL._UF1000,1000_QL80_.jpg",
+    alt: "ASUS ProArt",
+  },
+];
+
 export default function EpicHeroSection() {
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const sectionRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
   const descriptionRef = useRef<HTMLParagraphElement>(null);
@@ -17,6 +45,17 @@ export default function EpicHeroSection() {
   const imageRef = useRef<HTMLDivElement>(null);
   const cardsRef = useRef<HTMLDivElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
+
+  // Auto-rotate images every 4 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentImageIndex(
+        (prevIndex) => (prevIndex + 1) % productImages.length
+      );
+    }, 4000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -159,7 +198,7 @@ export default function EpicHeroSection() {
   return (
     <section
       ref={sectionRef}
-      className="relative bg-gradient-to-b from-gray-50 to-blue-50/30 py-12 md:py-20 px-4 transition-colors duration-300 overflow-hidden"
+      className="relative bg-gradient-to-b from-gray-50 to-blue-50/30 pt-12  px-4 transition-colors duration-300 overflow-hidden"
     >
       {/* Animated grid background */}
       <div
@@ -233,21 +272,46 @@ export default function EpicHeroSection() {
             </div>
           </div>
 
-          {/* Right image */}
+          {/* Right image - Slideshow */}
           <div
             ref={imageRef}
             className="relative lg:h-[500px] flex items-center justify-center"
           >
             <div className="relative w-full max-w-lg">
-              {/* Placeholder for product image */}
-              <div className="aspect-[4/3] bg-gradient-to-br from-white to-blue-50 dark:from-gray-800 dark:to-gray-700 rounded-2xl flex items-center justify-center overflow-hidden">
-                <Image
-                  src="https://macfinder.co.uk/wp-content/uploads/2023/12/img-MacBook-Pro-Retina-14-Inch-96139-scaled.jpg"
-                  alt="Product Image"
-                  width={500}
-                  height={500}
-                  className="w-full h-full object-cover"
-                />
+              {/* Product image slideshow */}
+              <div className="aspect-[4/3] bg-gradient-to-br from-white to-blue-50 dark:from-gray-800 dark:to-gray-700 rounded-2xl flex items-center justify-center overflow-hidden relative">
+                {productImages.map((image, index) => (
+                  <div
+                    key={index}
+                    className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
+                      index === currentImageIndex
+                        ? "opacity-100 z-10"
+                        : "opacity-0 z-0"
+                    }`}
+                  >
+                    <Image
+                      src={image.src}
+                      alt={image.alt}
+                      fill
+                      className="object-cover"
+                      priority={index === 0}
+                    />
+                  </div>
+                ))}
+              </div>
+
+              {/* Slideshow indicators */}
+              <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 flex gap-2">
+                {productImages.map((_, index) => (
+                  <div
+                    key={index}
+                    className={`h-1.5 rounded-full transition-all duration-500 ${
+                      index === currentImageIndex
+                        ? "w-8 bg-blue-600"
+                        : "w-1.5 bg-gray-300 dark:bg-gray-600"
+                    }`}
+                  />
+                ))}
               </div>
             </div>
           </div>

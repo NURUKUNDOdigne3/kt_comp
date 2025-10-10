@@ -11,40 +11,17 @@ import {
   DrawerHeader,
   DrawerTitle,
 } from "@/components/ui/drawer";
+import { useCart } from "@/contexts/CartContext";
+import Link from "next/link";
 
-// Mock cart items for demonstration
-const cartItems = [
-  {
-    id: 1,
-    name: "MacBook Pro M2",
-    price: 1299.99,
-    quantity: 1,
-    image: "/products/macbook.svg",
-  },
-  {
-    id: 2,
-    name: "Dell XPS 15",
-    price: 1599.99,
-    quantity: 1,
-    image: "/products/dell-xps.svg",
-  },
-];
-
-interface CartDrawerProps {
-  isOpen: boolean;
-  onClose: () => void;
-}
-
-export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
-  const subtotal = cartItems.reduce(
-    (total, item) => total + item.price * item.quantity,
-    0
-  );
-  const tax = subtotal * 0.1; // 10% tax
-  const total = subtotal + tax;
+export function CartDrawer() {
+  const { items, itemCount, totalAmount, updateQuantity, removeItem, isCartOpen, setIsCartOpen } = useCart();
+  
+  const tax = totalAmount * 0.18; // 18% VAT in Rwanda
+  const total = totalAmount + tax;
 
   return (
-    <Drawer open={isOpen} onOpenChange={onClose} direction="right">
+    <Drawer open={isCartOpen} onOpenChange={setIsCartOpen} direction="right">
       <DrawerContent>
         <div className="mx-auto w-full max-w-2xl">
           <DrawerHeader>
@@ -63,13 +40,25 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
               </DrawerClose>
             </div>
             <DrawerDescription>
-              {cartItems.length} items in your cart
+              {itemCount} {itemCount === 1 ? "item" : "items"} in your cart
             </DrawerDescription>
           </DrawerHeader>
 
           <div className="p-4 pb-0">
-            <div className="space-y-4">
-              {cartItems.map((item) => (
+            {items.length === 0 ? (
+              <div className="text-center py-12">
+                <ShoppingCart className="h-16 w-16 mx-auto text-gray-300 mb-4" />
+                <p className="text-gray-500 mb-4">Your cart is empty</p>
+                <button
+                  onClick={() => setIsCartOpen(false)}
+                  className="text-blue-600 hover:text-blue-700 font-medium"
+                >
+                  Continue Shopping
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {items.map((item) => (
                 <div
                   key={item.id}
                   className="flex items-center space-x-4 py-3 border-b"
@@ -87,10 +76,11 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                       {item.name}
                     </h3>
                     <p className="text-sm text-gray-500">
-                      ${item.price.toFixed(2)}
+                      RWF {item.price.toLocaleString()}
                     </p>
                     <div className="flex items-center space-x-2 mt-2">
                       <button
+                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
                         className="p-1 rounded-full hover:bg-gray-100 transition-colors"
                         aria-label="Decrease quantity"
                       >
@@ -100,6 +90,7 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                         {item.quantity}
                       </span>
                       <button
+                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
                         className="p-1 rounded-full hover:bg-gray-100 transition-colors"
                         aria-label="Increase quantity"
                       >
@@ -108,6 +99,7 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                     </div>
                   </div>
                   <button
+                    onClick={() => removeItem(item.id)}
                     className="p-2 rounded-full hover:bg-gray-100 transition-colors"
                     aria-label="Remove item"
                   >
@@ -116,38 +108,43 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                 </div>
               ))}
             </div>
+            )}
           </div>
 
-          <DrawerFooter>
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span>Subtotal</span>
-                  <span>${subtotal.toFixed(2)}</span>
+          {items.length > 0 && (
+            <DrawerFooter>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span>Subtotal</span>
+                    <span>RWF {totalAmount.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span>Tax (18% VAT)</span>
+                    <span>RWF {tax.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between text-base font-medium">
+                    <span>Total</span>
+                    <span>RWF {total.toLocaleString()}</span>
+                  </div>
                 </div>
-                <div className="flex justify-between text-sm">
-                  <span>Tax</span>
-                  <span>${tax.toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between text-base font-medium">
-                  <span>Total</span>
-                  <span>${total.toFixed(2)}</span>
-                </div>
+                <Link href="/checkout">
+                  <button
+                    className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                    onClick={() => setIsCartOpen(false)}
+                  >
+                    Checkout
+                  </button>
+                </Link>
+                <button
+                  className="w-full border border-gray-300 text-gray-700 py-3 px-4 rounded-lg hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                  onClick={() => setIsCartOpen(false)}
+                >
+                  Continue Shopping
+                </button>
               </div>
-              <button
-                className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                onClick={onClose}
-              >
-                Checkout
-              </button>
-              <button
-                className="w-full border border-gray-300 text-gray-700 py-3 px-4 rounded-lg hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                onClick={onClose}
-              >
-                Continue Shopping
-              </button>
-            </div>
-          </DrawerFooter>
+            </DrawerFooter>
+          )}
         </div>
       </DrawerContent>
     </Drawer>
