@@ -1,5 +1,8 @@
 "use client";
 
+import { useState } from "react";
+import { AuthProvider } from "@/contexts/AuthContext";
+import { DashboardGuard } from "@/components/DashboardGuard";
 import { AppSidebar } from "@/components/app-sidebar";
 import {
   Breadcrumb,
@@ -25,96 +28,63 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Search, Plus, Filter, Image, Pencil } from "lucide-react";
-import { useState } from "react";
+import { Search, Plus, Image, Pencil, Loader2, Trash2, Package } from "lucide-react";
 import { AddBrandModal } from "@/components/AddBrandModal";
 import { EditBrandModal } from "@/components/EditBrandModal";
 import { useRouter } from "next/navigation";
+import {
+  useBrands,
+  useBrand,
+  useCreateBrand,
+  useUpdateBrand,
+  useDeleteBrand,
+} from "@/hooks/use-api";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export default function BrandsPage() {
   const router = useRouter();
-
-  // Mock data for brands
-  const [brands, setBrands] = useState([
-    {
-      id: "apple",
-      name: "Apple",
-      description: "Innovative technology products",
-      products: 12,
-      status: "Active",
-      website: "https://apple.com",
-      categories: ["Computers", "Phones"],
-    },
-    {
-      id: "samsung",
-      name: "Samsung",
-      description: "Electronics and mobile devices",
-      products: 18,
-      status: "Active",
-      website: "https://samsung.com",
-      categories: ["Phones", "Monitors"],
-    },
-    {
-      id: "dell",
-      name: "Dell",
-      description: "Computer systems and accessories",
-      products: 9,
-      status: "Active",
-      website: "https://dell.com",
-      categories: ["Computers", "Monitors"],
-    },
-    {
-      id: "hp",
-      name: "HP",
-      description: "Printing and computing solutions",
-      products: 15,
-      status: "Active",
-      website: "https://hp.com",
-      categories: ["Computers", "Printers"],
-    },
-    {
-      id: "lenovo",
-      name: "Lenovo",
-      description: "Computers and smart devices",
-      products: 7,
-      status: "Active",
-      website: "https://lenovo.com",
-      categories: ["Computers"],
-    },
-  ]);
-
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedBrand, setSelectedBrand] = useState<any>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case "Active":
-        return <Badge variant="default">{status}</Badge>;
-      case "Inactive":
-        return <Badge variant="secondary">{status}</Badge>;
-      default:
-        return <Badge>{status}</Badge>;
-    }
-  };
+  // Fetch data
+  const { data: brands, isLoading, mutate: refetchBrands } = useBrands();
+  const { trigger: createBrand } = useCreateBrand();
+  const { trigger: updateBrand } = useUpdateBrand(selectedBrand?.id || "");
+  const { trigger: deleteBrand } = useDeleteBrand(selectedBrand?.id || "");
 
-  const handleAddBrand = (newBrand: {
+
+  const handleAddBrand = async (newBrand: {
     name: string;
-    description: string;
-    status: string;
-    website: string;
-    categories: string[];
+    description?: string;
+    logoUrl?: string;
   }) => {
-    // In a real app, you would make an API call here
-    const brand = {
-      id: newBrand.name.toLowerCase().replace(/\s+/g, "-"),
-      ...newBrand,
-      products: 0,
-    };
-    setBrands([...brands, brand]);
-    setIsAddModalOpen(false);
+    try {
+      // Transform data to match API schema
+      const brandData: any = {
+        name: newBrand.name,
+        slug: newBrand.name.toLowerCase().replace(/\s+/g, '-'),
+      };
+      if (newBrand.logoUrl) brandData.logo = newBrand.logoUrl;
+      
+      await createBrand(brandData);
+      refetchBrands();
+      setIsAddModalOpen(false);
+    } catch (error) {
+      console.error("Failed to create brand:", error);
+      alert("Failed to create brand");
+    }
   };
 
   const handleEditBrand = (brand: any) => {
@@ -122,11 +92,35 @@ export default function BrandsPage() {
     setIsEditModalOpen(true);
   };
 
-  const handleSaveBrand = (updatedBrand: any) => {
-    // In a real app, you would make an API call here
-    setBrands(brands.map((b) => (b.id === updatedBrand.id ? updatedBrand : b)));
-    setIsEditModalOpen(false);
-    setSelectedBrand(null);
+  const handleSaveBrand = async (updatedBrand: any) => {
+    try {
+      // Transform data to match API schema
+      const brandData: any = {
+        name: updatedBrand.name,
+        slug: updatedBrand.name.toLowerCase().replace(/\s+/g, '-'),
+      };
+      if (updatedBrand.logoUrl) brandData.logo = updatedBrand.logoUrl;
+      
+      await updateBrand(brandData);
+      refetchBrands();
+      setIsEditModalOpen(false);
+      setSelectedBrand(null);
+    } catch (error) {
+      console.error("Failed to update brand:", error);
+      alert("Failed to update brand");
+    }
+  };
+
+  const handleDeleteBrand = async () => {
+    try {
+      await deleteBrand();
+      setIsDeleteDialogOpen(false);
+      setSelectedBrand(null);
+      refetchBrands();
+    } catch (error) {
+      console.error("Failed to delete brand:", error);
+      alert("Failed to delete brand");
+    }
   };
 
   const handleViewProducts = (brandName: string) => {
@@ -134,26 +128,25 @@ export default function BrandsPage() {
     router.push(`/dashboard/products?brand=${encodeURIComponent(brandName)}`);
   };
 
-  // Filter brands based on search query and status
-  const filteredBrands = brands.filter((brand) => {
+  // Filter brands based on search query
+  const filteredBrands = (brands || []).filter((brand: any) => {
     const matchesSearch =
       brand.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      brand.description.toLowerCase().includes(searchQuery.toLowerCase());
+      (brand.description?.toLowerCase() || "").includes(searchQuery.toLowerCase());
 
-    const matchesStatus =
-      statusFilter === "all" || brand.status === statusFilter;
-
-    return matchesSearch && matchesStatus;
+    return matchesSearch;
   });
 
   return (
-    <SidebarProvider>
-      <AppSidebar />
-      <SidebarInset>
-        <header className="flex h-16 shrink-0 items-center gap-2">
-          <div className="flex items-center gap-2 px-4">
-            <SidebarTrigger className="-ml-1" />
-            <Separator orientation="vertical" className="mr-2 h-4" />
+    <AuthProvider>
+      <DashboardGuard>
+        <SidebarProvider>
+          <AppSidebar />
+          <SidebarInset>
+            <header className="flex h-16 shrink-0 items-center gap-2">
+              <div className="flex items-center gap-2 px-4">
+                <SidebarTrigger className="-ml-1" />
+                <Separator orientation="vertical" className="mr-2 data-[orientation=vertical]:h-4" />
             <Breadcrumb>
               <BreadcrumbList>
                 <BreadcrumbItem className="hidden md:block">
@@ -167,111 +160,160 @@ export default function BrandsPage() {
             </Breadcrumb>
           </div>
         </header>
-        <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-          <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-bold">Brands</h1>
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() =>
-                  setStatusFilter(statusFilter === "all" ? "Active" : "all")
-                }
-              >
-                <Filter className="mr-2 h-4 w-4" />
-                {statusFilter === "all" ? "Active Only" : "All Brands"}
-              </Button>
-              <Button size="sm" onClick={() => setIsAddModalOpen(true)}>
-                <Plus className="mr-2 h-4 w-4" />
-                Add Brand
-              </Button>
-            </div>
-          </div>
+            <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
 
-          <Card>
-            <CardHeader>
-              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                <CardTitle>All Brands</CardTitle>
-                <div className="flex items-center gap-2">
-                  <div className="relative">
-                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      placeholder="Search brands..."
-                      className="pl-8 w-full md:w-64"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                    />
+              <Card>
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <CardTitle>Brands</CardTitle>
+                      <CardDescription>
+                        Manage product brands and manufacturers
+                      </CardDescription>
+                    </div>
+                    <Button size="sm" onClick={() => setIsAddModalOpen(true)}>
+                      <Plus className="mr-2 h-4 w-4" />
+                      Add Brand
+                    </Button>
                   </div>
-                </div>
-              </div>
-              <CardDescription>
-                Manage product brands and manufacturers
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {filteredBrands.map((brand) => (
-                  <Card
-                    key={brand.id}
-                    className="hover:shadow-md transition-shadow"
+                </CardHeader>
+                <CardContent>
+                  {/* Search */}
+                  <div className="mb-6">
+                    <div className="relative">
+                      <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        placeholder="Search brands..."
+                        className="pl-8"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Brands Grid */}
+                  {isLoading ? (
+                    <div className="flex items-center justify-center py-12">
+                      <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                    </div>
+                  ) : filteredBrands.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-12 text-center">
+                      <Package className="h-12 w-12 text-muted-foreground mb-4" />
+                      <h3 className="text-lg font-semibold">No brands found</h3>
+                      <p className="text-sm text-muted-foreground">
+                        {searchQuery
+                          ? "Try adjusting your search"
+                          : "No brands added yet"}
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                      {filteredBrands.map((brand: any) => (
+                        <Card
+                          key={brand.id}
+                          className="hover:shadow-md transition-shadow"
+                        >
+                          <CardContent className="p-6">
+                            <div className="flex items-start gap-4">
+                              <div className="bg-muted flex h-16 w-16 items-center justify-center rounded-lg">
+                                {brand.logoUrl ? (
+                                  <img
+                                    src={brand.logoUrl}
+                                    alt={brand.name}
+                                    className="h-12 w-12 object-contain"
+                                  />
+                                ) : (
+                                  <Image className="h-8 w-8 text-muted-foreground" />
+                                )}
+                              </div>
+                              <div className="flex-1">
+                                <h3 className="font-semibold">{brand.name}</h3>
+                                <p className="text-sm text-muted-foreground mt-1">
+                                  {brand.description || "No description"}
+                                </p>
+                                <p className="text-sm text-muted-foreground mt-1">
+                                  {brand._count?.products || 0} products
+                                </p>
+                                <div className="flex gap-2 mt-3">
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => handleEditBrand(brand)}
+                                  >
+                                    <Pencil className="h-4 w-4 mr-2" />
+                                    Edit
+                                  </Button>
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => handleViewProducts(brand.name)}
+                                  >
+                                    View Products
+                                  </Button>
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="text-destructive"
+                                    onClick={() => {
+                                      setSelectedBrand(brand);
+                                      setIsDeleteDialogOpen(true);
+                                    }}
+                                  >
+                                    <Trash2 className="h-4 w-4" />
+                                  </Button>
+                                </div>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+            <AddBrandModal
+              open={isAddModalOpen}
+              onOpenChange={setIsAddModalOpen}
+              onSave={handleAddBrand}
+            />
+            <EditBrandModal
+              brand={selectedBrand}
+              open={isEditModalOpen}
+              onOpenChange={setIsEditModalOpen}
+              onSave={handleSaveBrand}
+            />
+
+            {/* Delete Confirmation */}
+            <AlertDialog
+              open={isDeleteDialogOpen}
+              onOpenChange={setIsDeleteDialogOpen}
+            >
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This will permanently delete "{selectedBrand?.name}". All
+                    products associated with this brand will lose their brand
+                    association. This action cannot be undone.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel onClick={() => setSelectedBrand(null)}>
+                    Cancel
+                  </AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={handleDeleteBrand}
+                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                   >
-                    <CardContent className="p-6">
-                      <div className="flex items-start gap-4">
-                        <div className="bg-muted flex h-16 w-16 items-center justify-center rounded-lg">
-                          <Image className="h-8 w-8 text-muted-foreground" />
-                        </div>
-                        <div className="flex-1">
-                          <div className="flex items-start justify-between">
-                            <h3 className="font-semibold">{brand.name}</h3>
-                            {getStatusBadge(brand.status)}
-                          </div>
-                          <p className="text-sm text-muted-foreground mt-1">
-                            {brand.description}
-                          </p>
-                          <p className="text-sm text-muted-foreground mt-1">
-                            {brand.products} products
-                          </p>
-                          <p className="text-sm text-muted-foreground mt-1">
-                            {brand.categories.join(", ")}
-                          </p>
-                          <div className="flex gap-2 mt-3">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleEditBrand(brand)}
-                            >
-                              <Pencil className="h-4 w-4 mr-2" />
-                              Edit
-                            </Button>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleViewProducts(brand.name)}
-                            >
-                              View Products
-                            </Button>
-                          </div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-        <AddBrandModal
-          open={isAddModalOpen}
-          onOpenChange={setIsAddModalOpen}
-          onSave={handleAddBrand}
-        />
-        <EditBrandModal
-          brand={selectedBrand}
-          open={isEditModalOpen}
-          onOpenChange={setIsEditModalOpen}
-          onSave={handleSaveBrand}
-        />
-      </SidebarInset>
-    </SidebarProvider>
+                    Delete
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </SidebarInset>
+        </SidebarProvider>
+      </DashboardGuard>
+    </AuthProvider>
   );
 }
