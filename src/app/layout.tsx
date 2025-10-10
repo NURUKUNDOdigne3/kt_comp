@@ -18,8 +18,76 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "KT Computer Supply",
-  description: "Top notch electronic and computer solutions in Rwanda",
+  metadataBase: new URL("https://ktcomputersupply.vercel.rw"),
+  title: {
+    default:
+      "KT Computer Supply - Premium Electronics & Computer Solutions in Rwanda",
+    template: "%s | KT Computer Supply",
+  },
+  description:
+    "KT Computer Supply - Your trusted source for premium electronics, computers, and tech solutions in Rwanda. We offer high-quality products, expert service, and competitive prices.",
+  keywords: [
+    "computer supply rwanda",
+    "electronics store kigali",
+    "laptop sales rwanda",
+    "computer accessories",
+    "tech solutions rwanda",
+    "IT equipment kigali",
+    "computer parts rwanda",
+    "electronics retailer",
+    "computer store kigali",
+    "tech shop rwanda",
+  ],
+  authors: { name: "KT Computer Supply" },
+  creator: "KT Computer Supply",
+  publisher: "KT Computer Supply",
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  icons: {
+    icon: "/logo.png",
+    apple: "/logo.png",
+  },
+  manifest: "/manifest.json",
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: "/",
+    title: "KT Computer Supply - Premium Electronics & Computer Solutions",
+    description:
+      "Your trusted source for premium electronics, computers, and tech solutions in Rwanda. We offer high-quality products, expert service, and competitive prices.",
+    siteName: "KT Computer Supply",
+    images: [
+      {
+        url: "/logo.png",
+        width: 1200,
+        height: 630,
+        alt: "KT Computer Supply - Premium Electronics & Computer Solutions",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "KT Computer Supply - Premium Electronics & Computer Solutions",
+    description:
+      "Your trusted source for premium electronics, computers, and tech solutions in Rwanda",
+    images: ["/logo.png"],
+    creator: "@ktcomputer",
+    site: "@ktcomputer",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
 };
 
 export default function RootLayout({
