@@ -42,6 +42,7 @@ const data = {
     email: "admin@ktcomputersupply.com",
     avatar: "/avatars/admin.jpg",
   },
+
   navMain: [
     {
       title: "Dashboard",
@@ -65,10 +66,10 @@ const data = {
           title: "Processing",
           url: "/dashboard/orders/processing",
         },
-        {
-          title: "Shipped",
-          url: "/dashboard/orders/shipped",
-        },
+        // {
+        //   title: "Shipped",
+        //   url: "/dashboard/orders/shipped",
+        // },
         {
           title: "Completed",
           url: "/dashboard/orders/completed",
@@ -88,10 +89,10 @@ const data = {
           title: "Categories",
           url: "/dashboard/products/categories",
         },
-        {
-          title: "Inventory",
-          url: "/dashboard/products/inventory",
-        },
+        // {
+        //   title: "Inventory",
+        //   url: "/dashboard/products/inventory",
+        // },
         // Removed "Add Product" link since we're using a modal now
       ],
     },
@@ -104,35 +105,35 @@ const data = {
           title: "Customer List",
           url: "/dashboard/customers",
         },
-        {
-          title: "Groups",
-          url: "/dashboard/customers/groups",
-        },
+        // {
+        //   title: "Groups",
+        //   url: "/dashboard/customers/groups",
+        // },
         {
           title: "Reviews",
           url: "/dashboard/customers/reviews",
         },
       ],
     },
-    {
-      title: "Marketing",
-      url: "/dashboard/marketing",
-      icon: TrendingUp,
-      items: [
-        {
-          title: "Coupons",
-          url: "/dashboard/marketing/coupons",
-        },
-        {
-          title: "Email Campaigns",
-          url: "/dashboard/marketing/campaigns",
-        },
-        {
-          title: "Affiliates",
-          url: "/dashboard/marketing/affiliates",
-        },
-      ],
-    },
+    // {
+    //   title: "Marketing",
+    //   url: "/dashboard/marketing",
+    //   icon: TrendingUp,
+    //   items: [
+    //     {
+    //       title: "Coupons",
+    //       url: "/dashboard/marketing/coupons",
+    //     },
+    //     {
+    //       title: "Email Campaigns",
+    //       url: "/dashboard/marketing/campaigns",
+    //     },
+    //     {
+    //       title: "Affiliates",
+    //       url: "/dashboard/marketing/affiliates",
+    //     },
+    //   ],
+    // },
     {
       title: "Analytics",
       url: "/dashboard/analytics",
@@ -146,65 +147,65 @@ const data = {
           title: "Sales",
           url: "/dashboard/analytics/sales",
         },
-        {
-          title: "Traffic",
-          url: "/dashboard/analytics/traffic",
-        },
+        // {
+        //   title: "Traffic",
+        //   url: "/dashboard/analytics/traffic",
+        // },
       ],
     },
     {
       title: "Brands",
       url: "/dashboard/brands",
       icon: Tag,
-      items: [
-        {
-          title: "All Brands",
-          url: "/dashboard/brands",
-        },
-        {
-          title: "Add Brand",
-          url: "/dashboard/brands/add",
-        },
-      ],
+      // items: [
+      //   {
+      //     title: "All Brands",
+      //     url: "/dashboard/brands",
+      //   },
+      //   {
+      //     title: "Add Brand",
+      //     url: "/dashboard/brands/add",
+      //   },
+      // ],
     },
-    {
-      title: "Logs",
-      url: "/dashboard/logs",
-      icon: FileText,
-      items: [
-        {
-          title: "Activity Logs",
-          url: "/dashboard/logs",
-        },
-      ],
-    },
-    {
-      title: "Settings",
-      url: "/dashboard/settings",
-      icon: Settings,
-      items: [
-        {
-          title: "General",
-          url: "/dashboard/settings",
-        },
-        {
-          title: "User Profile",
-          url: "/dashboard/settings/profile",
-        },
-        {
-          title: "Payments",
-          url: "/dashboard/settings/payments",
-        },
-        {
-          title: "Shipping",
-          url: "/dashboard/settings/shipping",
-        },
-        {
-          title: "Notifications",
-          url: "/dashboard/settings/notifications",
-        },
-      ],
-    },
+    // {
+    //   title: "Logs",
+    //   url: "/dashboard/logs",
+    //   icon: FileText,
+    //   items: [
+    //     {
+    //       title: "Activity Logs",
+    //       url: "/dashboard/logs",
+    //     },
+    //   ],
+    // },
+    // {
+    //   title: "Settings",
+    //   url: "/dashboard/settings",
+    //   icon: Settings,
+    //   items: [
+    //     {
+    //       title: "General",
+    //       url: "/dashboard/settings",
+    //     },
+    //     {
+    //       title: "User Profile",
+    //       url: "/dashboard/settings/profile",
+    //     },
+    //     {
+    //       title: "Payments",
+    //       url: "/dashboard/settings/payments",
+    //     },
+    //     {
+    //       title: "Shipping",
+    //       url: "/dashboard/settings/shipping",
+    //     },
+    //     {
+    //       title: "Notifications",
+    //       url: "/dashboard/settings/notifications",
+    //     },
+    //   ],
+    // },
   ],
   navSecondary: [
     {
@@ -245,12 +246,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
               <a href="/dashboard">
-                <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
+                {/* <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
                   <Store className="size-4" />
-                </div>
+                </div> */}
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-medium">
-                    KT Computer Supply
+                    <span className="text-primary font-bold">KT</span> Computer
+                    Supply
                   </span>
                   <span className="truncate text-xs">Admin Dashboard</span>
                 </div>
