@@ -280,8 +280,9 @@ export default function Header() {
               <div className="flex-shrink-0">
                 <Link
                   href="/"
-                  className="text-2xl font-bold hover:text-blue-700 transition-colors"
+                  className="text-2xl font-bold hover:text-blue-700 transition-colors flex items-center gap-2"
                 >
+                  <img src="/logo.png" alt="logo" className="size-8" />
                   <span className="text-blue-600">KT</span>ComputerSupply
                 </Link>
               </div>

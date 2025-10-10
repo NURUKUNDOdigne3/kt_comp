@@ -57,7 +57,7 @@ const socialLinks = [
 
 const categoryLinks = [
   { text: "Computers", href: data.categories.computers },
-  { text: "Phones", href: data.categories.phones },
+  // { text: "Phones", href: data.categories.phones },
   { text: "Printers", href: data.categories.printers },
   { text: "Routers", href: data.categories.routers },
   { text: "Speakers", href: data.categories.speakers },
@@ -90,7 +90,8 @@ export default function Footer() {
       <div className="mx-auto max-w-screen-xl px-4 pt-16 pb-6 sm:px-6 lg:px-8 lg:pt-24">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
           <div>
-            <div className="text-primary flex justify-center gap-2 sm:justify-start">
+            <div className="flex justify-center gap-2 sm:justify-start">
+              <img src="/logo.png" alt="logo" className="size-8" />
               <span className="text-2xl font-semibold">
                 <span className="text-blue-700 font-bold">KT</span>
                 {data.company.name}
