@@ -1,32 +1,32 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { useRouter } from "next/navigation";
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { useRouter } from 'next/navigation';
+import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 import {
   Field,
   FieldDescription,
   FieldGroup,
   FieldLabel,
-} from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
-import Link from "next/link";
-import { useLogin } from "@/hooks/use-api";
+} from '@/components/ui/field';
+import { Input } from '@/components/ui/input';
+import Link from 'next/link';
+import { useLogin } from '@/hooks/use-api';
 
 interface LoginFormData {
   email: string;
   password: string;
 }
 
-export function LoginForm({
+export function LoginFormWithHookForm({
   className,
   ...props
-}: React.ComponentProps<"div">) {
+}: React.ComponentProps<'div'>) {
   const router = useRouter();
-  const [error, setError] = useState<string>("");
+  const [error, setError] = useState<string>('');
   const { trigger, isMutating } = useLogin();
 
   const {
@@ -37,24 +37,20 @@ export function LoginForm({
 
   const onSubmit = async (data: LoginFormData) => {
     try {
-      setError("");
+      setError('');
       const result = await trigger(data);
-
-      if (result.success && result.data.token) {
-        // Store token in localStorage
-        localStorage.setItem("auth-token", result.data.token);
-
+      
+      if (result.success) {
         // Redirect to dashboard
-        router.push("/dashboard");
-        // router.refresh();
+        router.push('/dashboard');
       }
     } catch (err: any) {
-      setError(err.message || "Login failed. Please check your credentials.");
+      setError(err.message || 'Login failed. Please try again.');
     }
   };
 
   return (
-    <div className={cn("flex flex-col gap-6", className)} {...props}>
+    <div className={cn('flex flex-col gap-6', className)} {...props}>
       <Card className="overflow-hidden p-0">
         <CardContent className="grid p-0 md:grid-cols-2">
           <form onSubmit={handleSubmit(onSubmit)} className="p-6 md:p-8">
@@ -77,12 +73,12 @@ export function LoginForm({
                 <Input
                   id="email"
                   type="email"
-                  placeholder="admin@ktcomputer.rw"
-                  {...register("email", {
-                    required: "Email is required",
+                  placeholder="m@example.com"
+                  {...register('email', {
+                    required: 'Email is required',
                     pattern: {
                       value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                      message: "Invalid email address",
+                      message: 'Invalid email address',
                     },
                   })}
                 />
@@ -106,12 +102,11 @@ export function LoginForm({
                 <Input
                   id="password"
                   type="password"
-                  placeholder="••••••••"
-                  {...register("password", {
-                    required: "Password is required",
+                  {...register('password', {
+                    required: 'Password is required',
                     minLength: {
                       value: 6,
-                      message: "Password must be at least 6 characters",
+                      message: 'Password must be at least 6 characters',
                     },
                   })}
                 />
@@ -123,14 +118,10 @@ export function LoginForm({
               </Field>
 
               <Field>
-                <Button type="submit" disabled={isMutating} className="w-full">
-                  {isMutating ? "Logging in..." : "Login"}
+                <Button type="submit" disabled={isMutating}>
+                  {isMutating ? 'Logging in...' : 'Login'}
                 </Button>
               </Field>
-
-              <FieldDescription className="text-center text-xs">
-                Default credentials: admin@ktcomputer.rw / admin123
-              </FieldDescription>
 
               <FieldDescription className="text-center">
                 This page is reserved for authorized personnel only.
@@ -147,14 +138,14 @@ export function LoginForm({
         </CardContent>
       </Card>
       <FieldDescription className="px-6 text-center">
-        By clicking continue, you agree to our{" "}
+        By clicking continue, you agree to our{' '}
         <Link
           href="/terms"
           className="underline underline-offset-2 hover:underline"
         >
           Terms of Service
-        </Link>{" "}
-        and{" "}
+        </Link>{' '}
+        and{' '}
         <Link
           href="/privacy"
           className="underline underline-offset-2 hover:underline"
