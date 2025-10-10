@@ -17,7 +17,7 @@ const data = {
   githubLink: "https://github.com/ndizeyedavid/ktcomputersupply-new",
   categories: {
     computers: "/computers",
-    phones: "/phones",
+    // phones: "/phones",
     printers: "/printers",
     routers: "/routers",
     speakers: "/speakers",
