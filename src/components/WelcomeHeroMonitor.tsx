@@ -159,7 +159,7 @@ export default function WelcomeHeroMonitor() {
   return (
     <section
       ref={sectionRef}
-      className="relative bg-gradient-to-b from-gray-50 to-blue-50/30 py-12 md:py-20 px-4 transition-colors duration-300 overflow-hidden"
+      className="relative bg-gradient-to-b from-gray-50 to-blue-50/30  px-4 transition-colors duration-300 overflow-hidden"
     >
       {/* Animated grid background */}
       <div

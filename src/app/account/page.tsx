@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -34,26 +35,36 @@ import {
   Save,
   Camera,
   Key,
+  AlertCircle,
+  CheckCircle2,
+  Loader2,
 } from "lucide-react";
 
+interface UserData {
+  id: string;
+  email: string;
+  name: string | null;
+  phone: string | null;
+  avatar: string | null;
+  bio: string | null;
+  role: string;
+  createdAt: string;
+  lastLogin: string | null;
+}
+
 export default function AccountPage() {
-  // Mock user data
-  const [user, setUser] = useState({
-    name: "Admin User",
-    email: "admin@ktcomputersupply.com",
-    phone: "+250 788 123 456",
-    avatar: "/avatars/admin.jpg",
-    role: "Administrator",
-    joinDate: "2023-01-15",
-    lastLogin: "2025-10-08 14:30:22",
-  });
+  const router = useRouter();
+  const [user, setUser] = useState<UserData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   // Profile form state
   const [profileForm, setProfileForm] = useState({
-    name: user.name,
-    email: user.email,
-    phone: user.phone,
-    bio: "Store administrator for KT Computer Supply",
+    name: "",
+    phone: "",
+    bio: "",
   });
 
   // Security form state
@@ -72,44 +83,148 @@ export default function AccountPage() {
     pushMarketing: false,
   });
 
-  const handleProfileUpdate = (e: React.FormEvent) => {
+  // Fetch user data on mount
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const token = localStorage.getItem("auth_token");
+      const userData = localStorage.getItem("user");
+
+      if (!token || !userData) {
+        router.push("/auth/login");
+        return;
+      }
+
+      try {
+        const parsedUser = JSON.parse(userData);
+        setUser(parsedUser);
+        setProfileForm({
+          name: parsedUser.name || "",
+          phone: parsedUser.phone || "",
+          bio: parsedUser.bio || "",
+        });
+      } catch (error) {
+        console.error("Failed to parse user data:", error);
+        router.push("/auth/login");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchUserData();
+  }, [router]);
+
+  const handleProfileUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
-    // In a real app, you would make an API call here
-    setUser({
-      ...user,
-      name: profileForm.name,
-      email: profileForm.email,
-      phone: profileForm.phone,
-    });
-    alert("Profile updated successfully!");
+    setError("");
+    setSuccess("");
+    setIsSaving(true);
+
+    try {
+      const token = localStorage.getItem("auth_token");
+      const response = await fetch("/api/user/profile", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          name: profileForm.name || null,
+          phone: profileForm.phone || null,
+          bio: profileForm.bio || null,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to update profile");
+      }
+
+      // Update user state and localStorage
+      setUser(data.data);
+      localStorage.setItem("user", JSON.stringify(data.data));
+      setSuccess("Profile updated successfully!");
+
+      // Clear success message after 3 seconds
+      setTimeout(() => setSuccess(""), 3000);
+    } catch (err: any) {
+      setError(err.message || "Failed to update profile");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
-  const handleSecurityUpdate = (e: React.FormEvent) => {
+  const handleSecurityUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
-    // In a real app, you would make an API call here
+    setError("");
+    setSuccess("");
+
     if (securityForm.newPassword !== securityForm.confirmPassword) {
-      alert("New passwords do not match!");
+      setError("New passwords do not match!");
       return;
     }
-    if (securityForm.newPassword.length < 8) {
-      alert("Password must be at least 8 characters long!");
+    if (securityForm.newPassword.length < 6) {
+      setError("Password must be at least 6 characters long!");
       return;
     }
-    alert("Password updated successfully!");
-    setSecurityForm({
-      currentPassword: "",
-      newPassword: "",
-      confirmPassword: "",
-    });
+
+    setIsSaving(true);
+
+    try {
+      const token = localStorage.getItem("auth_token");
+      const response = await fetch("/api/user/password", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          currentPassword: securityForm.currentPassword,
+          newPassword: securityForm.newPassword,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to update password");
+      }
+
+      setSuccess("Password updated successfully!");
+      setSecurityForm({
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+      });
+
+      // Clear success message after 3 seconds
+      setTimeout(() => setSuccess(""), 3000);
+    } catch (err: any) {
+      setError(err.message || "Failed to update password");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleNotificationUpdate = () => {
-    // In a real app, you would make an API call here
-    alert("Notification preferences updated!");
+    setSuccess("Notification preferences updated!");
+    setTimeout(() => setSuccess(""), 3000);
   };
 
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+      </div>
+    );
+  }
+
+  if (!user) {
+    return null;
+  }
+
   return (
-    <div className="container mx-auto py-8">
+    <div className="container mx-auto py-8 px-10">
       <div className="flex flex-col md:flex-row gap-8">
         {/* Profile Header */}
         <div className="md:w-1/3">
@@ -117,12 +232,17 @@ export default function AccountPage() {
             <CardHeader className="text-center">
               <div className="relative mx-auto mb-4">
                 <Avatar className="w-24 h-24 mx-auto">
-                  <AvatarImage src={user.avatar} alt={user.name} />
+                  <AvatarImage
+                    src={user.avatar || undefined}
+                    alt={user.name || "User"}
+                  />
                   <AvatarFallback className="text-2xl">
                     {user.name
-                      .split(" ")
-                      .map((n) => n[0])
-                      .join("")}
+                      ? user.name
+                          .split(" ")
+                          .map((n) => n[0])
+                          .join("")
+                      : user.email.charAt(0).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
                 <Button
@@ -133,7 +253,7 @@ export default function AccountPage() {
                   <Camera className="h-4 w-4" />
                 </Button>
               </div>
-              <CardTitle>{user.name}</CardTitle>
+              <CardTitle>{user.name || "User"}</CardTitle>
               <CardDescription>{user.role}</CardDescription>
             </CardHeader>
             <CardContent>
@@ -144,18 +264,22 @@ export default function AccountPage() {
                 </div>
                 <div className="flex items-center">
                   <Phone className="h-4 w-4 mr-2 text-muted-foreground" />
-                  <span>{user.phone}</span>
+                  <span>{user.phone || "Not provided"}</span>
                 </div>
                 <div className="flex items-center">
                   <Calendar className="h-4 w-4 mr-2 text-muted-foreground" />
                   <span>
-                    Joined {new Date(user.joinDate).toLocaleDateString()}
+                    Joined {new Date(user.createdAt).toLocaleDateString()}
                   </span>
                 </div>
-                <div className="flex items-center">
-                  <Key className="h-4 w-4 mr-2 text-muted-foreground" />
-                  <span>Last login: {user.lastLogin}</span>
-                </div>
+                {user.lastLogin && (
+                  <div className="flex items-center">
+                    <Key className="h-4 w-4 mr-2 text-muted-foreground" />
+                    <span>
+                      Last login: {new Date(user.lastLogin).toLocaleString()}
+                    </span>
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>
@@ -164,10 +288,10 @@ export default function AccountPage() {
         {/* Main Content */}
         <div className="md:w-2/3">
           <Tabs defaultValue="profile">
-            <TabsList className="grid w-full grid-cols-4">
+            <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="profile">Profile</TabsTrigger>
               <TabsTrigger value="security">Security</TabsTrigger>
-              <TabsTrigger value="notifications">Notifications</TabsTrigger>
+              {/* <TabsTrigger value="notifications">Notifications</TabsTrigger> */}
               <TabsTrigger value="billing">Billing</TabsTrigger>
             </TabsList>
 
@@ -181,6 +305,20 @@ export default function AccountPage() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
+                  {/* Success/Error Messages */}
+                  {success && (
+                    <div className="flex items-center gap-2 p-4 mb-4 bg-green-50 border border-green-200 rounded-lg">
+                      <CheckCircle2 className="h-5 w-5 text-green-600" />
+                      <p className="text-sm text-green-600">{success}</p>
+                    </div>
+                  )}
+                  {error && (
+                    <div className="flex items-center gap-2 p-4 mb-4 bg-red-50 border border-red-200 rounded-lg">
+                      <AlertCircle className="h-5 w-5 text-red-600" />
+                      <p className="text-sm text-red-600">{error}</p>
+                    </div>
+                  )}
+
                   <form onSubmit={handleProfileUpdate} className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-2">
@@ -194,6 +332,7 @@ export default function AccountPage() {
                               name: e.target.value,
                             })
                           }
+                          disabled={isSaving}
                         />
                       </div>
                       <div className="space-y-2">
@@ -201,14 +340,13 @@ export default function AccountPage() {
                         <Input
                           id="email"
                           type="email"
-                          value={profileForm.email}
-                          onChange={(e) =>
-                            setProfileForm({
-                              ...profileForm,
-                              email: e.target.value,
-                            })
-                          }
+                          value={user.email}
+                          disabled
+                          className="bg-gray-100"
                         />
+                        <p className="text-xs text-muted-foreground">
+                          Email cannot be changed
+                        </p>
                       </div>
                     </div>
                     <div className="space-y-2">
@@ -222,6 +360,8 @@ export default function AccountPage() {
                             phone: e.target.value,
                           })
                         }
+                        disabled={isSaving}
+                        placeholder="+250 XXX XXX XXX"
                       />
                     </div>
                     <div className="space-y-2">
@@ -236,11 +376,22 @@ export default function AccountPage() {
                           })
                         }
                         rows={4}
+                        disabled={isSaving}
+                        placeholder="Tell us about yourself..."
                       />
                     </div>
-                    <Button type="submit">
-                      <Save className="mr-2 h-4 w-4" />
-                      Save Changes
+                    <Button type="submit" disabled={isSaving}>
+                      {isSaving ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Saving...
+                        </>
+                      ) : (
+                        <>
+                          <Save className="mr-2 h-4 w-4" />
+                          Save Changes
+                        </>
+                      )}
                     </Button>
                   </form>
                 </CardContent>
@@ -257,6 +408,20 @@ export default function AccountPage() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
+                  {/* Success/Error Messages */}
+                  {success && (
+                    <div className="flex items-center gap-2 p-4 mb-4 bg-green-50 border border-green-200 rounded-lg">
+                      <CheckCircle2 className="h-5 w-5 text-green-600" />
+                      <p className="text-sm text-green-600">{success}</p>
+                    </div>
+                  )}
+                  {error && (
+                    <div className="flex items-center gap-2 p-4 mb-4 bg-red-50 border border-red-200 rounded-lg">
+                      <AlertCircle className="h-5 w-5 text-red-600" />
+                      <p className="text-sm text-red-600">{error}</p>
+                    </div>
+                  )}
+
                   <form onSubmit={handleSecurityUpdate} className="space-y-4">
                     <div className="space-y-2">
                       <Label htmlFor="currentPassword">Current Password</Label>
@@ -270,6 +435,7 @@ export default function AccountPage() {
                             currentPassword: e.target.value,
                           })
                         }
+                        disabled={isSaving}
                       />
                     </div>
                     <div className="space-y-2">
@@ -284,6 +450,7 @@ export default function AccountPage() {
                             newPassword: e.target.value,
                           })
                         }
+                        disabled={isSaving}
                       />
                     </div>
                     <div className="space-y-2">
@@ -300,25 +467,23 @@ export default function AccountPage() {
                             confirmPassword: e.target.value,
                           })
                         }
+                        disabled={isSaving}
                       />
                     </div>
-                    <Button type="submit">
-                      <Lock className="mr-2 h-4 w-4" />
-                      Update Password
+                    <Button type="submit" disabled={isSaving}>
+                      {isSaving ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Updating...
+                        </>
+                      ) : (
+                        <>
+                          <Lock className="mr-2 h-4 w-4" />
+                          Update Password
+                        </>
+                      )}
                     </Button>
                   </form>
-
-                  <Separator className="my-6" />
-
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-medium">
-                      Two-Factor Authentication
-                    </h3>
-                    <p className="text-sm text-muted-foreground">
-                      Add an extra layer of security to your account
-                    </p>
-                    <Button variant="outline">Enable 2FA</Button>
-                  </div>
                 </CardContent>
               </Card>
             </TabsContent>

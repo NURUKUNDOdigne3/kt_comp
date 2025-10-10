@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -26,6 +26,7 @@ import { cn } from "@/lib/utils";
 import ProductCard from "@/components/ProductCard";
 import Header from "./Header";
 import Product3DModal from "./Product3DModal";
+import WriteReviewModal from "./WriteReviewModal";
 import {
   products,
   phoneProducts,
@@ -72,6 +73,31 @@ interface ProductDetailsProps {
   };
 }
 
+interface Review {
+  id: string;
+  rating: number;
+  comment: string | null;
+  createdAt: string;
+  user: {
+    id: string;
+    name: string | null;
+    avatar: string | null;
+  };
+}
+
+interface ReviewData {
+  reviews: Review[];
+  averageRating: number;
+  totalReviews: number;
+  ratingBreakdown: {
+    5: number;
+    4: number;
+    3: number;
+    2: number;
+    1: number;
+  };
+}
+
 export default function ProductDetails({ product }: ProductDetailsProps) {
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
@@ -80,6 +106,9 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
   );
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [is3DModalOpen, setIs3DModalOpen] = useState(false);
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [reviewData, setReviewData] = useState<ReviewData | null>(null);
+  const [isLoadingReviews, setIsLoadingReviews] = useState(false);
   const [activeTab, setActiveTab] = useState<
     "description" | "specs" | "reviews"
   >("description");
@@ -105,43 +134,42 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
     });
   };
 
-  // Get similar products based on category
-  const getSimilarProducts = () => {
-    // Combine all products
-    const allProducts = [
-      ...products,
-      ...phoneProducts,
-      ...printerProducts,
-      ...routerProducts,
-      ...speakerProducts,
-      ...monitorProducts,
-    ];
-
-    // Determine which category array to use
-    let categoryProducts = allProducts;
-    if (product.category === "Computers") categoryProducts = products;
-    else if (product.category === "Phones") categoryProducts = phoneProducts;
-    else if (product.category === "Printers")
-      categoryProducts = printerProducts;
-    else if (product.category === "Routers") categoryProducts = routerProducts;
-    else if (product.category === "Speakers")
-      categoryProducts = speakerProducts;
-    else if (product.category === "Monitors")
-      categoryProducts = monitorProducts;
-
-    // Filter out current product and prioritize same brand
-    const sameBrand = categoryProducts.filter(
-      (p) => p.brand === product.brand && p.id !== product.id
-    );
-    const otherBrands = categoryProducts.filter(
-      (p) => p.brand !== product.brand && p.id !== product.id
-    );
-
-    // Combine: same brand first, then others, limit to 4
-    return [...sameBrand, ...otherBrands].slice(0, 4);
+  // Fetch reviews
+  const fetchReviews = async () => {
+    setIsLoadingReviews(true);
+    try {
+      const response = await fetch(`/api/products/${product.id}/reviews`);
+      if (response.ok) {
+        const data = await response.json();
+        setReviewData(data.data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch reviews:", error);
+    } finally {
+      setIsLoadingReviews(false);
+    }
   };
 
-  const relatedProducts = getSimilarProducts();
+  useEffect(() => {
+    fetchReviews();
+  }, [product.id]);
+
+  // Get related products
+  const allProducts = [
+    ...products,
+    ...phoneProducts,
+    ...printerProducts,
+    ...routerProducts,
+    ...speakerProducts,
+    ...monitorProducts,
+  ];
+  const relatedProducts = allProducts
+    .filter((p) => p.brand === product.brand && p.id !== product.id)
+    .slice(0, 4);
+
+  const handleReviewSubmitted = () => {
+    fetchReviews();
+  };
 
   return (
     <>
@@ -407,7 +435,7 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                 >
                   Description
                 </button>
-                <button
+                {/* <button
                   onClick={() => setActiveTab("specs")}
                   className={cn(
                     "px-6 py-4 text-sm font-medium transition-colors relative",
@@ -417,7 +445,7 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                   )}
                 >
                   Specifications
-                </button>
+                </button> */}
                 <button
                   onClick={() => setActiveTab("reviews")}
                   className={cn(
@@ -520,7 +548,10 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                           Based on {product.reviewCount} reviews
                         </p>
                       </div>
-                      <button className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
+                      <button
+                        onClick={() => setIsReviewModalOpen(true)}
+                        className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+                      >
                         Write a Review
                       </button>
                     </div>
@@ -528,8 +559,10 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                     {/* Rating Breakdown */}
                     <div className="space-y-2">
                       {[5, 4, 3, 2, 1].map((rating) => {
-                        const percentage =
-                          rating === 5 ? 75 : rating === 4 ? 20 : 5;
+                        const count = reviewData?.ratingBreakdown[rating as keyof typeof reviewData.ratingBreakdown] || 0;
+                        const percentage = reviewData?.totalReviews
+                          ? Math.round((count / reviewData.totalReviews) * 100)
+                          : 0;
                         return (
                           <div key={rating} className="flex items-center gap-3">
                             <span className="text-sm text-gray-600 w-12">
@@ -550,59 +583,57 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                     </div>
                   </div>
 
-                  {/* Sample Reviews */}
-                  <div className="space-y-4">
-                    {[1, 2, 3].map((i) => (
-                      <div key={i} className="border-b border-gray-200 pb-4">
-                        <div className="flex items-start justify-between mb-2">
-                          <div>
-                            <div className="flex items-center gap-2 mb-1">
-                              <div className="flex">
-                                {[...Array(5)].map((_, j) => (
-                                  <Star
-                                    key={j}
-                                    className="w-4 h-4 fill-yellow-400 text-yellow-400"
-                                  />
-                                ))}
+                  {/* Reviews List */}
+                  {isLoadingReviews ? (
+                    <div className="flex justify-center py-12">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                    </div>
+                  ) : reviewData && reviewData.reviews.length > 0 ? (
+                    <div className="space-y-4">
+                      {reviewData.reviews.map((review) => {
+                        const timeAgo = new Date(review.createdAt).toLocaleDateString();
+                        return (
+                          <div key={review.id} className="border-b border-gray-200 pb-4">
+                            <div className="flex items-start justify-between mb-2">
+                              <div>
+                                <div className="flex items-center gap-2 mb-1">
+                                  <div className="flex">
+                                    {[...Array(5)].map((_, j) => (
+                                      <Star
+                                        key={j}
+                                        className={cn(
+                                          "w-4 h-4",
+                                          j < review.rating
+                                            ? "fill-yellow-400 text-yellow-400"
+                                            : "fill-gray-200 text-gray-200"
+                                        )}
+                                      />
+                                    ))}
+                                  </div>
+                                  <span className="text-sm font-medium text-gray-900">
+                                    {review.user.name || "Anonymous"}
+                                  </span>
+                                  <span className="text-sm text-gray-500">
+                                    Verified Buyer
+                                  </span>
+                                </div>
+                                <p className="text-xs text-gray-500">{timeAgo}</p>
                               </div>
-                              <span className="text-sm font-medium text-gray-900">
-                                John Doe
-                              </span>
-                              <span className="text-sm text-gray-500">
-                                Verified Buyer
-                              </span>
                             </div>
-                            <p className="text-xs text-gray-500">2 weeks ago</p>
+                            {review.comment && (
+                              <p className="text-sm text-gray-600">
+                                {review.comment}
+                              </p>
+                            )}
                           </div>
-                          <button className="text-sm text-gray-500 hover:text-gray-700">
-                            <HelpCircle className="w-4 h-4" />
-                          </button>
-                        </div>
-                        <h4 className="font-medium text-gray-900 mb-1">
-                          Excellent performance and battery life
-                        </h4>
-                        <p className="text-sm text-gray-600">
-                          This MacBook Pro has exceeded my expectations. The M3
-                          Pro chip is incredibly fast, and the battery life is
-                          amazing. I can work all day without needing to charge.
-                          The display is stunning, and the build quality is
-                          top-notch.
-                        </p>
-                        <div className="flex items-center gap-4 mt-3">
-                          <button className="text-sm text-gray-500 hover:text-gray-700">
-                            Helpful (12)
-                          </button>
-                          <button className="text-sm text-gray-500 hover:text-gray-700">
-                            Not Helpful (0)
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-
-                  <button className="w-full py-2 text-blue-600 font-medium hover:text-blue-700">
-                    Load More Reviews
-                  </button>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <div className="text-center py-12">
+                      <p className="text-gray-500">No reviews yet. Be the first to review this product!</p>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -637,6 +668,15 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
         isOpen={is3DModalOpen}
         onClose={() => setIs3DModalOpen(false)}
         productName={product.name}
+      />
+
+      {/* Write Review Modal */}
+      <WriteReviewModal
+        isOpen={isReviewModalOpen}
+        onClose={() => setIsReviewModalOpen(false)}
+        productId={product.id}
+        productName={product.name}
+        onReviewSubmitted={handleReviewSubmitted}
         sketchfabModelId={
           product.category === "Computers" &&
           product.brand.toLowerCase() === "apple"

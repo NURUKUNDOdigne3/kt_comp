@@ -128,10 +128,6 @@ export function LoginForm({
                 </Button>
               </Field>
 
-              <FieldDescription className="text-center text-xs">
-                Default credentials: admin@ktcomputer.rw / admin123
-              </FieldDescription>
-
               <FieldDescription className="text-center">
                 This page is reserved for authorized personnel only.
               </FieldDescription>
