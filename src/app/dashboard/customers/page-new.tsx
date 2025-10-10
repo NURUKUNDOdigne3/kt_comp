@@ -81,19 +81,20 @@ import { useUsers, useUser, useDeleteUser } from "@/hooks/use-api";
 
 export default function CustomersPage() {
   const [search, setSearch] = useState("");
+  const [roleFilter, setRoleFilter] = useState("all");
   const [page, setPage] = useState(1);
   const [selectedUser, setSelectedUser] = useState<any>(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
-  // Fetch data - only customers (role: USER)
+  // Fetch data
   const {
     data: usersData,
     isLoading,
     mutate: refetchUsers,
   } = useUsers({
     search,
-    role: "USER", // Only fetch customers
+    role: roleFilter !== "all" ? roleFilter : undefined,
     page,
     limit: 20,
   });
@@ -183,9 +184,9 @@ export default function CustomersPage() {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  {/* Search */}
-                  <div className="mb-6">
-                    <div className="relative">
+                  {/* Filters */}
+                  <div className="flex flex-col md:flex-row gap-4 mb-6">
+                    <div className="relative flex-1">
                       <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                       <Input
                         placeholder="Search by name or email..."
@@ -194,6 +195,16 @@ export default function CustomersPage() {
                         onChange={(e) => setSearch(e.target.value)}
                       />
                     </div>
+                    <Select value={roleFilter} onValueChange={setRoleFilter}>
+                      <SelectTrigger className="w-full md:w-[200px]">
+                        <SelectValue placeholder="All Roles" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Roles</SelectItem>
+                        <SelectItem value="USER">Customers</SelectItem>
+                        <SelectItem value="ADMIN">Admins</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
 
                   {/* Table */}
@@ -204,12 +215,10 @@ export default function CustomersPage() {
                   ) : users.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-12 text-center">
                       <Users className="h-12 w-12 text-muted-foreground mb-4" />
-                      <h3 className="text-lg font-semibold">
-                        No customers found
-                      </h3>
+                      <h3 className="text-lg font-semibold">No customers found</h3>
                       <p className="text-sm text-muted-foreground">
-                        {search
-                          ? "Try adjusting your search"
+                        {search || roleFilter !== "all"
+                          ? "Try adjusting your filters"
                           : "No customers registered yet"}
                       </p>
                     </div>
@@ -225,9 +234,7 @@ export default function CustomersPage() {
                               <TableHead>Orders</TableHead>
                               <TableHead>Reviews</TableHead>
                               <TableHead>Joined</TableHead>
-                              <TableHead className="text-right">
-                                Actions
-                              </TableHead>
+                              <TableHead className="text-right">Actions</TableHead>
                             </TableRow>
                           </TableHeader>
                           <TableBody>
@@ -238,25 +245,14 @@ export default function CustomersPage() {
                                 </TableCell>
                                 <TableCell>{user.email}</TableCell>
                                 <TableCell>{getRoleBadge(user.role)}</TableCell>
-                                <TableCell>
-                                  {user._count?.orders || 0}
-                                </TableCell>
-                                <TableCell>
-                                  {user._count?.reviews || 0}
-                                </TableCell>
-                                <TableCell>
-                                  {formatDate(user.createdAt)}
-                                </TableCell>
+                                <TableCell>{user._count?.orders || 0}</TableCell>
+                                <TableCell>{user._count?.reviews || 0}</TableCell>
+                                <TableCell>{formatDate(user.createdAt)}</TableCell>
                                 <TableCell className="text-right">
                                   <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
-                                      <Button
-                                        variant="ghost"
-                                        className="h-8 w-8 p-0"
-                                      >
-                                        <span className="sr-only">
-                                          Open menu
-                                        </span>
+                                      <Button variant="ghost" className="h-8 w-8 p-0">
+                                        <span className="sr-only">Open menu</span>
                                         <svg
                                           xmlns="http://www.w3.org/2000/svg"
                                           width="16"
@@ -275,9 +271,7 @@ export default function CustomersPage() {
                                       </Button>
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent align="end">
-                                      <DropdownMenuLabel>
-                                        Actions
-                                      </DropdownMenuLabel>
+                                      <DropdownMenuLabel>Actions</DropdownMenuLabel>
                                       <DropdownMenuItem
                                         onClick={() => handleViewUser(user)}
                                       >
@@ -308,8 +302,7 @@ export default function CustomersPage() {
                       {pagination && pagination.totalPages > 1 && (
                         <div className="flex items-center justify-between mt-4">
                           <p className="text-sm text-muted-foreground">
-                            Showing {users.length} of {pagination.total}{" "}
-                            customers
+                            Showing {users.length} of {pagination.total} customers
                           </p>
                           <div className="flex gap-2">
                             <Button
@@ -348,31 +341,21 @@ export default function CustomersPage() {
                     View customer information and activity
                   </DialogDescription>
                 </DialogHeader>
-                {userDetails ? (
+                {userDetails && (
                   <div className="space-y-6">
                     {/* User Info */}
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <p className="text-sm font-medium text-muted-foreground">
-                          Name
-                        </p>
-                        <p className="text-sm mt-1">
-                          {userDetails.name || "N/A"}
-                        </p>
+                        <p className="text-sm font-medium text-muted-foreground">Name</p>
+                        <p className="text-sm mt-1">{userDetails.name || "N/A"}</p>
                       </div>
                       <div>
-                        <p className="text-sm font-medium text-muted-foreground">
-                          Email
-                        </p>
+                        <p className="text-sm font-medium text-muted-foreground">Email</p>
                         <p className="text-sm mt-1">{userDetails.email}</p>
                       </div>
                       <div>
-                        <p className="text-sm font-medium text-muted-foreground">
-                          Role
-                        </p>
-                        <div className="mt-1">
-                          {getRoleBadge(userDetails.role)}
-                        </div>
+                        <p className="text-sm font-medium text-muted-foreground">Role</p>
+                        <div className="mt-1">{getRoleBadge(userDetails.role)}</div>
                       </div>
                       <div>
                         <p className="text-sm font-medium text-muted-foreground">
@@ -384,19 +367,54 @@ export default function CustomersPage() {
                       </div>
                     </div>
 
-                    {/* User ID */}
-                    <div>
-                      <p className="text-sm font-medium text-muted-foreground">
-                        User ID
-                      </p>
-                      <p className="text-sm mt-1 font-mono text-xs">
-                        {userDetails.id}
-                      </p>
+                    {/* Statistics */}
+                    <div className="grid grid-cols-2 gap-4">
+                      <Card>
+                        <CardContent className="p-4">
+                          <p className="text-sm font-medium text-muted-foreground">
+                            Total Orders
+                          </p>
+                          <p className="text-2xl font-bold mt-1">
+                            {userDetails._count?.orders || 0}
+                          </p>
+                        </CardContent>
+                      </Card>
+                      <Card>
+                        <CardContent className="p-4">
+                          <p className="text-sm font-medium text-muted-foreground">
+                            Total Reviews
+                          </p>
+                          <p className="text-2xl font-bold mt-1">
+                            {userDetails._count?.reviews || 0}
+                          </p>
+                        </CardContent>
+                      </Card>
                     </div>
-                  </div>
-                ) : (
-                  <div className="flex items-center justify-center py-12">
-                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
+
+                    {/* Recent Orders */}
+                    {userDetails.orders && userDetails.orders.length > 0 && (
+                      <div>
+                        <h3 className="font-semibold mb-3">Recent Orders</h3>
+                        <div className="space-y-2">
+                          {userDetails.orders.slice(0, 5).map((order: any) => (
+                            <div
+                              key={order.id}
+                              className="flex items-center justify-between p-3 border rounded-lg"
+                            >
+                              <div>
+                                <p className="text-sm font-medium">
+                                  Order #{order.id.slice(0, 8)}
+                                </p>
+                                <p className="text-xs text-muted-foreground">
+                                  {formatDate(order.createdAt)}
+                                </p>
+                              </div>
+                              <Badge>{order.status}</Badge>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
               </DialogContent>
@@ -411,10 +429,8 @@ export default function CustomersPage() {
                 <AlertDialogHeader>
                   <AlertDialogTitle>Are you sure?</AlertDialogTitle>
                   <AlertDialogDescription>
-                    This will permanently delete "
-                    {selectedUser?.name || selectedUser?.email}". All their
-                    orders and reviews will also be deleted. This action cannot
-                    be undone.
+                    This will permanently delete "{selectedUser?.name || selectedUser?.email}". 
+                    All their orders and reviews will also be deleted. This action cannot be undone.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>

@@ -265,9 +265,7 @@ export default function CustomerReviewsPage() {
                   ) : reviews.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-12 text-center">
                       <MessageSquare className="h-12 w-12 text-muted-foreground mb-4" />
-                      <h3 className="text-lg font-semibold">
-                        No reviews found
-                      </h3>
+                      <h3 className="text-lg font-semibold">No reviews found</h3>
                       <p className="text-sm text-muted-foreground">
                         {search || statusFilter !== "all"
                           ? "Try adjusting your filters"
@@ -297,9 +295,7 @@ export default function CustomerReviewsPage() {
                                   {review.user?.name || "N/A"}
                                 </TableCell>
                                 <TableCell>{review.product?.name}</TableCell>
-                                <TableCell>
-                                  {renderStars(review.rating)}
-                                </TableCell>
+                                <TableCell>{renderStars(review.rating)}</TableCell>
                                 <TableCell>
                                   {formatDate(review.createdAt)}
                                 </TableCell>
@@ -364,8 +360,7 @@ export default function CustomerReviewsPage() {
                       {pagination && pagination.totalPages > 1 && (
                         <div className="flex items-center justify-between mt-4">
                           <p className="text-sm text-muted-foreground">
-                            Showing {reviews.length} of {pagination.total}{" "}
-                            reviews
+                            Showing {reviews.length} of {pagination.total} reviews
                           </p>
                           <div className="flex gap-2">
                             <Button
@@ -411,9 +406,7 @@ export default function CustomerReviewsPage() {
                       <p className="text-sm font-medium text-muted-foreground">
                         Product
                       </p>
-                      <p className="text-sm mt-1">
-                        {reviewDetails.product?.name}
-                      </p>
+                      <p className="text-sm mt-1">{reviewDetails.product?.name}</p>
                     </div>
 
                     {/* Customer Info */}

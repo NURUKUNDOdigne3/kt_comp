@@ -289,3 +289,61 @@ export function useCancelOrder(id: string) {
     deleteRequest(`/api/orders/${id}`)
   );
 }
+
+// User hooks
+export function useUsers(params?: {
+  search?: string;
+  role?: string;
+  page?: number;
+  limit?: number;
+}) {
+  const queryParams = new URLSearchParams();
+  if (params?.search) queryParams.append("search", params.search);
+  if (params?.role) queryParams.append("role", params.role);
+  if (params?.page) queryParams.append("page", params.page.toString());
+  if (params?.limit) queryParams.append("limit", params.limit.toString());
+
+  const url = `/api/users${queryParams.toString() ? `?${queryParams.toString()}` : ""}`;
+  return useApi(url);
+}
+
+export function useUser(id?: string) {
+  return useApi(id ? `/api/users/${id}` : null);
+}
+
+export function useDeleteUser(id: string) {
+  return useSWRMutation(`/api/users/${id}`, () =>
+    deleteRequest(`/api/users/${id}`)
+  );
+}
+
+// Review hooks
+export function useReviews(params?: {
+  search?: string;
+  status?: string;
+  page?: number;
+  limit?: number;
+}) {
+  const queryParams = new URLSearchParams();
+  if (params?.search) queryParams.append("search", params.search);
+  if (params?.status) queryParams.append("status", params.status);
+  if (params?.page) queryParams.append("page", params.page.toString());
+  if (params?.limit) queryParams.append("limit", params.limit.toString());
+
+  const url = `/api/reviews${queryParams.toString() ? `?${queryParams.toString()}` : ""}`;
+  return useApi(url);
+}
+
+export function useReview(id?: string) {
+  return useApi(id ? `/api/reviews/${id}` : null);
+}
+
+export function useUpdateReviewStatus(id: string) {
+  return useSWRMutation(`/api/reviews/${id}`, updateRequest);
+}
+
+export function useDeleteReview(id: string) {
+  return useSWRMutation(`/api/reviews/${id}`, () =>
+    deleteRequest(`/api/reviews/${id}`)
+  );
+}
