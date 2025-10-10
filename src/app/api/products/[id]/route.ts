@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { isAdmin } from '@/lib/auth';
+import { isAdminFromHeader } from '@/lib/auth';
 import { updateProductSchema } from '@/lib/validations';
 import { successResponse, errorResponse, notFoundResponse, forbiddenResponse } from '@/lib/api-response';
 
@@ -63,7 +63,8 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const admin = await isAdmin();
+    const authHeader = request.headers.get('authorization');
+    const admin = isAdminFromHeader(authHeader);
     if (!admin) {
       return forbiddenResponse('Admin access required');
     }
@@ -102,7 +103,8 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const admin = await isAdmin();
+    const authHeader = request.headers.get('authorization');
+    const admin = isAdminFromHeader(authHeader);
     if (!admin) {
       return forbiddenResponse('Admin access required');
     }

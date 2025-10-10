@@ -71,20 +71,12 @@ export default function CategoriesPage() {
   const [selectedCategory, setSelectedCategory] = useState<any>(null);
 
   // Fetch data
-  const {
-    data: categories,
-    isLoading,
-    mutate: refetchCategories,
-  } = useCategories();
+  const { data: categories, isLoading, mutate: refetchCategories } = useCategories();
 
   // Mutations
   const { trigger: createCategory } = useCreateCategory();
-  const { trigger: updateCategory } = useUpdateCategory(
-    selectedCategory?.id || ""
-  );
-  const { trigger: deleteCategory } = useDeleteCategory(
-    selectedCategory?.id || ""
-  );
+  const { trigger: updateCategory } = useUpdateCategory(selectedCategory?.id || "");
+  const { trigger: deleteCategory } = useDeleteCategory(selectedCategory?.id || "");
 
   // Filter categories based on search
   const filteredCategories = categories?.filter(
@@ -119,7 +111,7 @@ export default function CategoriesPage() {
 
   const handleDeleteCategory = async () => {
     try {
-      await deleteCategory();
+      await deleteCategory({});
       setIsDeleteDialogOpen(false);
       setSelectedCategory(null);
       refetchCategories();

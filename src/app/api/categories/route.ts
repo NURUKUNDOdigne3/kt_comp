@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { isAdmin } from '@/lib/auth';
+import { isAdminFromHeader } from '@/lib/auth';
 import { categorySchema } from '@/lib/validations';
 import { successResponse, errorResponse, forbiddenResponse } from '@/lib/api-response';
 
@@ -26,7 +26,8 @@ export async function GET(request: NextRequest) {
 // POST /api/categories - Create a new category (Admin only)
 export async function POST(request: NextRequest) {
   try {
-    const admin = await isAdmin();
+    const authHeader = request.headers.get('authorization');
+    const admin = isAdminFromHeader(authHeader);
     if (!admin) {
       return forbiddenResponse('Admin access required');
     }
