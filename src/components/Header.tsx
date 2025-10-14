@@ -14,6 +14,7 @@ import {
   Mic,
   LogIn,
   UserPlus,
+  ReceiptText,
 } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { CartDrawer } from "./CartDrawer";
@@ -384,6 +385,14 @@ export default function Header() {
                       >
                         <User className="h-4 w-4" />
                         <span>My Account</span>
+                      </Link>
+                      <Link
+                        href="/account/orders"
+                        className="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                        onClick={() => setIsUserMenuOpen(false)}
+                      >
+                        <ReceiptText className="h-4 w-4" />
+                        <span>My Orders</span>
                       </Link>
                       <button
                         onClick={() => {

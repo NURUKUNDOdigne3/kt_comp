@@ -91,7 +91,7 @@ function CheckoutSuccessContent() {
             </div>
 
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Link href="/dashboard/orders">
+              <Link href="/account/orders">
                 <Button variant="outline" className="w-full sm:w-auto">
                   View Order
                 </Button>
