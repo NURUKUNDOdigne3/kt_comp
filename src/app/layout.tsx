@@ -6,6 +6,7 @@ import NProgressHandler from "@/components/NProgressHandler";
 import { Suspense } from "react";
 import { Toaster } from "@/components/ui/sonner";
 import { CartProvider } from "@/contexts/CartContext";
+import { Analytics } from "@vercel/analytics/next";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -109,6 +110,8 @@ export default function RootLayout({
           <Toaster richColors />
         </CartProvider>
       </body>
+
+      <Analytics />
     </html>
   );
 }
