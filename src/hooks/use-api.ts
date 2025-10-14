@@ -277,9 +277,9 @@ export function useUpdateProduct(id: string) {
 }
 
 export function useDeleteProduct(id: string) {
-  return useSWRMutation(`/api/products/${id}`, () =>
-    deleteRequest(`/api/products/${id}`)
-  );
+  return useSWRMutation(`/api/products/${id}`, async () => {
+    return await deleteRequest(`/api/products/${id}`);
+  });
 }
 
 // Category mutations

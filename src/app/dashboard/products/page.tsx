@@ -36,6 +36,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { toast } from "sonner";
 import {
   Search,
   Plus,
@@ -141,35 +142,43 @@ export default function ProductsPage() {
     try {
       console.log(data);
       await createProduct(data);
+      toast.success("Product created successfully");
       setIsAddModalOpen(false);
       refetchProducts();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to create product:", error);
-      alert("Failed to create product");
+      toast.error(error.message || "Failed to create product");
     }
   };
 
   const handleEditProduct = async (data: any) => {
     try {
       await updateProduct(data);
+      toast.success("Product updated successfully");
       setIsEditModalOpen(false);
       setSelectedProduct(null);
       refetchProducts();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to update product:", error);
-      alert("Failed to update product");
+      toast.error(error.message || "Failed to update product");
     }
   };
 
   const handleDeleteProduct = async () => {
+    if (!selectedProduct?.id) {
+      toast.error("No product selected");
+      return;
+    }
+
     try {
-      // await deleteProduct({});
+      await deleteProduct();
+      toast.success(`Product "${selectedProduct.name}" deleted successfully`);
       setIsDeleteDialogOpen(false);
       setSelectedProduct(null);
       refetchProducts();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to delete product:", error);
-      alert("Failed to delete product");
+      toast.error(error.message || "Failed to delete product");
     }
   };
 
