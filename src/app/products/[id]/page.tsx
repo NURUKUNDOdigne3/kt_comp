@@ -49,6 +49,7 @@ async function getProduct(id: string) {
       reviewCount: product.reviewCount,
       description: product.description || "",
       shortDescription: product.description?.slice(0, 150) || "",
+      model3dId: product.model3dId || undefined,
       features: [
         product.description || "",
         `Brand: ${product.brand?.name || "Unknown"}`,

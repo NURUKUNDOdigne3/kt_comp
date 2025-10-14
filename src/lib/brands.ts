@@ -3,7 +3,7 @@ export const brandData = [
     name: "Apple",
     href: "/brands/apple",
     logo: "/brands/apple.png",
-    categories: ["computers", "phones"],
+    categories: ["computers"],
   },
   {
     name: "Dell",
@@ -39,7 +39,7 @@ export const brandData = [
     name: "Samsung",
     href: "/brands/samsung",
     logo: "/brands/samsung.png",
-    categories: ["phones", "monitors"],
+    categories: [, "monitors"],
   },
   {
     name: "Canon",
@@ -63,26 +63,9 @@ export const brandData = [
     name: "Google",
     href: "/brands/google",
     logo: "/brands/google.png",
-    categories: ["phones", "routers"],
+    categories: [, "routers"],
   },
-  {
-    name: "OnePlus",
-    href: "/brands/oneplus",
-    logo: "/brands/1plus.png",
-    categories: ["phones"],
-  },
-  {
-    name: "Xiaomi",
-    href: "/brands/xiaomi",
-    logo: "/brands/xiaomi.png",
-    categories: ["phones"],
-  },
-  {
-    name: "OPPO",
-    href: "/brands/oppo",
-    logo: "/brands/oppo.png",
-    categories: ["phones"],
-  },
+
   {
     name: "SpaceX",
     href: "/brands/spacex",

@@ -40,10 +40,10 @@ export function NavUser() {
     try {
       // Clear token from localStorage
       localStorage.removeItem("auth-token");
-      
+
       // Call logout endpoint (optional, just for logging)
       await logout({});
-      
+
       // Redirect to login
       router.push("/dashboard/login");
       router.refresh();
@@ -142,10 +142,6 @@ export function NavUser() {
                   Account
                 </DropdownMenuItem>
               </Link>
-              <DropdownMenuItem>
-                <CreditCard />
-                Billing
-              </DropdownMenuItem>
 
               <Link href="/dashboard/logs">
                 <DropdownMenuItem>

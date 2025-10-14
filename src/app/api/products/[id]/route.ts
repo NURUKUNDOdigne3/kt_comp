@@ -72,11 +72,16 @@ export async function PATCH(
     const { id } = await params;
     const body = await request.json();
 
+    console.log('Update product request body:', body);
+
     // Validate input
     const validation = updateProductSchema.safeParse(body);
     if (!validation.success) {
+      console.error('Validation error:', validation.error.issues);
       return errorResponse(validation.error.issues[0].message);
     }
+
+    console.log('Validated data:', validation.data);
 
     const product = await prisma.product.update({
       where: { id },
@@ -90,6 +95,7 @@ export async function PATCH(
     return successResponse(product, 'Product updated successfully');
   } catch (error: any) {
     console.error('Update product error:', error);
+    console.error('Error details:', error.message, error.stack);
     if (error.code === 'P2025') {
       return notFoundResponse('Product not found');
     }

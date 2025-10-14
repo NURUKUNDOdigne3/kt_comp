@@ -79,6 +79,7 @@ model Product {
   oldPrice    Int?     // Original price for discounts
   image       String?
   images      String[] // Multiple product images
+  model3dId   String?  // Sketchfab 3D model ID (e.g., efab224280fd4c3993c808107f7c0b38)
   badge       String?  // "New", "Hot", "Sale", etc.
   rating      Float    @default(0)
   reviewCount Int      @default(0)

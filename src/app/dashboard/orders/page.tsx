@@ -43,12 +43,33 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Search, Download, Filter, Loader2, Eye } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Search,
+  Download,
+  Filter,
+  Loader2,
+  Eye,
+  Package,
+  Truck,
+  MapPin,
+  CreditCard,
+  User,
+} from "lucide-react";
+import Image from "next/image";
 
 export default function OrdersPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [page, setPage] = useState(1);
+  const [selectedOrder, setSelectedOrder] = useState<any>(null);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   // @ts-ignore
   const { data, isLoading, mutate } = useOrders(page, 20);
 
@@ -207,7 +228,9 @@ export default function OrdersPage() {
                               <TableCell>
                                 <div>
                                   <p className="font-medium">
-                                    {order.user?.name || order.customerName || "N/A"}
+                                    {order.user?.name ||
+                                      order.customerName ||
+                                      "N/A"}
                                   </p>
                                   <p className="text-sm text-muted-foreground">
                                     {order.user?.email || order.customerEmail}
@@ -228,9 +251,10 @@ export default function OrdersPage() {
                                 <Button
                                   variant="ghost"
                                   size="sm"
-                                  onClick={() =>
-                                    (window.location.href = `/dashboard/orders/${order.id}`)
-                                  }
+                                  onClick={() => {
+                                    setSelectedOrder(order);
+                                    setIsViewModalOpen(true);
+                                  }}
                                 >
                                   <Eye className="h-4 w-4 mr-1" />
                                   View
@@ -273,6 +297,229 @@ export default function OrdersPage() {
                 </CardContent>
               </Card>
             </div>
+
+            {/* Order View Modal */}
+            <Dialog open={isViewModalOpen} onOpenChange={setIsViewModalOpen}>
+              <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle>Order Details</DialogTitle>
+                  <DialogDescription>
+                    Order #{selectedOrder?.orderNumber}
+                  </DialogDescription>
+                </DialogHeader>
+                {selectedOrder && (
+                  <div className="space-y-6">
+                    {/* Order Status and Info */}
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      <div>
+                        <p className="text-sm text-muted-foreground">Status</p>
+                        <div className="mt-1">
+                          {getStatusBadge(selectedOrder.status)}
+                        </div>
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">Date</p>
+                        <p className="font-medium mt-1">
+                          {formatDate(selectedOrder.createdAt)}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">Payment</p>
+                        <p className="font-medium mt-1">
+                          {selectedOrder.paymentStatus}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">Total</p>
+                        <p className="font-medium mt-1">
+                          {formatCurrency(selectedOrder.totalAmount)}
+                        </p>
+                      </div>
+                    </div>
+
+                    <Separator />
+
+                    {/* Customer Information */}
+                    <div>
+                      <h3 className="font-semibold flex items-center gap-2 mb-3">
+                        <User className="h-4 w-4" />
+                        Customer Information
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-muted/50 p-4 rounded-lg">
+                        <div>
+                          <p className="text-sm text-muted-foreground">Name</p>
+                          <p className="font-medium">
+                            {selectedOrder.user?.name ||
+                              selectedOrder.customerName ||
+                              "N/A"}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-sm text-muted-foreground">Email</p>
+                          <p className="font-medium">
+                            {selectedOrder.user?.email ||
+                              selectedOrder.customerEmail}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-sm text-muted-foreground">Phone</p>
+                          <p className="font-medium">
+                            {selectedOrder.shippingPhone || "N/A"}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Shipping Address */}
+                    <div>
+                      <h3 className="font-semibold flex items-center gap-2 mb-3">
+                        <MapPin className="h-4 w-4" />
+                        Shipping Address
+                      </h3>
+                      <div className="bg-muted/50 p-4 rounded-lg">
+                        <p className="font-medium">
+                          {selectedOrder.shippingAddress}
+                        </p>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          {selectedOrder.shippingCity},{" "}
+                          {selectedOrder.shippingDistrict || ""}
+                        </p>
+                        {selectedOrder.shippingPostalCode && (
+                          <p className="text-sm text-muted-foreground">
+                            {selectedOrder.shippingPostalCode}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Order Items */}
+                    <div>
+                      <h3 className="font-semibold flex items-center gap-2 mb-3">
+                        <Package className="h-4 w-4" />
+                        Order Items ({selectedOrder.orderItems.length})
+                      </h3>
+                      <div className="space-y-3">
+                        {selectedOrder.orderItems.map((item: any) => (
+                          <div
+                            key={item.id}
+                            className="flex gap-4 bg-muted/50 p-4 rounded-lg"
+                          >
+                            <div className="relative h-20 w-20 rounded-md overflow-hidden bg-white flex-shrink-0">
+                              {item.product?.images?.[0] ? (
+                                <Image
+                                  src={item.product.images[0]}
+                                  alt={item.product.name}
+                                  fill
+                                  className="object-contain p-1"
+                                />
+                              ) : (
+                                <div className="w-full h-full flex items-center justify-center">
+                                  <Package className="h-8 w-8 text-muted-foreground" />
+                                </div>
+                              )}
+                            </div>
+                            <div className="flex-1">
+                              <p className="font-medium">
+                                {item.product?.name || "Product"}
+                              </p>
+                              <p className="text-sm text-muted-foreground mt-1">
+                                Quantity: {item.quantity}
+                              </p>
+                              <p className="text-sm font-medium mt-1">
+                                {formatCurrency(item.price)} × {item.quantity} ={" "}
+                                {formatCurrency(item.price * item.quantity)}
+                              </p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Payment Summary */}
+                    <div>
+                      <h3 className="font-semibold flex items-center gap-2 mb-3">
+                        <CreditCard className="h-4 w-4" />
+                        Payment Summary
+                      </h3>
+                      <div className="bg-muted/50 p-4 rounded-lg space-y-2">
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">
+                            Subtotal
+                          </span>
+                          <span className="font-medium">
+                            {formatCurrency(
+                              selectedOrder.orderItems.reduce(
+                                (sum: number, item: any) =>
+                                  sum + item.price * item.quantity,
+                                0
+                              )
+                            )}
+                          </span>
+                        </div>
+                        {selectedOrder.shippingCost > 0 && (
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">
+                              Shipping
+                            </span>
+                            <span className="font-medium">
+                              {formatCurrency(selectedOrder.shippingCost)}
+                            </span>
+                          </div>
+                        )}
+                        <Separator />
+                        <div className="flex justify-between text-lg font-bold">
+                          <span>Total</span>
+                          <span className="text-blue-600">
+                            {formatCurrency(selectedOrder.totalAmount)}
+                          </span>
+                        </div>
+                        {selectedOrder.stripePaymentIntentId && (
+                          <p className="text-xs text-muted-foreground mt-2">
+                            Payment ID: {selectedOrder.stripePaymentIntentId}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Update Status */}
+                    {/* <div>
+                      <h3 className="font-semibold flex items-center gap-2 mb-3">
+                        <Truck className="h-4 w-4" />
+                        Update Order Status
+                      </h3>
+                      <Select
+                        value={selectedOrder.status}
+                        onValueChange={(value) => {
+                          // TODO: Implement status update
+                          console.log("Update status to:", value);
+                        }}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="PENDING">Pending</SelectItem>
+                          <SelectItem value="PROCESSING">Processing</SelectItem>
+                          <SelectItem value="SHIPPED">Shipped</SelectItem>
+                          <SelectItem value="DELIVERED">Delivered</SelectItem>
+                          <SelectItem value="CANCELLED">Cancelled</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div> */}
+
+                    {/* Action Buttons */}
+                    <div className="flex justify-end gap-2 pt-4">
+                      <Button
+                        variant="outline"
+                        onClick={() => setIsViewModalOpen(false)}
+                      >
+                        Close
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </DialogContent>
+            </Dialog>
           </SidebarInset>
         </SidebarProvider>
       </DashboardGuard>

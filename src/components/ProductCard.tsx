@@ -57,15 +57,25 @@ export default function ProductCard({
 
   // Handle both database and legacy product formats
   const name = product.name;
-  const brandName = typeof product.brand === 'string' ? product.brand : (product.brand?.name || 'Unknown Brand');
-  const categoryName = typeof product.category === 'string' ? product.category : (product.category?.name || 'Products');
-  const image = product.images?.[0] || product.image || '/placeholder-product.png';
+  const brandName =
+    typeof product.brand === "string"
+      ? product.brand
+      : product.brand?.name || "Unknown Brand";
+  const categoryName =
+    typeof product.category === "string"
+      ? product.category
+      : product.category?.name || "Products";
+  const image =
+    product.images?.[0] || product.image || "/placeholder-product.png";
   const price = product.price;
   const oldPrice = product.compareAtPrice || product.oldPrice;
-  const priceFormatted = product.priceFormatted || `RWF ${price.toLocaleString()}`;
-  const oldPriceFormatted = product.oldPriceFormatted || (oldPrice ? `RWF ${oldPrice.toLocaleString()}` : undefined);
+  const priceFormatted =
+    product.priceFormatted || `RWF ${price.toLocaleString()}`;
+  const oldPriceFormatted =
+    product.oldPriceFormatted ||
+    (oldPrice ? `RWF ${oldPrice.toLocaleString()}` : undefined);
   const description = product.description;
-  const badge = product.badge || (product.featured ? 'Featured' : undefined);
+  const badge = product.badge || (product.featured ? "Featured" : undefined);
   const inStock = (product.stockQuantity ?? 0) > 0 || product.inStock !== false;
 
   const discount =
@@ -121,7 +131,7 @@ export default function ProductCard({
           </span>
         )}
         <Image
-          src={image || '/placeholder-product.png'}
+          src={image || "/placeholder-product.png"}
           alt={name}
           fill
           sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
@@ -141,7 +151,7 @@ export default function ProductCard({
               e.preventDefault();
               onToggleWishlist?.(product);
             }}
-            className="pointer-events-auto inline-flex items-center gap-2 rounded-full bg-white/90 px-3 py-2 text-sm font-medium text-gray-700 shadow hover:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="hidden pointer-events-auto  items-center gap-2 rounded-full bg-white/90 px-3 py-2 text-sm font-medium text-gray-700 shadow hover:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
             aria-label="Toggle wishlist"
           >
             <Heart className="h-4 w-4" />
@@ -151,9 +161,7 @@ export default function ProductCard({
 
       {/* Content */}
       <div className="space-y-2 p-4">
-        <div className="text-xs font-medium text-gray-500">
-          {brandName}
-        </div>
+        <div className="text-xs font-medium text-gray-500">{brandName}</div>
         <div className="line-clamp-2 text-sm font-semibold text-gray-900">
           {name}
         </div>

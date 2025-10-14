@@ -63,6 +63,7 @@ interface ProductDetailsProps {
     reviewCount: number;
     description: string;
     shortDescription: string;
+    model3dId?: string;
     features: string[];
     specifications: Record<string, string>;
     variants?: ProductVariant[];
@@ -210,7 +211,7 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
   return (
     <>
       <Header />
-      <div className="min-h-screen bg-gray-50/50">
+      <div className="min-h-screen">
         {/* Breadcrumb */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <nav className="flex items-center space-x-2 text-sm">
@@ -415,7 +416,7 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                   <button
                     onClick={() => setIsWishlisted(!isWishlisted)}
                     className={cn(
-                      "p-3 rounded-lg border-2 transition-all",
+                      "hidden p-3 rounded-lg border-2 transition-all",
                       isWishlisted
                         ? "border-red-500 bg-red-50 text-red-500"
                         : "border-gray-300 hover:border-gray-400 text-gray-600"
@@ -485,7 +486,7 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                 <button
                   onClick={() => setActiveTab("reviews")}
                   className={cn(
-                    "px-6 py-4 text-sm font-medium transition-colors relative",
+                    "hidden px-6 py-4 text-sm font-medium transition-colors relative",
                     activeTab === "reviews"
                       ? "text-blue-600 border-b-2 border-blue-600"
                       : "text-gray-600 hover:text-gray-900"
@@ -716,6 +717,7 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
         isOpen={is3DModalOpen}
         onClose={() => setIs3DModalOpen(false)}
         productName={product.name}
+        sketchfabModelId={product.model3dId}
       />
 
       {/* Write Review Modal */}

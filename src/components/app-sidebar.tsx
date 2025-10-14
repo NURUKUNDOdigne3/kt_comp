@@ -20,6 +20,7 @@ import {
   Tag,
   Headphones,
   FileText,
+  ReceiptText,
 } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
@@ -52,7 +53,7 @@ const data = {
     {
       title: "Orders",
       url: "/dashboard/orders",
-      icon: Package,
+      icon: ReceiptText,
       items: [
         {
           title: "All Orders",
@@ -70,10 +71,10 @@ const data = {
         //   title: "Shipped",
         //   url: "/dashboard/orders/shipped",
         // },
-        {
-          title: "Completed",
-          url: "/dashboard/orders/completed",
-        },
+        // {
+        //   title: "Completed",
+        //   url: "/dashboard/orders/completed",
+        // },
       ],
     },
     {

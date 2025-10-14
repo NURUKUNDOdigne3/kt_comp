@@ -23,10 +23,10 @@ function Speaker() {
 
   useEffect(() => {
     camera.position.set(0, 0.5, 3.5);
-    camera.lookAt(0, 0.2, 0);
+    camera.lookAt(0, 0, 0);
 
     if (modelRef.current) {
-      gsap.set(modelRef.current.position, { y: 0, x: 0, z: 0 });
+      gsap.set(modelRef.current.position, { y: -10, x: 0, z: 0 }); // 🔧 ADJUST Y POSITION HERE (negative = move up)
       gsap.set(modelRef.current.rotation, { x: 0.2, y: -0.3, z: 0 });
       gsap.set(modelRef.current.scale, { x: 0, y: 0, z: 0 });
 
@@ -48,7 +48,11 @@ function Speaker() {
           { y: Math.PI * 2, duration: 4, ease: "power1.inOut" },
           "-=0.5"
         )
-        .to(modelRef.current.rotation, { y: 0, duration: 1, ease: "power2.inOut" });
+        .to(modelRef.current.rotation, {
+          y: 0,
+          duration: 1,
+          ease: "power2.inOut",
+        });
     }
 
     const scrollTrigger = ScrollTrigger.create({
@@ -104,13 +108,25 @@ function Speaker() {
       rotationVelocity.current *= 0.95;
     }
 
-    const targetCameraY = 0.5 + progress * 0.3;
+    const targetCameraY = 0.3 + progress * 0.3; // 🔧 ADJUST CAMERA Y HEIGHT (lower = camera looks down more)
     const targetCameraZ = 3.5 - progress * 0.5;
     const targetCameraX = Math.sin(progress * Math.PI) * 0.3;
 
-    camera.position.y = THREE.MathUtils.lerp(camera.position.y, targetCameraY, 0.05);
-    camera.position.z = THREE.MathUtils.lerp(camera.position.z, targetCameraZ, 0.05);
-    camera.position.x = THREE.MathUtils.lerp(camera.position.x, targetCameraX, 0.05);
+    camera.position.y = THREE.MathUtils.lerp(
+      camera.position.y,
+      targetCameraY,
+      0.05
+    );
+    camera.position.z = THREE.MathUtils.lerp(
+      camera.position.z,
+      targetCameraZ,
+      0.05
+    );
+    camera.position.x = THREE.MathUtils.lerp(
+      camera.position.x,
+      targetCameraX,
+      0.05
+    );
     camera.lookAt(0, 0.2, 0);
   });
 
@@ -236,9 +252,12 @@ export default function WelcomeHeroSpeaker() {
   }, []);
 
   return (
-    <section id="welcome-hero" className="h-screen w-full relative">
+    <section
+      id="welcome-hero"
+      className="w-full relative h-[50vh] md:h-[60vh] top-[100px]"
+    >
       <Canvas
-        className="relative -top-5 left-0 w-full h-full"
+        className="relative left-0 w-full h-full"
         camera={{ fov: 45 }}
         gl={{ antialias: true, alpha: true }}
       >

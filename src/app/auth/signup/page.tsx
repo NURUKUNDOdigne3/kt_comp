@@ -153,11 +153,12 @@ export default function SignupPage() {
 
   return (
     <>
-      <div className="flex items-center justify-center min-h-screen bg-gray-50">
+      <div className="flex items-center justify-center min-h-screen ">
         <div className="w-full max-w-md p-4">
           <Card className="border-none shadow-lg">
             <CardHeader className="flex flex-col items-center space-y-1.5 pb-4 pt-6">
-              <h2 className="text-2xl font-semibold text-foreground">
+              <h2 className="text-2xl font-semibold text-foreground flex items-center gap-2">
+                <img src="/logo.png" alt="logo" className="size-8" />
                 <span className="text-blue-700 font-bold">KT</span>
                 ComputerSupply
               </h2>
@@ -242,7 +243,7 @@ export default function SignupPage() {
 
                 {/* Phone Field */}
                 <div className="space-y-2">
-                  <Label htmlFor="phone">Phone number (Optional)</Label>
+                  <Label htmlFor="phone">Phone number</Label>
                   <Input
                     id="phone"
                     type="tel"

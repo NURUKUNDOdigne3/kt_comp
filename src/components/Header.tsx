@@ -23,12 +23,13 @@ import { useCart } from "@/contexts/CartContext";
 const categories = [
   { name: "All", href: "/", active: true },
   { name: "Computers", href: "/computers", active: false },
+  { name: "Tablets", href: "/tablets", active: false },
   // { name: "Phones", href: "/phones", active: false },
   { name: "Printers", href: "/printers", active: false },
   { name: "Routers", href: "/routers", active: false },
   { name: "Speakers", href: "/speakers", active: false },
   { name: "Monitors", href: "/monitors", active: false },
-  { name: "Accessories", href: "#", active: false },
+  // { name: "Accessories", href: "#", active: false },
 ];
 
 // Brand data with categories
@@ -225,23 +226,46 @@ export default function Header() {
         <div className="md:hidden ">
           <div className="px-4 py-3">
             <div className="flex items-center justify-between mb-3">
-              <button
-                type="button"
-                className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 hover:bg-blue-200 transition-colors"
-                aria-label="Account"
-              >
-                <span className="text-sm font-medium text-blue-600">JD</span>
-              </button>
+              <img src="/logo.png" alt="logo" className="size-8" />
 
               <Link href="/" className="text-xl font-bold">
                 <span className="text-blue-600">KT</span>ComputerSupply
               </Link>
 
               <div className="flex items-center gap-2">
+                {user ? (
+                  <Link
+                    href="/account"
+                    className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 hover:bg-blue-200 transition-colors overflow-hidden"
+                    aria-label="Account"
+                  >
+                    {user.avatar ? (
+                      <img
+                        src={user.avatar}
+                        alt={user.name || "User"}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <span className="text-sm font-medium text-blue-600">
+                        {user.name?.charAt(0).toUpperCase() ||
+                          user.email.charAt(0).toUpperCase()}
+                      </span>
+                    )}
+                  </Link>
+                ) : (
+                  <Link
+                    href="/auth/login"
+                    className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 hover:bg-blue-200 transition-colors"
+                    aria-label="Login"
+                  >
+                    <User className="h-4 w-4 text-blue-600" />
+                  </Link>
+                )}
+
                 <button
                   type="button"
                   onClick={() => setIsCartOpen(true)}
-                  className="p-2 rounded-full hover:bg-gray-700 transition-colors relative"
+                  className="p-2 rounded-full hover:bg-gray-100 transition-colors relative"
                   aria-label="Cart"
                 >
                   <ShoppingCart className="h-5 w-5" />
@@ -296,7 +320,7 @@ export default function Header() {
                     type="search"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 sm:text-sm"
+                    className="block w-full pl-10 pr-3 py-2 border rounded-full border-gray-300  leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 sm:text-sm"
                     placeholder="Search for products..."
                   />
                 </div>

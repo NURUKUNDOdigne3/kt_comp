@@ -104,9 +104,17 @@ export default function LoginPage() {
 
       setSuccess(true);
 
-      // Redirect to home page after 1.5 seconds
+      // Check if there's a redirect path stored
+      const redirectPath = localStorage.getItem("redirect_after_login");
+      
+      // Redirect after 1.5 seconds
       setTimeout(() => {
-        router.push("/");
+        if (redirectPath) {
+          localStorage.removeItem("redirect_after_login");
+          router.push(redirectPath);
+        } else {
+          router.push("/");
+        }
       }, 1500);
     } catch (err: any) {
       setError(err.message || "Invalid email or password. Please try again.");
@@ -117,11 +125,12 @@ export default function LoginPage() {
 
   return (
     <>
-      <div className="flex items-center justify-center min-h-screen bg-gray-50">
+      <div className="flex items-center justify-center min-h-screen">
         <div className="w-full max-w-md p-4">
           <Card className="border-none shadow-lg">
             <CardHeader className="flex flex-col items-center space-y-1.5 pb-4 pt-6">
-              <h2 className="text-2xl font-semibold text-foreground">
+              <h2 className="text-2xl font-semibold text-foreground flex items-center gap-2">
+                <img src="/logo.png" alt="logo" className="size-8" />
                 <span className="text-blue-700 font-bold">KT</span>
                 ComputerSupply
               </h2>
