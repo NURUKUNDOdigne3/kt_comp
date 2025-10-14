@@ -453,8 +453,6 @@ export default function MyOrdersPage() {
           )}
         </DialogContent>
       </Dialog>
-
-      <Footer />
     </>
   );
 }
