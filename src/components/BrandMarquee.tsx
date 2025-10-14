@@ -16,8 +16,8 @@ const brands = [
   { name: "Epson", logo: "/brands/epson.png" },
   { name: "Brother", logo: "/brands/brother.png" },
   { name: "TP-Link", logo: "/brands/tp-link.png" },
-  { name: "Cisco", logo: "/brands/cisco.png" },
-  { name: "Logitech", logo: "/brands/logitech.png" },
+  // { name: "Cisco", logo: "/brands/cisco.png" },
+  // { name: "Logitech", logo: "/brands/logitech.png" },
 ];
 
 export function BrandMarquee() {
@@ -28,12 +28,12 @@ export function BrandMarquee() {
           Trusted Brands We Carry
         </h2>
       </div>
-      
+
       <div className="relative">
         {/* Gradient overlays */}
         <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-gray-50 dark:from-gray-900 to-transparent z-10" />
         <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-gray-50 dark:from-gray-900 to-transparent z-10" />
-        
+
         {/* Marquee container */}
         <div className="flex">
           {/* First set of brands */}
@@ -53,9 +53,12 @@ export function BrandMarquee() {
               </div>
             ))}
           </div>
-          
+
           {/* Duplicate set for seamless loop */}
-          <div className="flex animate-marquee space-x-16 px-8" aria-hidden="true">
+          <div
+            className="flex animate-marquee space-x-16 px-8"
+            aria-hidden="true"
+          >
             {brands.map((brand, index) => (
               <div
                 key={`brand-2-${index}`}

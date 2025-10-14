@@ -80,6 +80,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { ProductForm } from "@/components/ProductForm";
+import Product3DModal from "@/components/Product3DModal";
 import {
   useProducts,
   useCategories,
@@ -99,6 +100,7 @@ export default function ProductsPage() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const [is3DModalOpen, setIs3DModalOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
 
@@ -299,6 +301,7 @@ export default function ProductsPage() {
                               <TableHead>Price</TableHead>
                               <TableHead>Stock</TableHead>
                               <TableHead>Status</TableHead>
+                              <TableHead className="w-[80px]">3D</TableHead>
                               <TableHead className="text-right">
                                 Actions
                               </TableHead>
@@ -341,6 +344,24 @@ export default function ProductsPage() {
                                     <Badge variant="secondary" className="ml-1">
                                       Featured
                                     </Badge>
+                                  )}
+                                </TableCell>
+                                <TableCell>
+                                  {product.model3dId ? (
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      onClick={() => {
+                                        setSelectedProduct(product);
+                                        setIs3DModalOpen(true);
+                                      }}
+                                    >
+                                      <Eye className="h-4 w-4" />
+                                    </Button>
+                                  ) : (
+                                    <span className="text-xs text-muted-foreground">
+                                      N/A
+                                    </span>
                                   )}
                                 </TableCell>
                                 <TableCell className="text-right">
@@ -574,6 +595,17 @@ export default function ProductsPage() {
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
+
+            {/* 3D Preview Modal */}
+            <Product3DModal
+              isOpen={is3DModalOpen}
+              onClose={() => {
+                setIs3DModalOpen(false);
+                setSelectedProduct(null);
+              }}
+              productName={selectedProduct?.name || ""}
+              sketchfabModelId={selectedProduct?.model3dId}
+            />
           </SidebarInset>
         </SidebarProvider>
       </DashboardGuard>

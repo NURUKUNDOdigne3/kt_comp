@@ -1,15 +1,14 @@
 import Header from "@/components/Header";
-import WelcomeHeroSpeaker from "@/components/WelcomeHeroSpeaker";
 import ProductCard from "@/components/ProductCard";
 import FeaturedProductsCarousel from "@/components/FeaturedProductsCarousel";
 import { Suspense } from "react";
 import { prisma } from "@/lib/prisma";
 import Footer from "@/components/Footer";
 
-async function getSpeakerProducts() {
+async function getTabletProducts() {
   try {
     const category = await prisma.category.findUnique({
-      where: { slug: "speakers" },
+      where: { slug: "tablets" },
     });
 
     if (!category) return { featured: [], all: [] };
@@ -36,13 +35,13 @@ async function getSpeakerProducts() {
 
     return { featured, all };
   } catch (error) {
-    console.error("Error fetching speaker products:", error);
+    console.error("Error fetching tablet products:", error);
     return { featured: [], all: [] };
   }
 }
 
 export default async function Page() {
-  const { featured, all } = await getSpeakerProducts();
+  const { featured, all } = await getTabletProducts();
   return (
     <main>
       <Header />
@@ -53,36 +52,17 @@ export default async function Page() {
           </div>
         }
       >
-        {/* <WelcomeHeroSpeaker /> */}
+        {/* Hero section can be added here later */}
       </Suspense>
 
-      {/* <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12" id="shop">
-        <div className="flex items-end justify-between">
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900">
-              Featured Speakers
-            </h2>
-            <p className="text-sm text-gray-600">
-              Curated picks from top brands
-            </p>
-          </div>
-        </div>
-        {featured.length > 0 ? (
-          <FeaturedProductsCarousel products={featured} />
-        ) : (
-          <div className="flex flex-col items-center justify-center py-12 text-center">
-            <p className="text-gray-500">No featured speakers available.</p>
-          </div>
-        )}
-      </div> */}
-
+      {/* All Products Section */}
       <div
-        className="max-w-7xl mx-auto px-4 mt-5 sm:px-6 lg:px-8 py-12"
+        className="max-w-7xl mx-auto px-4 mt-5 sm:px-6 lg:px-8 pb-12"
         id="all-products"
       >
         <div className="flex items-end justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">All Speakers</h2>
+            <h2 className="text-2xl font-bold text-gray-900">All Tablets</h2>
             <p className="text-sm text-gray-600">Browse the full catalog</p>
           </div>
         </div>
@@ -94,9 +74,7 @@ export default async function Page() {
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center py-12 text-center">
-            <p className="text-gray-500">
-              No speakers available at the moment.
-            </p>
+            <p className="text-gray-500">No tablets available at the moment.</p>
           </div>
         )}
       </div>

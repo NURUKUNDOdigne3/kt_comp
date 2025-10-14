@@ -53,7 +53,7 @@ export default async function Page() {
           </div>
         }
       >
-        <WelcomeHeroRouter />
+        {/* <WelcomeHeroRouter /> */}
       </Suspense>
 
       {/* <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12" id="shop">
@@ -76,7 +76,10 @@ export default async function Page() {
         )}
       </div> */}
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" id="all-products">
+      <div
+        className="max-w-7xl mx-auto px-4 mt-10 sm:px-6 lg:px-8"
+        id="all-products"
+      >
         <div className="flex items-end justify-between">
           <div>
             <h2 className="text-2xl font-bold text-gray-900">All Routers</h2>

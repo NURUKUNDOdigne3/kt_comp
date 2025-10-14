@@ -283,7 +283,7 @@ export default function WelcomeHeroPrinter() {
   }, []);
 
   return (
-    <section id="welcome-hero" className="h-screen w-full relative">
+    <section id="welcome-hero" className="h-screen w-full relative -mt-[140px]">
       <Canvas
         className="relative -top-5 left-0 w-full h-full"
         camera={{ fov: 45 }}

@@ -211,6 +211,8 @@ async function updateRequest(url: string, { arg }: { arg: any }) {
     headers["Authorization"] = `Bearer ${token}`;
   }
 
+  console.log("Update request payload:", arg);
+
   const res = await fetch(url, {
     method: "PATCH",
     headers,
@@ -219,8 +221,10 @@ async function updateRequest(url: string, { arg }: { arg: any }) {
 
   const data = await res.json();
 
+  console.log("Update response:", { ok: res.ok, status: res.status, data });
+
   if (!res.ok) {
-    throw new Error(data.error || "Request failed");
+    throw new Error(data.error || "Failed to update product");
   }
 
   return data;

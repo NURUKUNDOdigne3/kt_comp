@@ -13,12 +13,20 @@ import {
   ArrowLeft,
   Package,
   Truck,
+  LogIn,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { toast } from "sonner";
 import Footer from "@/components/Footer";
 
@@ -27,6 +35,7 @@ export default function CheckoutPage() {
   const { items, totalAmount, clearCart } = useCart();
   const [isProcessing, setIsProcessing] = useState(false);
   const [user, setUser] = useState<any>(null);
+  const [showLoginModal, setShowLoginModal] = useState(false);
 
   // Shipping form
   const [shippingInfo, setShippingInfo] = useState({
@@ -51,6 +60,9 @@ export default function CheckoutPage() {
         email: parsedUser.email || "",
         phone: parsedUser.phone || "",
       }));
+    } else {
+      // User not logged in - show modal
+      setShowLoginModal(true);
     }
   }, []);
 
@@ -130,6 +142,12 @@ export default function CheckoutPage() {
     }
   };
 
+  const handleLoginRedirect = () => {
+    // Store current path to redirect back after login
+    localStorage.setItem("redirect_after_login", "/checkout");
+    router.push("/auth/login");
+  };
+
   if (items.length === 0) {
     return null;
   }
@@ -137,6 +155,39 @@ export default function CheckoutPage() {
   return (
     <>
       <Header />
+
+      {/* Login Required Modal */}
+      <Dialog open={showLoginModal} onOpenChange={setShowLoginModal}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Lock className="h-5 w-5 text-blue-600" />
+              Login Required
+            </DialogTitle>
+            <DialogDescription>
+              You need to be logged in to proceed with checkout. Please login or
+              create an account to continue.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 pt-4">
+            <Button
+              onClick={handleLoginRedirect}
+              className="w-full bg-blue-600 hover:bg-blue-700"
+            >
+              <LogIn className="mr-2 h-4 w-4" />
+              Go to Login
+            </Button>
+            <Button
+              onClick={() => router.push("/")}
+              variant="outline"
+              className="w-full"
+            >
+              Continue Shopping
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       <div className="min-h-screen bg-gray-50 py-8">
         <div className="container mx-auto px-4 max-w-7xl">
           {/* Back button */}

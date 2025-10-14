@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { X, Upload, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,6 +15,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import { Dropzone, ImagePreview } from "@/components/ui/dropzone";
 import { useBrands, useCategories } from "@/hooks/use-api";
 
 interface ProductFormData {
@@ -28,6 +29,7 @@ interface ProductFormData {
   brandId: string;
   image?: string;
   images: string[];
+  model3dId?: string;
   badge?: string;
   inStock: boolean;
   featured: boolean;
@@ -65,6 +67,7 @@ export function ProductForm({ product, onSubmit, onCancel }: ProductFormProps) {
       brandId: product?.brandId || "",
       image: product?.image || "",
       images: product?.images || [],
+      model3dId: product?.model3dId || "",
       badge: product?.badge || "",
       inStock: product?.inStock ?? true,
       featured: product?.featured || false,
@@ -77,14 +80,13 @@ export function ProductForm({ product, onSubmit, onCancel }: ProductFormProps) {
     setValue("images", images);
   }, [images, setValue]);
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
+  const handleFilesChange = async (files: File[]) => {
     if (!files || files.length === 0) return;
 
     setUploading(true);
 
     try {
-      const uploadPromises = Array.from(files).map(async (file) => {
+      const uploadPromises = files.map(async (file) => {
         const formData = new FormData();
         formData.append("file", file);
         formData.append("folder", "products");
@@ -123,18 +125,41 @@ export function ProductForm({ product, onSubmit, onCancel }: ProductFormProps) {
     setSubmitting(true);
     try {
       // Generate slug from name if not provided
-      const slug = data.slug || data.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-      
+      const slug =
+        data.slug ||
+        data.name
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/(^-|-$)/g, "");
+
       // Set image to first uploaded image if available
       const image = images.length > 0 ? images[0] : undefined;
-      
-      await onSubmit({ 
-        ...data, 
+
+      // Clean up the data - remove NaN and undefined values
+      const cleanedData: any = {
+        ...data,
         slug,
         image,
         images,
         inStock: data.stockCount > 0,
-      });
+      };
+
+      // Remove NaN values and convert to null/undefined
+      if (isNaN(cleanedData.oldPrice) || cleanedData.oldPrice === 0) {
+        delete cleanedData.oldPrice;
+      }
+
+      // Clean model3dId - remove if empty string
+      if (cleanedData.model3dId === "") {
+        delete cleanedData.model3dId;
+      }
+
+      // Clean badge - remove if empty string
+      if (cleanedData.badge === "") {
+        delete cleanedData.badge;
+      }
+
+      await onSubmit(cleanedData);
     } catch (error) {
       console.error("Form submission error:", error);
     } finally {
@@ -294,6 +319,23 @@ export function ProductForm({ product, onSubmit, onCancel }: ProductFormProps) {
         )}
       </div>
 
+      {/* 3D Model ID */}
+      <div className="space-y-2">
+        <Label htmlFor="model3dId">
+          Sketchfab 3D Model ID{" "}
+          <span className="text-muted-foreground text-xs">(Optional)</span>
+        </Label>
+        <Input
+          id="model3dId"
+          {...register("model3dId")}
+          placeholder="e.g., efab224280fd4c3993c808107f7c0b38"
+          className="font-mono text-sm"
+        />
+        <p className="text-xs text-muted-foreground">
+          Enter the Sketchfab model ID to display a 3D preview of this product
+        </p>
+      </div>
+
       {/* Featured Toggle */}
       <div className="flex items-center space-x-2">
         <Switch
@@ -307,61 +349,23 @@ export function ProductForm({ product, onSubmit, onCancel }: ProductFormProps) {
       {/* Image Upload */}
       <div className="space-y-2">
         <Label>Product Images</Label>
-        <div className="border-2 border-dashed rounded-lg p-4">
-          <div className="flex flex-col items-center justify-center space-y-2">
-            <Upload className="h-8 w-8 text-muted-foreground" />
-            <div className="text-sm text-muted-foreground text-center">
-              <label
-                htmlFor="image-upload"
-                className="cursor-pointer text-primary hover:underline"
-              >
-                Click to upload
-              </label>
-              {" or drag and drop"}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              PNG, JPG, WEBP up to 10MB
-            </p>
-            <input
-              id="image-upload"
-              type="file"
-              multiple
-              accept="image/*"
-              onChange={handleImageUpload}
-              className="hidden"
-              disabled={uploading}
-            />
+        <Dropzone
+          onFilesChange={handleFilesChange}
+          maxFiles={5}
+          maxSize={10 * 1024 * 1024}
+          accept="image/*"
+          disabled={uploading}
+        />
+
+        {/* Image Preview */}
+        <ImagePreview images={images} onRemove={removeImage} />
+
+        {uploading && (
+          <div className="flex items-center justify-center mt-4">
+            <Loader2 className="h-6 w-6 animate-spin text-primary" />
+            <span className="ml-2 text-sm">Uploading...</span>
           </div>
-
-          {/* Image Preview */}
-          {images.length > 0 && (
-            <div className="grid grid-cols-4 gap-4 mt-4">
-              {images.map((url, index) => (
-                <div key={index} className="relative group">
-                  <img
-                    src={url}
-                    alt={`Product ${index + 1}`}
-                    className="w-full h-24 object-cover rounded-lg"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => removeImage(index)}
-                    className="absolute top-1 right-1 bg-destructive text-destructive-foreground rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {uploading && (
-            <div className="flex items-center justify-center mt-4">
-              <Loader2 className="h-6 w-6 animate-spin text-primary" />
-              <span className="ml-2 text-sm">Uploading...</span>
-            </div>
-          )}
-        </div>
+        )}
       </div>
 
       {/* Form Actions */}
