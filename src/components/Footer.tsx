@@ -36,7 +36,7 @@ const data = {
   },
   companyInfo: {
     name: "KT Computer Supply",
-    logo: "/logo-white.png",
+    logo: "/logo.png",
   },
 };
 
@@ -94,11 +94,36 @@ const accountLinks = [
   { text: "Purchase", href: data.account.purchase },
 ];
 
+const usefulLinks = [
+  { text: "Our Shop", href: "/products" },
+  { text: "Services", href: "/services" },
+  { text: "News", href: "/news" },
+  { text: "Contact", href: "/contact" },
+];
+
 const supportLinks = [
-  { text: "HTML & CSS", href: data.support.faqs },
-  { text: "JavaScript", href: data.support.shipping },
-  { text: "Photography", href: data.support.returns },
-  { text: "Photoshop", href: data.support.warranty },
+  { text: "FAQs", href: data.support.faqs },
+  { text: "Refund", href: data.support.returns },
+  { text: "Privacy Policy", href: "/privacy" },
+  { text: "Report", href: "/report" },
+  { text: "DMCA", href: "/dmca" },
+];
+
+const informationLinks = [
+  { text: "About Us", href: "/about" },
+  { text: "Our Services", href: "/services" },
+  { text: "Pricing Plan", href: "/pricing" },
+  { text: "Vendor Shop", href: "/vendors" },
+  { text: "Affiliate", href: "/affiliate" },
+  { text: "Stores", href: "/stores" },
+];
+
+const servicesLinks = [
+  { text: "Products", href: "/products" },
+  { text: "Payment", href: "/payment" },
+  { text: "Discount", href: "/discount" },
+  { text: "Promotional", href: "/promo" },
+  { text: "Gifts", href: "/gifts" },
 ];
 
 export default function Footer() {
@@ -112,132 +137,193 @@ export default function Footer() {
   };
 
   return (
-    <footer className="bg-[#1a0b3e] text-white mt-16 w-full">
-      {/* Top Section with Logo and Social Icons */}
-      <div className="border-b border-white/10">
-        <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between flex-col gap-7 md:flex-row md:gap-0">
-            <Link href="/" className="flex items-center gap-2">
-              <div className="flex items-center gap-2 text-xl font-bold">
+    <footer className="w-full px-4 py-8 mt-[50px]">
+      <div className="max-w-7xl mx-auto relative">
+        {/* Newsletter Section */}
+
+        {/* <div className="bg-[#0B1A2D] rounded-[32px] px-8 md:px-12 py-10 mb-8 w-[90%] absolute right-0 left-0 -top-24 mx-auto z-50">
+          <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+            <div>
+              <h2 className="text-3xl md:text-4xl font-bold text-white mb-2">
+                Our <span className="text-[#3B9EFF]">Newsletter</span>
+              </h2>
+              <p className="text-gray-400 text-sm">
+                Get updates by subscribe our weekly newsletter
+              </p>
+            </div>
+            <form
+              onSubmit={handleSubscribe}
+              className="relative w-full md:w-auto"
+            >
+              <div className="relative flex items-center bg-[#1a2942] rounded-full overflow-hidden w-full md:w-[420px]">
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Enter your email ..."
+                  className="flex-1 px-6 py-3.5 bg-transparent text-white placeholder:text-gray-500 border-none outline-none text-sm"
+                  required
+                />
+                <button
+                  type="submit"
+                  className="px-8 py-3 bg-[#3B9EFF] hover:bg-[#2B8EEF] text-white font-semibold rounded-full transition-colors whitespace-nowrap m-1"
+                >
+                  Subscribe
+                </button>
+              </div>
+            </form>
+          </div>
+        </div> */}
+
+        {/* Main Footer Content */}
+        <div className="bg-[#EDF2F7] rounded-[32px] px-8 md:px-12 py-10 -mt-[50px] -z-10 pt-20">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 mb-12">
+            {/* Company Info Column */}
+            <div className="col-span-2 md:col-span-3 lg:col-span-1">
+              <Link href="/" className="flex items-center gap-2 mb-6">
                 <img
                   src={data.companyInfo.logo}
-                  alt="logo"
-                  className="size-8"
+                  alt={data.companyInfo.name}
+                  width={50}
+                  height={50}
                 />
-                <span>{data.companyInfo.name}</span>
+
+                <span className="text-xl font-bold text-[#0B1A2D]">
+                  {data.companyInfo.name}.
+                </span>
+              </Link>
+              <div className="space-y-1 text-sm text-gray-600">
+                <p className="font-semibold text-gray-700 mb-2">Our Address:</p>
+                <p className="font-semibold text-[#0B1A2D]">
+                  KG 549 St, Kigali,
+                </p>
+                <p className="font-semibold text-[#0B1A2D]">Rwanda</p>
+                <p className="mt-4 mb-1">
+                  <span className="font-semibold text-gray-700">
+                    24/7 Free Call:
+                  </span>
+                </p>
+                <p className="font-bold text-[#0B1A2D]">+250 788 123 456</p>
               </div>
-            </Link>
-
-            <div className="flex items-center gap-3">
-              {socialLinks.map(({ icon: Icon, label, href, color }) => (
+              <div className="flex items-center gap-3 mt-6">
                 <Link
-                  key={label}
-                  href={href}
+                  href={data.twitterLink}
                   target="_blank"
-                  rel="noopener noreferrer"
-                  className={`${color} hover:opacity-90 transition-opacity rounded-full p-2`}
-                  aria-label={label}
+                  className="w-9 h-9 bg-white hover:bg-[#3B9EFF] text-[#3B9EFF] hover:text-white rounded-lg flex items-center justify-center transition-colors shadow-sm"
                 >
-                  <Icon className="h-5 w-5 text-white" />
+                  <Twitter className="w-4 h-4" />
                 </Link>
-              ))}
+                <Link
+                  href={data.instaLink}
+                  target="_blank"
+                  className="w-9 h-9 bg-white hover:bg-[#3B9EFF] text-[#3B9EFF] hover:text-white rounded-lg flex items-center justify-center transition-colors shadow-sm"
+                >
+                  <Instagram className="w-4 h-4" />
+                </Link>
+                <Link
+                  href={data.facebookLink}
+                  target="_blank"
+                  className="w-9 h-9 bg-white hover:bg-[#3B9EFF] text-[#3B9EFF] hover:text-white rounded-lg flex items-center justify-center transition-colors shadow-sm"
+                >
+                  <Facebook className="w-4 h-4" />
+                </Link>
+              </div>
+            </div>
+
+            {/* Useful Links Column */}
+            <div>
+              <h3 className="text-base font-bold text-[#0B1A2D] mb-5">
+                Useful Links
+              </h3>
+              <ul className="space-y-2.5">
+                {usefulLinks.map(({ text, href }) => (
+                  <li key={text}>
+                    <Link
+                      href={href}
+                      className="text-gray-600 hover:text-[#3B9EFF] transition-colors text-sm flex items-center gap-1.5"
+                    >
+                      <span className="text-gray-400 text-base">›</span>
+                      {text}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Support Column */}
+            <div>
+              <h3 className="text-base font-bold text-[#0B1A2D] mb-5">
+                Support
+              </h3>
+              <ul className="space-y-2.5">
+                {supportLinks.map(({ text, href }) => (
+                  <li key={text}>
+                    <Link
+                      href={href}
+                      className="text-gray-600 hover:text-[#3B9EFF] transition-colors text-sm flex items-center gap-1.5"
+                    >
+                      <span className="text-gray-400 text-base">›</span>
+                      {text}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Information Column */}
+            {/* <div>
+              <h3 className="text-base font-bold text-[#0B1A2D] mb-5">
+                Information
+              </h3>
+              <ul className="space-y-2.5">
+                {informationLinks.map(({ text, href }) => (
+                  <li key={text}>
+                    <Link
+                      href={href}
+                      className="text-gray-600 hover:text-[#3B9EFF] transition-colors text-sm flex items-center gap-1.5"
+                    >
+                      <span className="text-gray-400 text-base">›</span>
+                      {text}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div> */}
+
+            {/* Services Column */}
+            <div>
+              <h3 className="text-base font-bold text-[#0B1A2D] mb-5">
+                Services
+              </h3>
+              <ul className="space-y-2.5">
+                {servicesLinks.map(({ text, href }) => (
+                  <li key={text}>
+                    <Link
+                      href={href}
+                      className="text-gray-600 hover:text-[#3B9EFF] transition-colors text-sm flex items-center gap-1.5"
+                    >
+                      <span className="text-gray-400 text-base">›</span>
+                      {text}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
+
+          {/* Bottom Section */}
         </div>
-      </div>
-
-      {/* Main Footer Content */}
-      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-2 gap-8 md:grid-cols-3 lg:grid-cols-5">
-          {/* Company Column */}
-          <div>
-            <h3 className="text-lg font-semibold mb-6">Company</h3>
-            <ul className="space-y-3">
-              {companyLinks.map(({ text, href }) => (
-                <li key={text}>
-                  <Link
-                    href={href}
-                    className="text-gray-300 hover:text-white transition-colors text-sm"
-                  >
-                    {text}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Categories Column */}
-          <div>
-            <h3 className="text-lg font-semibold mb-6">Categories</h3>
-            <ul className="space-y-3">
-              {categoryLinks.map(({ text, href }) => (
-                <li key={text}>
-                  <Link
-                    href={href}
-                    className="text-gray-300 hover:text-white transition-colors text-sm"
-                  >
-                    {text}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Account Column */}
-          <div>
-            <h3 className="text-lg font-semibold mb-6">Account</h3>
-            <ul className="space-y-3">
-              {accountLinks.map(({ text, href }) => (
-                <li key={text}>
-                  <Link
-                    href={href}
-                    className="text-gray-300 hover:text-white transition-colors text-sm"
-                  >
-                    {text}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Map Column */}
-          <div className="col-span-2 md:col-span-1 lg:col-span-2">
-            <h3 className="text-lg font-semibold mb-6">Find Us</h3>
-            <div className="w-full h-48 rounded-lg overflow-hidden border border-white/10">
-              <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3987.5150630506755!2d30.059535099999998!3d-1.9469428000000002!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x19dca50041a76767%3A0x1dee841a755a1cf!2sBliss%20Technology%20LTD!5e0!3m2!1sen!2srw!4v1760388296399!5m2!1sen!2srw"
-                width="100%"
-                height="100%"
-                style={{ border: 0 }}
-                allowFullScreen
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-                title="KT Computer Supply Location"
-              ></iframe>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Bottom Section */}
-      <div className="border-t border-white/10">
-        <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-400">
-            <p>Copyright 2025 {data.companyInfo.name}. All rights reserved</p>
-            <div className="flex items-center gap-6">
-              <Link
-                href="/privacy"
-                className="hover:text-white transition-colors"
-              >
-                Privacy policy
-              </Link>
-              <Link
-                href="/terms"
-                className="hover:text-white transition-colors"
-              >
-                Terms & condition
-              </Link>
-            </div>
+        <div className="pt-6 flex flex-col md:flex-row items-center px-10 justify-between gap-4">
+          <p className="text-sm text-gray-500">
+            Gadgets Shop © 2025 All Rights Reserved.
+          </p>
+          <div className="flex items-center gap-3">
+            <img
+              src="/cards.png"
+              alt="Credit card images"
+              width={300}
+              height={50}
+            />
           </div>
         </div>
       </div>
