@@ -13,6 +13,8 @@ import {
   FileText,
   DollarSign,
   Users,
+  ArrowRight,
+  Play,
 } from "lucide-react";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -21,22 +23,32 @@ const productImages = [
   {
     src: "https://macfinder.co.uk/wp-content/uploads/2023/12/img-MacBook-Pro-Retina-14-Inch-96139-scaled.jpg",
     alt: "MacBook Pro",
+    name: "MacBook Pro 14",
+    price: "RWF 2,399,000",
   },
   {
     src: "https://m.media-amazon.com/images/I/61si2lzARfL.jpg",
     alt: "Epson Printer",
+    name: "Epson EcoTank",
+    price: "RWF 450,000",
   },
   {
     src: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSrXkPX67HY7CIyMamvPTeYWZ7SWYaOevYUMA&s",
     alt: "TP-Link Router",
+    name: "TP-Link AX3000",
+    price: "RWF 50,000",
   },
   {
     src: "https://uploads-eu-west-1.insided.com/sonos-en/attachment/67246f05-a47d-4e5f-8b53-4724bf52c644.png",
     alt: "Sonos Speaker",
+    name: "Sonos One",
+    price: "RWF 200,000",
   },
   {
     src: "https://m.media-amazon.com/images/I/81iPNmdC-vL._UF1000,1000_QL80_.jpg",
     alt: "ASUS Monitor",
+    name: 'ASUS 27" 4K',
+    price: "RWF 449,000",
   },
 ];
 
@@ -194,205 +206,147 @@ export default function EpicHeroSection() {
     },
   ];
 
+  const currentProduct = productImages[currentImageIndex];
+
   return (
     <section
       ref={sectionRef}
-      className="relative bg-gradient-to-br from-gray-50 via-blue-50/20 to-cyan-50/30 py-16 px-4 overflow-hidden min-h-[90vh]-mt-10"
+      className="relative bg-[#0B1A2D] py-16 px-10 overflow-hidden rounded-[40px] mx-10 my-8"
     >
-      {/* Decorative circles */}
-      <div className="absolute top-20 right-10 w-96 h-96 bg-cyan-200/30 rounded-full blur-3xl" />
-      <div className="absolute bottom-20 left-10 w-80 h-80 bg-blue-200/20 rounded-full blur-3xl" />
-      <div className="absolute top-1/2 right-1/4 w-4 h-4 bg-blue-400 rounded-full" />
-      <div className="absolute bottom-1/3 right-1/3 w-3 h-3 bg-red-400 rounded-full" />
+      {/* Grid pattern overlay */}
+      <div
+        className="absolute inset-0 opacity-[0.03]"
+        style={{
+          backgroundImage:
+            "linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px)",
+          backgroundSize: "40px 40px",
+        }}
+      />
 
       <div className="relative max-w-7xl mx-auto">
         {/* Main Hero Grid */}
-        <div className="grid lg:grid-cols-2 gap-12 items-center mb-20">
+        <div className="grid lg:grid-cols-2 gap-16 items-center">
           {/* Left Content */}
-          <div className="space-y-8">
+          <div className="space-y-6 z-10">
             <h1
               ref={titleRef}
-              className="text-5xl sm:text-6xl lg:text-7xl font-bold text-gray-900 leading-[65px]"
+              className="text-5xl sm:text-6xl lg:text-[64px] font-bold leading-[1.1]"
             >
-              The ultimate product{" "}
-              <span className="text-gray-900">with pleasure</span>
+              <span className="text-white">Get </span>
+              <span className="text-[#3B9EFF]">Best Device</span>
+              <br />
+              <span className="text-white">With Lowest Price.</span>
             </h1>
 
             <p
               ref={descriptionRef}
-              className="text-lg text-gray-600 leading-relaxed max-w-xl"
+              className="text-[15px] text-gray-400 leading-relaxed max-w-md"
             >
-              Let your product do the magic care for you. Change the quality of
-              your personality by changing your appearance. Everything reflects
-              your character and we&apos;re taking care of it.
+              iPad is a line of tablet computers designed, developed and
+              marketed by Apple Inc., which run the iOS and iPad OS mobile
+              operating systems.
             </p>
 
             {/* CTA Buttons */}
-            <div className="flex flex-wrap gap-4">
+            <div className="flex flex-wrap gap-6 items-center pt-4">
               <a
                 href="#computers"
-                className="px-8 py-4 bg-blue-400 hover:bg-blue-500 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-200"
+                className="group px-8 py-4 bg-[#3B9EFF] hover:bg-[#2B8EEF] text-white font-semibold rounded-[14px] shadow-lg hover:shadow-xl transition-all duration-200 flex items-center gap-2"
               >
-                Get Started
+                Explore Now
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </a>
             </div>
           </div>
 
-          {/* Right Illustration Area */}
+          {/* Right Product Area */}
           <div className="relative">
-            {/* Stats Card - Positioned over illustration */}
-            <div
-              ref={statsRef}
-              className="absolute top-32 left-0 z-20 inline-flex items-center gap-4 bg-white rounded-2xl px-6 py-4 shadow-xl"
-            >
-              <div className="w-14 h-14 bg-cyan-100 rounded-xl flex items-center justify-center">
-                <Award className="w-8 h-8 text-cyan-600" />
-              </div>
-              <div>
-                <div className="text-2xl font-bold text-gray-900">35K+</div>
-                <div className="text-sm text-gray-600">
-                  Products everyday on sale
-                </div>
-              </div>
-            </div>
-
-            {/* Main Illustration Circle */}
+            {/* Main Product Display */}
             <div
               ref={illustrationRef}
-              className="relative w-full aspect-square max-w-2xl mx-auto"
+              className="relative w-full h-[500px] lg:h-[600px]"
             >
-              {/* Large cyan circle background */}
-              <div className="absolute inset-0 bg-gradient-to-br from-cyan-200 to-cyan-300 rounded-full opacity-80" />
-              <div className="absolute inset-8 bg-gradient-to-br from-cyan-100 to-cyan-200 rounded-full opacity-60" />
+              {/* Decorative circles behind product - matching exact positions */}
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full">
+                {/* Large blue circle */}
+                <div className="absolute top-[15%] right-[10%] w-[350px] h-[350px] bg-[#3B9EFF] rounded-full" />
 
-              {/* Product Image Slideshow */}
-              <div className="absolute inset-0 flex items-center justify-center p-12">
-                <div className="relative w-full h-full">
-                  {/* Laptop Frame */}
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="relative w-full h-3/4 bg-gradient-to-br from-blue-600 to-blue-800 rounded-lg shadow-2xl overflow-hidden">
-                      {/* Screen with slideshow */}
-                      <div className="absolute inset-2 bg-white rounded-md overflow-hidden">
-                        {productImages.map((image, index) => (
-                          <div
-                            key={index}
-                            className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
-                              index === currentImageIndex
-                                ? "opacity-100 z-10"
-                                : "opacity-0 z-0"
-                            }`}
-                          >
-                            <Image
-                              src={image.src}
-                              alt={image.alt}
-                              fill
-                              className="object-contain p-2"
-                              priority={index === 0}
-                            />
-                          </div>
-                        ))}
+                {/* Light gray/white circle */}
+                <div className="absolute top-[20%] right-[5%] w-[280px] h-[280px] bg-white/90 rounded-full" />
+
+                {/* Pink/salmon circle */}
+                <div className="absolute bottom-[15%] right-[15%] w-[200px] h-[200px] bg-[#FF9B9B] rounded-full" />
+
+                {/* Orange circle */}
+                <div className="absolute bottom-[25%] right-[8%] w-[140px] h-[140px] bg-[#FFA366] rounded-full" />
+
+                {/* Small blue circle bottom right */}
+                <div className="absolute bottom-[10%] right-[25%] w-[120px] h-[120px] bg-[#3B9EFF] rounded-full" />
+              </div>
+
+              {/* Product Image with smooth transitions */}
+              <div className="absolute inset-0 flex items-center justify-center z-10">
+                <div className="relative w-[400px] h-[500px]">
+                  {productImages.map((image, index) => (
+                    <div
+                      key={index}
+                      className={`absolute inset-0 transition-all duration-1000 ease-in-out ${
+                        index === currentImageIndex
+                          ? "opacity-100 scale-100 z-10"
+                          : "opacity-0 scale-95 z-0"
+                      }`}
+                    >
+                      <Image
+                        src={image.src}
+                        alt={image.alt}
+                        fill
+                        className="object-contain drop-shadow-2xl"
+                        priority={index === 0}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Product Info Card - positioned like in image */}
+              <div
+                ref={statsRef}
+                className="absolute top-[40%] right-0 lg:right-8 z-20 bg-white rounded-[20px] px-5 py-4 shadow-2xl"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 bg-gray-100 rounded-[12px] flex items-center justify-center overflow-hidden relative">
+                    {productImages.map((image, index) => (
+                      <div
+                        key={index}
+                        className={`absolute inset-0 transition-opacity duration-1000 ${
+                          index === currentImageIndex
+                            ? "opacity-100"
+                            : "opacity-0"
+                        }`}
+                      >
+                        <Image
+                          src={image.src}
+                          alt={image.alt}
+                          fill
+                          className="object-contain p-1"
+                        />
                       </div>
-                      {/* Person icon */}
-                      <div className="absolute -right-8 top-1/2 -translate-y-1/2 w-12 h-16 bg-blue-900 rounded-t-full z-20" />
+                    ))}
+                  </div>
+                  <div>
+                    <div className="text-[15px] font-semibold text-gray-900 transition-all duration-500">
+                      {currentProduct.name}
+                    </div>
+                    <div className="text-[13px] text-gray-500">
+                      Price:{" "}
+                      <span className="text-gray-900 font-semibold">
+                        {currentProduct.price}
+                      </span>
                     </div>
                   </div>
-
-                  {/* Shopping cart icon */}
-                  <div className="absolute bottom-4 right-4 w-12 h-12 bg-pink-400 rounded-full flex items-center justify-center shadow-lg z-20">
-                    <ShoppingCart className="w-6 h-6 text-white" />
-                  </div>
-
-                  {/* Book/Product icon */}
-                  <div className="absolute bottom-8 left-8 w-10 h-12 bg-red-400 rounded shadow-lg z-20" />
                 </div>
               </div>
-
-              {/* Slideshow indicators */}
-              <div className="absolute -bottom-12 left-1/2 transform -translate-x-1/2 flex gap-2 z-20">
-                {productImages.map((_, index) => (
-                  <div
-                    key={index}
-                    className={`h-1.5 rounded-full transition-all duration-500 ${
-                      index === currentImageIndex
-                        ? "w-8 bg-cyan-600"
-                        : "w-1.5 bg-gray-300"
-                    }`}
-                  />
-                ))}
-              </div>
-
-              {/* Floating Icons */}
-              <div
-                ref={(el) => {
-                  if (el) floatingIconsRef.current[0] = el;
-                }}
-                className="absolute top-12 left-12 w-16 h-16 bg-blue-400 rounded-full flex items-center justify-center shadow-lg"
-              >
-                <TrendingUp className="w-8 h-8 text-white" />
-              </div>
-
-              <div
-                ref={(el) => {
-                  if (el) floatingIconsRef.current[1] = el;
-                }}
-                className="absolute top-8 right-16 w-12 h-12 bg-red-400 rounded-full shadow-lg"
-              />
-
-              <div
-                ref={(el) => {
-                  if (el) floatingIconsRef.current[2] = el;
-                }}
-                className="absolute bottom-24 right-8 w-16 h-16 bg-pink-400 rounded-full flex items-center justify-center shadow-lg"
-              >
-                <Heart className="w-8 h-8 text-white" />
-              </div>
-
-              {/* Our Clients Badge */}
-              {/* <div className="absolute bottom-8 right-12 bg-white rounded-2xl px-6 py-3 shadow-xl">
-                <div className="text-sm font-semibold text-gray-900 mb-2">
-                  Our Clients
-                </div>
-                <div className="flex -space-x-2">
-                  {[1, 2, 3].map((i) => (
-                    <div
-                      key={i}
-                      className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-purple-400 border-2 border-white"
-                    />
-                  ))}
-                  <div className="w-8 h-8 rounded-full bg-gray-200 border-2 border-white flex items-center justify-center text-xs font-semibold">
-                    4+
-                  </div>
-                </div>
-              </div> */}
             </div>
-          </div>
-        </div>
-
-        {/* Services Section */}
-        <div className="mt-12">
-          <h3 className="text-2xl font-bold text-gray-900 mb-6">
-            Our Service:
-          </h3>
-          <div
-            ref={servicesRef}
-            className="grid grid-cols-2 md:grid-cols-4 gap-4"
-          >
-            {services.map((service, index) => {
-              const Icon = service.icon;
-              return (
-                <div
-                  key={index}
-                  className={`${service.bgColor} rounded-2xl p-6 text-center space-y-3 hover:scale-105 transition-transform duration-200`}
-                >
-                  <div className="flex justify-center">
-                    <Icon className={`w-12 h-12 ${service.iconColor}`} />
-                  </div>
-                  <h4 className="font-semibold text-gray-900 text-sm">
-                    {service.title}
-                  </h4>
-                </div>
-              );
-            })}
           </div>
         </div>
       </div>
