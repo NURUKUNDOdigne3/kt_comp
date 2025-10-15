@@ -1,0 +1,11 @@
+Model Information:
+* title:	The canon printer
+* source:	https://sketchfab.com/3d-models/the-canon-printer-aa232d8302ca44ee9f08adfef2f3f894
+* author:	Sumit Jariwal (https://sketchfab.com/sumitjariwal)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "The canon printer" (https://sketchfab.com/3d-models/the-canon-printer-aa232d8302ca44ee9f08adfef2f3f894) by Sumit Jariwal (https://sketchfab.com/sumitjariwal) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
