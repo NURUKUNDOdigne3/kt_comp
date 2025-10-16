@@ -375,7 +375,7 @@ export default function EpicHeroSection() {
               {/* Scroll mouse indicator */}
               <div className="absolute right-0 top-1/2 -translate-y-1/2 flex flex-col items-center gap-2 text-gray-500">
                 <span className="rotate-90 text-sm">scroll down</span>
-                <span className="w-6 h-10 rounded-full border border-gray-300 relative overflow-hidden">
+                <span className="w-6 h-10 mt-10 rounded-full border border-blue-300 relative overflow-hidden">
                   <span className="absolute top-2 left-1/2 -translate-x-1/2 w-1 h-2 rounded bg-gray-400 animate-bounce" />
                 </span>
               </div>
@@ -393,7 +393,7 @@ export default function EpicHeroSection() {
                 <div className="absolute inset-6 rounded-full border border-gray-200" />
                 <div className="absolute inset-12 rounded-full border border-gray-200" />
                 <Image
-                  src="/products/watch-sample.png"
+                  src="https://xtratheme.com/elementor/watch-shop/wp-content/uploads/sites/79/2021/10/slide-2.png"
                   alt="Smart Watch"
                   fill
                   className="object-contain p-10"
@@ -410,7 +410,7 @@ export default function EpicHeroSection() {
                 { title: "Best Quality and design" },
               ].map((item, i) => (
                 <div key={i} className="flex items-start gap-3">
-                  <div className="w-6 h-6 rounded-full bg-blue-500 mt-1" />
+                  <div className="w-1 h-1 rounded-full bg-blue-500 mt-1" />
                   <div>
                     <p className="font-semibold text-gray-900 text-sm">{item.title}</p>
                     <p className="text-gray-500 text-sm">A smartwatch is a wearable computer in the form of a watch.</p>
@@ -425,7 +425,7 @@ export default function EpicHeroSection() {
         <div ref={roundedBannerRef} className="mb-24">
           <div className="relative max-w-5xl mx-auto rounded-[40px] overflow-hidden shadow-2xl">
             <Image
-              src="https://images.unsplash.com/photo-1518449032156-436b67b7fd90?q=80&w=1800&auto=format&fit=crop"
+              src="https://xtratheme.com/elementor/watch-shop/wp-content/uploads/sites/79/2021/10/slide-2.png"
               alt="Gadget Theme"
               width={1800}
               height={900}
@@ -497,7 +497,7 @@ export default function EpicHeroSection() {
         </div>
 
         {/* Services Section */}
-        <div className="mt-12">
+        {/* <div className="mt-12">
           <h3 className="text-2xl font-bold text-gray-900 mb-6">
             Our Service:
           </h3>
@@ -522,7 +522,7 @@ export default function EpicHeroSection() {
               );
             })}
           </div>
-        </div>
+        </div> */}
       </div>
     </section>
   );
