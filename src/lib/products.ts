@@ -24,10 +24,10 @@ export const products: Product[] = [
     brand: "Apple",
     image:
       "https://macfinder.co.uk/wp-content/uploads/2023/12/img-MacBook-Pro-Retina-14-Inch-96139-scaled.jpg",
-    price: 2399000,
-    oldPrice: 2599000,
-    priceFormatted: formatPrice(2399000),
-    oldPriceFormatted: formatPrice(2599000),
+    price: 100,
+    oldPrice: 100,
+    priceFormatted: formatPrice(100),
+    oldPriceFormatted: formatPrice(100),
     description: "Apple M3 Pro, 18GB RAM, 1TB SSD",
     badge: "New",
     rating: 4.8,
@@ -786,7 +786,7 @@ export const monitorProducts: Product[] = [
     brand: "Dell",
     image:
       "https://www.dellonline.co.za/cdn/shop/products/E8F39CC0-00E5-4FB4-B43E-359076AC66B7_122925_1080x.jpg?v=1681477487",
-    price: 649000,
+    price: 100,
     oldPrice: 699000,
     priceFormatted: formatPrice(649000),
     oldPriceFormatted: formatPrice(699000),

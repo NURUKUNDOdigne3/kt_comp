@@ -183,9 +183,10 @@ export default function Footer() {
               <Link href="/" className="flex items-center gap-2 mb-6">
                 <img
                   src={data.companyInfo.logo}
-                  alt={data.companyInfo.name}
+                  alt={`${data.companyInfo.name} logo - Premium electronics store in Rwanda`}
                   width={50}
                   height={50}
+                  loading="lazy"
                 />
 
                 <span className="text-xl font-bold text-[#0B1A2D]">
@@ -320,9 +321,10 @@ export default function Footer() {
           <div className="flex items-center gap-3">
             <img
               src="/cards.png"
-              alt="Credit card images"
+              alt="Accepted payment methods - Credit cards, mobile money, and PayPack payments at KT Computer Supply Rwanda"
               width={300}
               height={50}
+              loading="lazy"
             />
           </div>
         </div>

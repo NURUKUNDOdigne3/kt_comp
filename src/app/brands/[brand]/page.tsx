@@ -4,6 +4,9 @@ import Image from "next/image";
 import Header from "@/components/Header";
 import { prisma } from "@/lib/prisma";
 import Footer from "@/components/Footer";
+import { generateBrandMetadata } from "@/lib/seo";
+import { Metadata } from "next";
+import Breadcrumbs from "@/components/SEO/Breadcrumbs";
 
 interface BrandPageProps {
   params: Promise<{
@@ -45,6 +48,36 @@ async function getBrandData(brandSlug: string) {
   }
 }
 
+export async function generateMetadata({ params }: BrandPageProps): Promise<Metadata> {
+  const { brand: brandSlug } = await params;
+
+  try {
+    const brand = await prisma.brand.findUnique({
+      where: { slug: brandSlug },
+      include: {
+        products: {
+          select: { id: true },
+        },
+      },
+    });
+
+    if (!brand) {
+      return {
+        title: "Brand Not Found - KT Computer Supply",
+        description: "The requested brand could not be found.",
+      };
+    }
+
+    return generateBrandMetadata(brand, brand.products);
+  } catch (error) {
+    console.error("Error generating metadata for brand:", error);
+    return {
+      title: "Brand - KT Computer Supply",
+      description: "Premium electronics and computer solutions from top brands in Rwanda",
+    };
+  }
+}
+
 export default async function BrandPage({ params }: BrandPageProps) {
   const { brand: brandSlug } = await params;
   const data = await getBrandData(brandSlug);
@@ -55,9 +88,17 @@ export default async function BrandPage({ params }: BrandPageProps) {
 
   const { brand, productsByCategory } = data;
 
+  const breadcrumbItems = [
+    { name: "Brands", href: "/brands" },
+    { name: brand.name, href: `/brands/${brand.slug}` },
+  ];
+
   return (
     <>
       <Header />
+      <div className="container mx-auto px-4 py-4">
+        <Breadcrumbs items={breadcrumbItems} />
+      </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Brand Header */}

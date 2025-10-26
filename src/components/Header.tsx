@@ -16,21 +16,20 @@ import {
   UserPlus,
   ReceiptText,
 } from "lucide-react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { CartDrawer } from "./CartDrawer";
 import { brandData } from "../lib/brands";
 import { useCart } from "@/contexts/CartContext";
+import SearchDropdown from "./SearchDropdown";
 
 const categories = [
-  { name: "All", href: "/", active: true },
-  { name: "Computers", href: "/computers", active: false },
-  { name: "Tablets", href: "/tablets", active: false },
-  // { name: "Phones", href: "/phones", active: false },
-  { name: "Printers", href: "/printers", active: false },
-  { name: "Routers", href: "/routers", active: false },
-  { name: "Speakers", href: "/speakers", active: false },
-  { name: "Monitors", href: "/monitors", active: false },
-  // { name: "Accessories", href: "#", active: false },
+  { name: "All", href: "/", scrollTo: null, active: true },
+  { name: "Computers", href: "/computers", scrollTo: "computers", active: false },
+  { name: "Tablets", href: "/tablets", scrollTo: "tablets", active: false },
+  { name: "Printers", href: "/printers", scrollTo: "printers", active: false },
+  { name: "Routers", href: "/routers", scrollTo: "routers", active: false },
+  { name: "Speakers", href: "/speakers", scrollTo: "speakers", active: false },
+  { name: "Monitors", href: "/monitors", scrollTo: "monitors", active: false },
 ];
 
 // Brand data with categories
@@ -45,10 +44,12 @@ interface UserData {
 
 export default function Header() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [activeBrand, setActiveBrand] = useState<string | null>(null);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [user, setUser] = useState<UserData | null>(null);
   const pathname = usePathname();
+  const router = useRouter();
   const userMenuRef = useRef<HTMLDivElement>(null);
   const { itemCount, setIsCartOpen } = useCart();
 
@@ -93,6 +94,48 @@ export default function Header() {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isUserMenuOpen]);
+
+  // Handle search form submission
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+      setIsSearchOpen(false);
+    }
+  };
+
+  // Handle category click with smooth scrolling
+  const handleCategoryClick = (e: React.MouseEvent, category: any) => {
+    if (pathname === "/" && category.scrollTo) {
+      e.preventDefault();
+      const element = document.getElementById(category.scrollTo);
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }
+  };
+
+  // Handle category scroll from search dropdown
+  const handleCategoryScroll = (categoryName: string) => {
+    if (pathname === "/") {
+      const categoryMap: { [key: string]: string } = {
+        "Computers": "computers",
+        "Printers": "printers",
+        "Monitors": "monitors",
+        "Speakers": "speakers",
+        "Routers": "routers"
+      };
+      
+      const scrollId = categoryMap[categoryName];
+      if (scrollId) {
+        const element = document.getElementById(scrollId);
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth", block: "start" });
+          setIsSearchOpen(false);
+        }
+      }
+    }
+  };
 
   // Get current category from pathname
   const getCurrentCategory = () => {
@@ -280,20 +323,45 @@ export default function Header() {
             </div>
 
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Search className="h-5 w-5 " />
-              </div>
-              <input
-                type="search"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="block w-full pl-10 pr-20 py-2 border border-gray-700 placeholder-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 sm:text-sm"
-                placeholder="Search products..."
+              <form onSubmit={handleSearchSubmit}>
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Search className="h-5 w-5 text-gray-400" />
+                </div>
+                <input
+                  type="search"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onFocus={() => {
+                    console.log("Mobile search input focused, opening dropdown");
+                    console.log("Current searchQuery:", searchQuery);
+                    setIsSearchOpen(true);
+                    console.log("setIsSearchOpen(true) called");
+                  }}
+                  onBlur={() => {
+                    console.log("Search input blurred, scheduling close");
+                    // Delay closing to allow click events to process
+                    setTimeout(() => {
+                      console.log("Closing dropdown after delay");
+                      setIsSearchOpen(false);
+                    }, 200);
+                  }}
+                  className="block w-full pl-10 pr-12 py-2 border border-gray-300 placeholder-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 sm:text-sm"
+                  placeholder="Search for products..."
+                />
+                <button
+                  type="submit"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center hover:bg-gray-50 rounded-r-lg transition-colors"
+                >
+                  <Search className="h-4 w-4 text-gray-400 hover:text-blue-600" />
+                </button>
+              </form>
+              <SearchDropdown
+                searchQuery={searchQuery}
+                onSearchChange={setSearchQuery}
+                onClose={() => setIsSearchOpen(false)}
+                isOpen={isSearchOpen}
+                onCategoryScroll={handleCategoryScroll}
               />
-              <div className="absolute inset-y-0 right-0 pr-3 flex items-center gap-4">
-                <Mic className="h-5 w-5 " />
-                <Camera className="h-5 w-5 " />
-              </div>
             </div>
           </div>
         </div>
@@ -314,15 +382,44 @@ export default function Header() {
 
               <div className="flex flex-1 max-w-2xl mx-8">
                 <div className="relative w-full">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Search className="h-5 w-5 text-gray-400" />
-                  </div>
-                  <input
-                    type="search"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="block w-full pl-10 pr-3 py-2 border rounded-full border-gray-300  leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 sm:text-sm"
-                    placeholder="Search for products..."
+                  <form onSubmit={handleSearchSubmit}>
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <Search className="h-5 w-5 text-gray-400" />
+                    </div>
+                    <input
+                      type="search"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      onFocus={() => {
+                        console.log("Desktop search input focused, opening dropdown");
+                        console.log("Current searchQuery:", searchQuery);
+                        setIsSearchOpen(true);
+                        console.log("setIsSearchOpen(true) called");
+                      }}
+                      onBlur={() => {
+                        console.log("Desktop search input blurred, scheduling close");
+                        // Delay closing to allow click events to process
+                        setTimeout(() => {
+                          console.log("Closing desktop dropdown after delay");
+                          setIsSearchOpen(false);
+                        }, 200);
+                      }}
+                      className="block w-full pl-10 pr-12 py-2 border rounded-full border-gray-300 leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 sm:text-sm"
+                      placeholder="Search for products..."
+                    />
+                    <button
+                      type="submit"
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center hover:bg-gray-50 rounded-r-full transition-colors"
+                    >
+                      <Search className="h-4 w-4 text-gray-400 hover:text-blue-600" />
+                    </button>
+                  </form>
+                  <SearchDropdown
+                    searchQuery={searchQuery}
+                    onSearchChange={setSearchQuery}
+                    onClose={() => setIsSearchOpen(false)}
+                    isOpen={isSearchOpen}
+                    onCategoryScroll={handleCategoryScroll}
                   />
                 </div>
               </div>
@@ -442,6 +539,7 @@ export default function Header() {
                   <Link
                     key={category.name}
                     href={category.href}
+                    onClick={(e) => handleCategoryClick(e, category)}
                     className={`inline-flex items-center px-1 pt-1 text-sm font-medium transition-colors focus:outline-none relative ${
                       isActive
                         ? "text-blue-600 font-semibold"
@@ -485,10 +583,12 @@ export default function Header() {
                     <div className="relative w-5 h-5 mr-2">
                       <Image
                         src={brand.logo}
-                        alt={`${brand.name} logo`}
+                        alt={`${brand.name} brand logo - Shop ${brand.name} products at KT Computer Supply Rwanda`}
                         fill
                         sizes="24x24"
                         className="object-contain group-hover:text-blue-600 transition-colors"
+                        loading="lazy"
+                        quality={80}
                       />
                     </div>
                     <span>{brand.name}</span>
