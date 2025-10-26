@@ -42,34 +42,10 @@ const data = {
 
 const socialLinks = [
   {
-    icon: Facebook,
-    label: "Facebook",
-    href: data.facebookLink,
-    color: "bg-blue-600",
-  },
-  {
-    icon: Twitter,
-    label: "Twitter",
-    href: data.twitterLink,
-    color: "bg-sky-500",
-  },
-  {
     icon: Instagram,
     label: "Instagram",
     href: data.instaLink,
     color: "bg-pink-600",
-  },
-  {
-    icon: Linkedin,
-    label: "LinkedIn",
-    href: data.linkedinLink,
-    color: "bg-blue-700",
-  },
-  {
-    icon: Youtube,
-    label: "YouTube",
-    href: data.youtubeLink,
-    color: "bg-red-600",
   },
 ];
 
