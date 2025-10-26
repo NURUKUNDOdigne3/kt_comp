@@ -258,7 +258,7 @@ export default function ProductsPage() {
                         <SelectItem value="all-categories">
                           All Categories
                         </SelectItem>
-                        {categories?.map((category: any) => (
+                        {Array.isArray(categories) && categories.map((category: any) => (
                           <SelectItem key={category.id} value={category.id}>
                             {category.name}
                           </SelectItem>
@@ -271,7 +271,7 @@ export default function ProductsPage() {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="all-brands">All Brands</SelectItem>
-                        {brands?.map((brand: any) => (
+                        {Array.isArray(brands) && brands.map((brand: any) => (
                           <SelectItem key={brand.id} value={brand.id}>
                             {brand.name}
                           </SelectItem>
@@ -320,9 +320,9 @@ export default function ProductsPage() {
                             {products.map((product: any) => (
                               <TableRow key={product.id}>
                                 <TableCell>
-                                  {product.images && product.images[0] ? (
+                                  {(product.images && product.images[0]) || product.image ? (
                                     <img
-                                      src={product.images[0]}
+                                      src={product.images?.[0] || product.image}
                                       alt={product.name}
                                       className="h-12 w-12 rounded-md object-cover"
                                     />
@@ -340,9 +340,9 @@ export default function ProductsPage() {
                                 <TableCell>
                                   {formatPrice(product.price)}
                                 </TableCell>
-                                <TableCell>{product.stockCount}</TableCell>
+                                <TableCell>{product.stockCount || product.stockQuantity}</TableCell>
                                 <TableCell>
-                                  {product.stockCount > 0 ? (
+                                  {(product.stockCount || product.stockQuantity) > 0 || product.inStock ? (
                                     <Badge variant="default">In Stock</Badge>
                                   ) : (
                                     <Badge variant="destructive">
@@ -500,10 +500,10 @@ export default function ProductsPage() {
                 {selectedProduct && (
                   <div className="space-y-6">
                     {/* Images */}
-                    {selectedProduct.images &&
-                      selectedProduct.images.length > 0 && (
-                        <div className="grid grid-cols-3 gap-4">
-                          {selectedProduct.images.map(
+                    {((selectedProduct.images && selectedProduct.images.length > 0) || selectedProduct.image) && (
+                      <div className="grid grid-cols-3 gap-4">
+                        {selectedProduct.images ? (
+                          selectedProduct.images.map(
                             (img: string, idx: number) => (
                               <img
                                 key={idx}
@@ -512,9 +512,16 @@ export default function ProductsPage() {
                                 className="w-full h-32 object-cover rounded-lg"
                               />
                             )
-                          )}
-                        </div>
-                      )}
+                          )
+                        ) : (
+                          <img
+                            src={selectedProduct.image}
+                            alt={selectedProduct.name}
+                            className="w-full h-32 object-cover rounded-lg"
+                          />
+                        )}
+                      </div>
+                    )}
 
                     {/* Details */}
                     <div className="grid grid-cols-2 gap-4">
@@ -550,14 +557,14 @@ export default function ProductsPage() {
                         <Label className="text-sm font-medium text-muted-foreground">
                           Stock
                         </Label>
-                        <p className="text-sm">{selectedProduct.stockCount}</p>
+                        <p className="text-sm">{selectedProduct.stockCount || selectedProduct.stockQuantity}</p>
                       </div>
                       <div>
                         <Label className="text-sm font-medium text-muted-foreground">
                           Status
                         </Label>
                         <p className="text-sm">
-                          {selectedProduct.stockCount > 0
+                          {(selectedProduct.stockCount || selectedProduct.stockQuantity) > 0 || selectedProduct.inStock
                             ? "In Stock"
                             : "Out of Stock"}
                         </p>

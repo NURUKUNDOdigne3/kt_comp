@@ -53,6 +53,7 @@ const productImages = [
 ];
 
 export default function EpicHeroSection() {
+  // Enable lazy loading for better performance
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const sectionRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
@@ -232,19 +233,16 @@ export default function EpicHeroSection() {
               ref={titleRef}
               className="text-5xl sm:text-6xl lg:text-[64px] font-bold leading-[1.1]"
             >
-              <span className="text-white">Get </span>
-              <span className="text-[#3B9EFF]">Best Device</span>
+              <span className="text-white">KT Computer Supply</span>
               <br />
-              <span className="text-white">With Lowest Price.</span>
+              <span className="text-[#3B9EFF]">Premium Electronics in Rwanda</span>
             </h1>
 
             <p
               ref={descriptionRef}
               className="text-[15px] text-gray-400 leading-relaxed max-w-md"
             >
-              iPad is a line of tablet computers designed, developed and
-              marketed by Apple Inc., which run the iOS and iPad OS mobile
-              operating systems.
+              Discover premium electronics and computer solutions in Rwanda. Get the best devices with competitive prices from KT Computer Supply. From high-performance laptops and professional printers to networking equipment and premium audio systems, we offer top-quality products from leading brands. Fast delivery across Kigali and Rwanda with expert technical support and warranty coverage.
             </p>
 
             {/* CTA Buttons */}
@@ -298,10 +296,13 @@ export default function EpicHeroSection() {
                     >
                       <Image
                         src={image.src}
-                        alt={image.alt}
+                        alt={`${image.name} - Premium ${image.name} available at KT Computer Supply Rwanda`}
                         fill
                         className="object-contain drop-shadow-2xl"
                         priority={index === 0}
+                        loading={index === 0 ? "eager" : "lazy"}
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        quality={90}
                       />
                     </div>
                   ))}

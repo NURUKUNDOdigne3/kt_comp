@@ -87,7 +87,8 @@ export default function CategoriesPage() {
   );
 
   // Filter categories based on search
-  const filteredCategories = categories?.filter(
+  const categoriesArray = categories || [];
+  const filteredCategories = categoriesArray.filter(
     (category: any) =>
       category.name.toLowerCase().includes(search.toLowerCase()) ||
       category.description?.toLowerCase().includes(search.toLowerCase())

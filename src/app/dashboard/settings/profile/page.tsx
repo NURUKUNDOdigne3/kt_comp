@@ -65,6 +65,7 @@ interface Profile {
   lastLogin: string | null;
   createdAt: string;
   updatedAt: string;
+  data?: any;
 }
 
 export default function UserProfilePage() {
@@ -88,14 +89,17 @@ export default function UserProfilePage() {
 
   // Update form when profile loads
   useEffect(() => {
-    if (profile?.name !== undefined) {
+    const profileData = profile?.data || profile;
+    if (profileData?.name !== undefined) {
       setProfileForm({
-        name: profile.name || "",
-        phone: profile.phone || "",
-        bio: profile.bio || "",
+        name: profileData.name || "",
+        phone: profileData.phone || "",
+        bio: profileData.bio || "",
       });
     }
   }, [profile]);
+
+  const profileData = profile?.data || profile;
 
   const handleProfileUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -189,11 +193,11 @@ export default function UserProfilePage() {
                     <CardHeader className="text-center">
                       <div className="relative mx-auto mb-4">
                         <Avatar className="w-24 h-24 mx-auto">
-                          <AvatarImage src={profile.avatar || undefined} alt={profile.name || "User"} />
+                          <AvatarImage src={profileData?.avatar || undefined} alt={profileData?.name || "User"} />
                           <AvatarFallback className="text-2xl">
-                            {profile.name
-                              ? profile.name.split(" ").map((n) => n[0]).join("")
-                              : profile.email[0].toUpperCase()}
+                            {profileData?.name
+                              ? profileData.name.split(" ").map((n: string) => n[0]).join("")
+                              : profileData?.email?.[0]?.toUpperCase() || "U"}
                           </AvatarFallback>
                         </Avatar>
                         <Button
@@ -204,32 +208,32 @@ export default function UserProfilePage() {
                           <Camera className="h-4 w-4" />
                         </Button>
                       </div>
-                      <CardTitle>{profile.name || "User"}</CardTitle>
-                      <CardDescription>{profile.role}</CardDescription>
+                      <CardTitle>{profileData?.name || "User"}</CardTitle>
+                      <CardDescription>{profileData?.role || "User"}</CardDescription>
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-2 text-sm">
                         <div className="flex items-center">
                           <Mail className="h-4 w-4 mr-2 text-muted-foreground" />
-                          <span>{profile.email}</span>
+                          <span>{profileData?.email || "Not set"}</span>
                         </div>
                         <div className="flex items-center">
                           <Phone className="h-4 w-4 mr-2 text-muted-foreground" />
-                          <span>{profile.phone || "Not set"}</span>
+                          <span>{profileData?.phone || "Not set"}</span>
                         </div>
                         <div className="flex items-center">
                           <Calendar className="h-4 w-4 mr-2 text-muted-foreground" />
                           <span>
                             Joined{" "}
-                            {new Date(profile.createdAt).toLocaleDateString()}
+                            {profileData?.createdAt ? new Date(profileData.createdAt).toLocaleDateString() : "Unknown"}
                           </span>
                         </div>
-                        {profile.lastLogin && (
+                        {profileData?.lastLogin && (
                           <div className="flex items-center">
                             <Key className="h-4 w-4 mr-2 text-muted-foreground" />
                             <span>
                               Last login:{" "}
-                              {new Date(profile.lastLogin).toLocaleString()}
+                              {new Date(profileData.lastLogin).toLocaleString()}
                             </span>
                           </div>
                         )}

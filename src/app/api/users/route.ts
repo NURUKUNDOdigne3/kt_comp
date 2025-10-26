@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '20');
 
     const where: any = {
-      role: 'USER', // Only show customers, not admins
+      role: 'CUSTOMER', // Only show customers, not admins
     };
 
     // Search filter
@@ -32,7 +32,13 @@ export async function GET(request: NextRequest) {
 
     // Role filter (override default if specified)
     if (role && role !== 'all') {
-      where.role = role;
+      // Map frontend role values to Prisma enum values
+      const roleMap: { [key: string]: string } = {
+        'USER': 'CUSTOMER',
+        'CUSTOMER': 'CUSTOMER',
+        'ADMIN': 'ADMIN'
+      };
+      where.role = roleMap[role] || 'CUSTOMER';
     }
 
     const [users, total] = await Promise.all([

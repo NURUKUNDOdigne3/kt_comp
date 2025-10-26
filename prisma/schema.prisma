@@ -177,6 +177,7 @@ model Order {
   // Relations
   user       User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
   orderItems OrderItem[]
+  payments   Payment[]   // Link to Paypack payments
 
   @@index([userId])
   @@index([orderNumber])
@@ -247,4 +248,28 @@ enum LogLevel {
   SUCCESS
   WARNING
   ERROR
+}
+
+// Payment model for Paypack integration
+enum PaypackPaymentStatus {
+  PENDING
+  SUCCESSFUL
+  FAILED
+}
+
+model Payment {
+  id         String               @id @default(cuid())
+  amount     Float
+  status     PaypackPaymentStatus @default(PENDING)
+  paypackRef String?              @unique
+  orderId    String?              // Link to Order if this is for an order
+  createdAt  DateTime             @default(now())
+  updatedAt  DateTime             @updatedAt
+
+  // Relations
+  order Order? @relation(fields: [orderId], references: [id], onDelete: SetNull)
+
+  @@index([paypackRef])
+  @@index([orderId])
+  @@index([status])
 }

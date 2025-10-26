@@ -5,6 +5,9 @@ import FeaturedProductsCarousel from "@/components/FeaturedProductsCarousel";
 import { Suspense } from "react";
 import { prisma } from "@/lib/prisma";
 import Footer from "@/components/Footer";
+import { generateCategoryMetadata } from "@/lib/seo";
+import { Metadata } from "next";
+import Breadcrumbs from "@/components/SEO/Breadcrumbs";
 
 async function getSpeakerProducts() {
   try {
@@ -41,11 +44,46 @@ async function getSpeakerProducts() {
   }
 }
 
+export async function generateMetadata(): Promise<Metadata> {
+  try {
+    const category = await prisma.category.findUnique({
+      where: { slug: "speakers" },
+    });
+
+    if (!category) {
+      return {
+        title: "Speakers & Audio - KT Computer Supply",
+        description: "Premium sound systems and portable speakers in Rwanda",
+      };
+    }
+
+    const products = await prisma.product.findMany({
+      where: { categoryId: category.id },
+      select: { id: true },
+    });
+
+    return generateCategoryMetadata(category, products);
+  } catch (error) {
+    console.error("Error generating metadata for speakers:", error);
+    return {
+      title: "Speakers & Audio - KT Computer Supply",
+      description: "Premium sound systems and portable speakers in Rwanda",
+    };
+  }
+}
+
 export default async function Page() {
   const { featured, all } = await getSpeakerProducts();
+  const breadcrumbItems = [
+    { name: "Speakers & Audio", href: "/speakers" },
+  ];
+
   return (
     <main>
       <Header />
+      <div className="container mx-auto px-4 py-4">
+        <Breadcrumbs items={breadcrumbItems} />
+      </div>
       <Suspense
         fallback={
           <div className="h-screen flex items-center justify-center">

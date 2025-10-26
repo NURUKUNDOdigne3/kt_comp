@@ -129,7 +129,8 @@ export default function BrandsPage() {
   };
 
   // Filter brands based on search query
-  const filteredBrands = (brands || []).filter((brand: any) => {
+  const brandsArray = brands || [];
+  const filteredBrands = brandsArray.filter((brand: any) => {
     const matchesSearch =
       brand.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (brand.description?.toLowerCase() || "").includes(searchQuery.toLowerCase());

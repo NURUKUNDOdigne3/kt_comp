@@ -132,10 +132,12 @@ export default function ProductCard({
         )}
         <Image
           src={image || "/placeholder-product.png"}
-          alt={name}
+          alt={`${name} - ${brandName} ${categoryName} available at KT Computer Supply Rwanda`}
           fill
           sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
           className="object-cover h-full transition-transform duration-500 group-hover:scale-105"
+          loading="lazy"
+          quality={85}
         />
 
         {/* Hover actions */}
