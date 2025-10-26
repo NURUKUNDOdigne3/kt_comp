@@ -1,184 +1,12 @@
 "use client";
 
-import { Suspense, useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import Image from "next/image";
-import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { useGLTF, Environment, OrbitControls } from "@react-three/drei";
 import gsap from "gsap";
 import ScrollTrigger from "gsap/ScrollTrigger";
-import * as THREE from "three";
 
 gsap.registerPlugin(ScrollTrigger);
 
-function MacBook() {
-  // @ts-ignore
-  const modelRef = useRef<THREE.Group>();
-  const { camera } = useThree();
-  const { scene, animations } = useGLTF("/models/computers/scene.gltf");
-  const mixer = useRef(new THREE.AnimationMixer(scene));
-  const animationAction = useRef<THREE.AnimationAction | null>(null);
-  const scrollProgress = useRef(0);
-  const introProgress = useRef<{ value: number }>({ value: 0 });
-  const isDragging = useRef(false);
-  const lastPointerX = useRef<number | null>(null);
-  const rotationVelocity = useRef(0);
-
-  useEffect(() => {
-    // Initial camera position
-    camera.position.set(0, 2, 5);
-
-    // Set up animation
-    if (animations && animations.length > 0) {
-      const clip = animations[0]; // Get the first animation
-      animationAction.current = mixer.current.clipAction(clip);
-      animationAction.current.setLoop(THREE.LoopOnce, 1);
-      animationAction.current.clampWhenFinished = true;
-      animationAction.current.play();
-      // Pause at the start
-      animationAction.current.paused = true;
-    }
-
-    // Initial model appearance animation + showcase spin
-    if (modelRef.current) {
-      const tl = gsap.timeline();
-      tl.from(modelRef.current.position, {
-        y: -2,
-        duration: 1.5,
-        ease: "power3.out",
-      })
-        .from(
-          modelRef.current.rotation,
-          {
-            x: -Math.PI / 4,
-            duration: 1.5,
-            ease: "power3.out",
-          },
-          "<"
-        )
-        // Spin around Y axis to showcase on load
-        .to(
-          modelRef.current.rotation,
-          {
-            y: "+=" + Math.PI * 2,
-            duration: 3,
-            ease: "power2.inOut",
-          },
-          "<"
-        );
-    }
-
-    // During intro, also advance a portion of the clip so scroll can continue it
-    gsap.to(introProgress.current, {
-      value: 0.25, // intro reveals first 25% of the animation
-      duration: 2,
-      ease: "power2.out",
-    });
-
-    // Set up scroll-based animation
-    const scrollTrigger = ScrollTrigger.create({
-      trigger: "#welcome-hero",
-      start: "top top",
-      end: "bottom top",
-      onUpdate: (self) => {
-        scrollProgress.current = self.progress;
-      },
-    });
-
-    // Clean up
-    return () => {
-      scrollTrigger.kill();
-      mixer.current.stopAllAction();
-    };
-  }, [camera, animations]);
-
-  useFrame((_, delta) => {
-    // Update animation mixer
-    mixer.current.update(delta);
-
-    // Determine combined progress between intro animation and scroll
-    const combinedProgress = Math.max(
-      scrollProgress.current,
-      introProgress.current.value
-    );
-
-    // Drive GLTF clip based on combined progress
-    if (animationAction.current && animations && animations[0]) {
-      const clip = animations[0];
-      animationAction.current.time = clip.duration * combinedProgress;
-    }
-
-    // Smooth camera movement based on combined progress
-    const targetY = 2 + combinedProgress * 1;
-    const targetZ = 5 - combinedProgress * 2;
-
-    camera.position.y = THREE.MathUtils.lerp(camera.position.y, targetY, 0.1);
-    camera.position.z = THREE.MathUtils.lerp(camera.position.z, targetZ, 0.1);
-    camera.lookAt(0, 0, 0);
-
-    if (modelRef.current) {
-      // Smooth model rotation based on combined progress
-      const targetRotationX = (combinedProgress * Math.PI) / 4;
-      modelRef.current.rotation.x = THREE.MathUtils.lerp(
-        modelRef.current.rotation.x,
-        targetRotationX,
-        0.1
-      );
-
-      // Apply inertia spin after user drag ends
-      if (!isDragging.current && Math.abs(rotationVelocity.current) > 0.0001) {
-        modelRef.current.rotation.y += rotationVelocity.current * 0.003;
-        rotationVelocity.current *= 0.95;
-      }
-    }
-  });
-
-  return (
-    <group
-      ref={modelRef}
-      position={[0, 0, 0]}
-      scale={15}
-      onPointerDown={(e) => {
-        e.stopPropagation();
-        isDragging.current = true;
-        lastPointerX.current = e.clientX;
-        rotationVelocity.current = 0;
-        if (typeof document !== "undefined") {
-          document.body.style.cursor = "grabbing";
-        }
-      }}
-      onPointerUp={(e) => {
-        e.stopPropagation();
-        isDragging.current = false;
-        lastPointerX.current = null;
-        if (typeof document !== "undefined") {
-          document.body.style.cursor = "auto";
-        }
-      }}
-      onPointerOut={(e) => {
-        e.stopPropagation();
-        isDragging.current = false;
-        lastPointerX.current = null;
-        if (typeof document !== "undefined") {
-          document.body.style.cursor = "auto";
-        }
-      }}
-      onPointerMove={(e) => {
-        if (!isDragging.current || !modelRef.current) return;
-        e.stopPropagation();
-        const currentX = e.clientX;
-        if (lastPointerX.current !== null) {
-          const deltaX = currentX - lastPointerX.current;
-          const sensitivity = 0.005;
-          modelRef.current.rotation.y += deltaX * sensitivity;
-          rotationVelocity.current = deltaX;
-        }
-        lastPointerX.current = currentX;
-      }}
-    >
-      <primitive object={scene} />
-    </group>
-  );
-}
 
 export default function WelcomeHero() {
   const textRef = useRef<HTMLDivElement>(null);
@@ -254,21 +82,16 @@ export default function WelcomeHero() {
 
   return (
     <section id="welcome-hero" className="h-screen w-full relative">
-      <Canvas className="relative -top-5 left-0 w-full h-full">
-        <Suspense fallback={null}>
-          <MacBook />
-          <Environment preset="city" />
-          <ambientLight intensity={0.8} />
-          <spotLight
-            position={[5, 5, 5]}
-            angle={0.4}
-            penumbra={1}
-            intensity={1}
-            castShadow
-          />
-          <pointLight position={[-5, 5, -5]} intensity={0.5} />
-        </Suspense>
-      </Canvas>
+      <video
+        className="absolute inset-0 w-full h-full object-cover"
+        autoPlay
+        // loop
+        muted
+        playsInline
+      >
+        <source src="/videos/computer.mp4" type="video/mp4" />
+        Your browser does not support the video tag.
+      </video>
 
       <div
         ref={dimRef}
@@ -277,12 +100,12 @@ export default function WelcomeHero() {
       />
       <div
         ref={textRef}
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center z-30 px-4"
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center z-30 rounded-2xl py-4 px-4 backdrop-blur-lg"
       >
         <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4 text-gray-900">
           Power Your Work. Elevate Your Play.
         </h1>
-        <p className="text-base sm:text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">
+        <p className="text-base sm:text-lg md:text-xl font-bold text-black  max-w-2xl mx-auto">
           Premium laptops, desktops, and accessories from the brands you
           trust—curated for performance and reliability.
         </p>

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Poppins } from "next/font/google";
+import { Poppins, Roboto } from "next/font/google";
 import "./globals.css";
 import NProgressProvider from "@/components/NProgressProvider";
 import NProgressHandler from "@/components/NProgressHandler";
@@ -8,12 +8,14 @@ import { Toaster } from "@/components/ui/sonner";
 import { CartProvider } from "@/contexts/CartContext";
 import { Analytics } from "@vercel/analytics/next";
 
-const poppins = Poppins({
-  variable: "--font-poppins",
+const roboto = Roboto({
+  variable: "--font-roboto",
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700", "800"],
   display: "swap",
 });
+
+
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://ktcomputersupply.vercel.rw"),
@@ -96,7 +98,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${poppins.variable} font-sans antialiased`}
+        className={`${roboto.variable} font-sans antialiased`}
       >
         <CartProvider>
           <Suspense fallback={null}>
