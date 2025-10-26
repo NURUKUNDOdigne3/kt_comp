@@ -36,7 +36,7 @@ const data = {
   },
   companyInfo: {
     name: "KT Computer Supply",
-    logo: "/white-logo.png",
+    logo: "/logo-white.png",
   },
 };
 
@@ -138,7 +138,7 @@ export default function Footer() {
 
   return (
     <footer className="w-full mt-[50px]">
-      <div className="min-w-full mx-auto relative bg-[#140a5c]">
+      <div className="min-w-full mx-auto relative bg-[#1a0b3e] px-[10%]">
         {/* Newsletter Section */}
 
         {/* <div className="bg-[#0B1A2D] rounded-[32px] px-8 md:px-12 py-10 mb-8 w-[90%] absolute right-0 left-0 -top-24 mx-auto z-50">
@@ -184,12 +184,12 @@ export default function Footer() {
                 <img
                   src={data.companyInfo.logo}
                   alt={data.companyInfo.name}
-                  width={200}
-                  height={200}
+                  width={100}
+                  height={100}
                 />
-                {/* <span className="text-xl font-bold text-blue-600">
+                <span className="text-xl font-bold text-white">
                   {data.companyInfo.name}.
-                </span> */}
+                </span>
               </Link>
               <div className="space-y-1 text-sm text-white/70">
                 <p className="font-semibold -gray-700 mb-2">Our Address:</p>
@@ -216,7 +216,7 @@ export default function Footer() {
 
             {/* Useful Links */}
             <div>
-              <h3 className="text-base font-bold text-blue-600 mb-5">Useful Links</h3>
+              <h3 className="text-base font-bold text-white mb-5">Useful Links</h3>
               <ul className="space-y-2.5">
                 {usefulLinks.map(({ text, href }) => (
                   <li key={text}>
@@ -234,7 +234,7 @@ export default function Footer() {
 
             {/* Support */}
             <div>
-              <h3 className="text-base font-bold text-blue-600 mb-5">Support</h3>
+              <h3 className="text-base font-bold text-white mb-5">Support</h3>
               <ul className="space-y-2.5">
                 {supportLinks.map(({ text, href }) => (
                   <li key={text}>
@@ -252,7 +252,7 @@ export default function Footer() {
 
             {/* Services */}
             <div>
-              <h3 className="text-base font-bold text-blue-600 mb-5">Services</h3>
+              <h3 className="text-base font-bold text-white mb-5">Services</h3>
               <ul className="space-y-2.5">
                 {servicesLinks.map(({ text, href }) => (
                   <li key={text}>
@@ -270,7 +270,7 @@ export default function Footer() {
 
             {/* Map */}
             <div>
-              <h3 className="text-base font-bold text-blue-600 mb-5">Our Location</h3>
+              <h3 className="text-base font-bold text-white mb-5">Our Location</h3>
               <div className="w-full h-[200px] overflow-hidden shadow-md">
                 <iframe
                   src="https://www.google.com/maps/embed?pb=!3m2!1sen!2srw!4v1761233685624!5m2!1sen!2srw!6m8!1m7!1sJtIJyV-i_U30zf35aq61JQ!2m2!1d-1.946320957571322!2d30.05986903665121!3f217.0100586884753!4f19.073266932088387!5f0.7820865974627469"
@@ -286,7 +286,7 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="bg-[#110945] pt-6 pb-3 flex flex-col md:flex-row items-center px-10 justify-between gap-4">
+        <div className="bg-[#1a0b3e] pt-6 pb-3 flex flex-col md:flex-row items-center px-10 justify-between gap-4">
           <p className="text-sm text-gray-500">
             Gadgets Shop © 2025 All Rights Reserved.
           </p>
