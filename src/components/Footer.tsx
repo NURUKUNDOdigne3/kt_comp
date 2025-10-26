@@ -36,7 +36,7 @@ const data = {
   },
   companyInfo: {
     name: "KT Computer Supply",
-    logo: "/logo.png",
+    logo: "/white-logo.png",
   },
 };
 
@@ -137,8 +137,8 @@ export default function Footer() {
   };
 
   return (
-    <footer className="w-full px-4 py-8 mt-[50px]">
-      <div className="max-w-7xl mx-auto relative">
+    <footer className="w-full mt-[50px]">
+      <div className="min-w-full mx-auto relative bg-[#140a5c]">
         {/* Newsletter Section */}
 
         {/* <div className="bg-[#0B1A2D] rounded-[32px] px-8 md:px-12 py-10 mb-8 w-[90%] absolute right-0 left-0 -top-24 mx-auto z-50">
@@ -176,73 +176,55 @@ export default function Footer() {
         </div> */}
 
         {/* Main Footer Content */}
-        <div className="bg-[#EDF2F7] rounded-[32px] px-8 md:px-12 py-10 -mt-[50px] -z-10 pt-20">
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 mb-12">
+        <div className=" px-8 md:px-12 py-10 -mt-[50px] -z-10 pt-20">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 mb-12">
             {/* Company Info Column */}
             <div className="col-span-2 md:col-span-3 lg:col-span-1">
               <Link href="/" className="flex items-center gap-2 mb-6">
                 <img
                   src={data.companyInfo.logo}
                   alt={data.companyInfo.name}
-                  width={50}
-                  height={50}
+                  width={200}
+                  height={200}
                 />
-
-                <span className="text-xl font-bold text-[#0B1A2D]">
+                {/* <span className="text-xl font-bold text-blue-600">
                   {data.companyInfo.name}.
-                </span>
+                </span> */}
               </Link>
-              <div className="space-y-1 text-sm text-gray-600">
-                <p className="font-semibold text-gray-700 mb-2">Our Address:</p>
-                <p className="font-semibold text-[#0B1A2D]">
-                  KG 549 St, Kigali,
-                </p>
-                <p className="font-semibold text-[#0B1A2D]">Rwanda</p>
+              <div className="space-y-1 text-sm text-white/70">
+                <p className="font-semibold -gray-700 mb-2">Our Address:</p>
+                <p className="font-semibold -[#0B1A2D]">KG 549 St, Kigali,</p>
+                <p className="font-semibold -[#0B1A2D]">Rwanda</p>
                 <p className="mt-4 mb-1">
-                  <span className="font-semibold text-gray-700">
-                    24/7 Free Call:
-                  </span>
+                  <span className="font-semibold -gray-700">24/7 Free Call:</span>
                 </p>
-                <p className="font-bold text-[#0B1A2D]">+250 788 123 456</p>
+                <p className="font-bold -[#0B1A2D]">+250 788 123 456</p>
               </div>
               <div className="flex items-center gap-3 mt-6">
-                <Link
-                  href={data.twitterLink}
-                  target="_blank"
-                  className="w-9 h-9 bg-white hover:bg-[#3B9EFF] text-[#3B9EFF] hover:text-white rounded-lg flex items-center justify-center transition-colors shadow-sm"
-                >
-                  <Twitter className="w-4 h-4" />
-                </Link>
-                <Link
-                  href={data.instaLink}
-                  target="_blank"
-                  className="w-9 h-9 bg-white hover:bg-[#3B9EFF] text-[#3B9EFF] hover:text-white rounded-lg flex items-center justify-center transition-colors shadow-sm"
-                >
-                  <Instagram className="w-4 h-4" />
-                </Link>
-                <Link
-                  href={data.facebookLink}
-                  target="_blank"
-                  className="w-9 h-9 bg-white hover:bg-[#3B9EFF] text-[#3B9EFF] hover:text-white rounded-lg flex items-center justify-center transition-colors shadow-sm"
-                >
-                  <Facebook className="w-4 h-4" />
-                </Link>
+                {socialLinks.map(({ icon: Icon, href, label, color }) => (
+                  <Link
+                    key={label}
+                    href={href}
+                    target="_blank"
+                    className={`w-9 h-9 ${color} text-white rounded-lg flex items-center justify-center transition-colors shadow-sm hover:opacity-80`}
+                  >
+                    <Icon className="w-4 h-4" />
+                  </Link>
+                ))}
               </div>
             </div>
 
-            {/* Useful Links Column */}
+            {/* Useful Links */}
             <div>
-              <h3 className="text-base font-bold text-[#0B1A2D] mb-5">
-                Useful Links
-              </h3>
+              <h3 className="text-base font-bold text-blue-600 mb-5">Useful Links</h3>
               <ul className="space-y-2.5">
                 {usefulLinks.map(({ text, href }) => (
                   <li key={text}>
                     <Link
                       href={href}
-                      className="text-gray-600 hover:text-[#3B9EFF] transition-colors text-sm flex items-center gap-1.5"
+                      className="text-white/70 hover:text-[#3B9EFF] transition-colors text-sm flex items-center gap-1.5"
                     >
-                      <span className="text-gray-400 text-base">›</span>
+                      <span className="text-white/70 text-base">›</span>
                       {text}
                     </Link>
                   </li>
@@ -250,19 +232,17 @@ export default function Footer() {
               </ul>
             </div>
 
-            {/* Support Column */}
+            {/* Support */}
             <div>
-              <h3 className="text-base font-bold text-[#0B1A2D] mb-5">
-                Support
-              </h3>
+              <h3 className="text-base font-bold text-blue-600 mb-5">Support</h3>
               <ul className="space-y-2.5">
                 {supportLinks.map(({ text, href }) => (
                   <li key={text}>
                     <Link
                       href={href}
-                      className="text-gray-600 hover:text-[#3B9EFF] transition-colors text-sm flex items-center gap-1.5"
+                      className="text-white/70 hover:text-[#3B9EFF] transition-colors text-sm flex items-center gap-1.5"
                     >
-                      <span className="text-gray-400 text-base">›</span>
+                      <span className="text-white/70 text-base">›</span>
                       {text}
                     </Link>
                   </li>
@@ -270,56 +250,49 @@ export default function Footer() {
               </ul>
             </div>
 
-            {/* Information Column */}
-            {/* <div>
-              <h3 className="text-base font-bold text-[#0B1A2D] mb-5">
-                Information
-              </h3>
-              <ul className="space-y-2.5">
-                {informationLinks.map(({ text, href }) => (
-                  <li key={text}>
-                    <Link
-                      href={href}
-                      className="text-gray-600 hover:text-[#3B9EFF] transition-colors text-sm flex items-center gap-1.5"
-                    >
-                      <span className="text-gray-400 text-base">›</span>
-                      {text}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div> */}
-
-            {/* Services Column */}
+            {/* Services */}
             <div>
-              <h3 className="text-base font-bold text-[#0B1A2D] mb-5">
-                Services
-              </h3>
+              <h3 className="text-base font-bold text-blue-600 mb-5">Services</h3>
               <ul className="space-y-2.5">
                 {servicesLinks.map(({ text, href }) => (
                   <li key={text}>
                     <Link
                       href={href}
-                      className="text-gray-600 hover:text-[#3B9EFF] transition-colors text-sm flex items-center gap-1.5"
+                      className="text-white/70 hover:text-[#3B9EFF] transition-colors text-sm flex items-center gap-1.5"
                     >
-                      <span className="text-gray-400 text-base">›</span>
+                      <span className="text-white/70 text-base">›</span>
                       {text}
                     </Link>
                   </li>
                 ))}
               </ul>
             </div>
-          </div>
 
-          {/* Bottom Section */}
+            {/* Map */}
+            <div>
+              <h3 className="text-base font-bold text-blue-600 mb-5">Our Location</h3>
+              <div className="w-full h-[200px] overflow-hidden shadow-md">
+                <iframe
+                  src="https://www.google.com/maps/embed?pb=!3m2!1sen!2srw!4v1761233685624!5m2!1sen!2srw!6m8!1m7!1sJtIJyV-i_U30zf35aq61JQ!2m2!1d-1.946320957571322!2d30.05986903665121!3f217.0100586884753!4f19.073266932088387!5f0.7820865974627469"
+                  width="100%"
+                  height="100%"
+                  style={{ border: 0 }}
+                  allowFullScreen
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                ></iframe>
+              </div>
+            </div>
+          </div>
         </div>
-        <div className="pt-6 flex flex-col md:flex-row items-center px-10 justify-between gap-4">
+
+        <div className="bg-[#110945] pt-6 pb-3 flex flex-col md:flex-row items-center px-10 justify-between gap-4">
           <p className="text-sm text-gray-500">
             Gadgets Shop © 2025 All Rights Reserved.
           </p>
           <div className="flex items-center gap-3">
             <img
-              src="/cards.png"
+              src="/cards2.png"
               alt="Credit card images"
               width={300}
               height={50}
