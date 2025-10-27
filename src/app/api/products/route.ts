@@ -1,41 +1,55 @@
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { isAdminFromHeader } from "@/lib/auth";
-import { productSchema } from "@/lib/validations";
-import {
-  successResponse,
-  errorResponse,
-  forbiddenResponse,
-} from "@/lib/api-response";
 
-// GET /api/products - Get all products with optional filters
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const categoryId = searchParams.get("categoryId");
-    const brandId = searchParams.get("brandId");
-    const featured = searchParams.get("featured");
     const search = searchParams.get("search");
-    const page = parseInt(searchParams.get("page") || "1");
+    const category = searchParams.get("category");
+    const brand = searchParams.get("brand");
     const limit = parseInt(searchParams.get("limit") || "20");
+    const page = parseInt(searchParams.get("page") || "1");
     const skip = (page - 1) * limit;
 
     const where: any = {};
 
-    if (categoryId) where.categoryId = categoryId;
-    if (brandId) where.brandId = brandId;
-    if (featured === "true") where.featured = true;
+    // Search functionality
     if (search) {
       where.OR = [
         { name: { contains: search, mode: "insensitive" } },
         { description: { contains: search, mode: "insensitive" } },
+        { brand: { name: { contains: search, mode: "insensitive" } } },
+        { category: { name: { contains: search, mode: "insensitive" } } },
       ];
+    }
+
+    // Category filter
+    if (category) {
+      where.category = { slug: category };
+    }
+
+    // Brand filter
+    if (brand) {
+      where.brand = { slug: brand };
+    }
+
+    // For search dropdown, prioritize in-stock items
+    if (search && limit <= 10) {
+      where.inStock = true;
     }
 
     const [products, total] = await Promise.all([
       prisma.product.findMany({
         where,
-        include: {
+        select: {
+          id: true,
+          name: true,
+          image: true,
+          price: true,
+          inStock: true,
+          stockCount: true,
+          featured: true,
+          createdAt: true,
           brand: {
             select: {
               id: true,
@@ -54,12 +68,17 @@ export async function GET(request: NextRequest) {
         },
         skip,
         take: limit,
-        orderBy: { createdAt: "desc" },
+        orderBy: [
+          { inStock: "desc" },
+          { featured: "desc" },
+          { createdAt: "desc" },
+        ],
       }),
       prisma.product.count({ where }),
     ]);
 
-    return successResponse({
+    return NextResponse.json({
+      success: true,
       products,
       pagination: {
         page,
@@ -69,39 +88,60 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error("Get products error:", error);
-    return errorResponse("Failed to fetch products", 500);
+    console.error("Products API error:", error);
+    return NextResponse.json(
+      { success: false, message: "Failed to fetch products" },
+      { status: 500 }
+    );
   }
 }
 
-// POST /api/products - Create a new product (Admin only)
 export async function POST(request: NextRequest) {
   try {
-    const authHeader = request.headers.get("authorization");
-    const admin = isAdminFromHeader(authHeader);
-    if (!admin) {
-      return forbiddenResponse("Admin access required");
-    }
-
     const body = await request.json();
-
-    // Validate input
-    const validation = productSchema.safeParse(body);
-    if (!validation.success) {
-      return errorResponse(validation.error.issues[0].message);
-    }
+    const {
+      name,
+      slug,
+      description,
+      price,
+      brandId,
+      categoryId,
+      image,
+      images,
+      inStock,
+      stockCount,
+      featured
+    } = body;
 
     const product = await prisma.product.create({
-      data: validation.data,
+      data: {
+        name,
+        slug,
+        description,
+        price: parseFloat(price),
+        brandId,
+        categoryId,
+        image,
+        images: images || [],
+        inStock: inStock ?? true,
+        stockCount: parseInt(stockCount) || 0,
+        featured: featured ?? false,
+      },
       include: {
         brand: true,
         category: true,
       },
     });
 
-    return successResponse(product, "Product created successfully", 201);
+    return NextResponse.json({
+      success: true,
+      product,
+    });
   } catch (error) {
-    console.error("Create product error:", error);
-    return errorResponse("Failed to create product", 500);
+    console.error("Product creation error:", error);
+    return NextResponse.json(
+      { success: false, message: "Failed to create product" },
+      { status: 500 }
+    );
   }
 }

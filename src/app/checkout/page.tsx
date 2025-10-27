@@ -14,6 +14,8 @@ import {
   Package,
   Truck,
   LogIn,
+  CheckCircle,
+  XCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -29,6 +31,7 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import Footer from "@/components/Footer";
+import PaypackPaymentButton from "@/components/PaypackPaymentButton";
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -36,6 +39,11 @@ export default function CheckoutPage() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<'stripe' | 'paypack'>('stripe');
+  const [currentOrderId, setCurrentOrderId] = useState<string>('');
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [paymentStatus, setPaymentStatus] = useState<'success' | 'failed'>('success');
+  const [showSuccessCard, setShowSuccessCard] = useState(false);
 
   // Shipping form
   const [shippingInfo, setShippingInfo] = useState({
@@ -75,7 +83,7 @@ export default function CheckoutPage() {
   }, [items, router]);
 
   const tax = totalAmount * 0.18; // 18% VAT
-  const shipping = totalAmount > 100000 ? 0 : 5000; // Free shipping over RWF 100,000
+  const shipping = totalAmount > 100000 ? 0 : 5000; // Free shipping over RWF 100,000, otherwise RWF 5,000
   const total = totalAmount + tax + shipping;
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -98,42 +106,76 @@ export default function CheckoutPage() {
       return;
     }
 
+    // For Paypack, validation is handled in the PaypackPaymentButton component
+
     setIsProcessing(true);
 
     try {
       const token = localStorage.getItem("auth_token");
 
-      // Create checkout session
-      const response = await fetch("/api/checkout/create-session", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...(token && { Authorization: `Bearer ${token}` }),
-        },
-        body: JSON.stringify({
-          items: items.map((item) => ({
-            productId: item.productId,
-            name: item.name,
-            price: item.price,
-            quantity: item.quantity,
-            image: item.image,
-          })),
-          shippingInfo,
-          totalAmount: total,
-        }),
-      });
+      if (paymentMethod === 'stripe') {
+        // Stripe checkout
+        const response = await fetch("/api/checkout/create-session", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            ...(token && { Authorization: `Bearer ${token}` }),
+          },
+          body: JSON.stringify({
+            items: items.map((item) => ({
+              productId: item.productId,
+              name: item.name,
+              price: item.price,
+              quantity: item.quantity,
+              image: item.image,
+            })),
+            shippingInfo,
+            totalAmount: total,
+          }),
+        });
 
-      const data = await response.json();
+        const data = await response.json();
 
-      if (!response.ok) {
-        throw new Error(data.message || "Failed to create checkout session");
-      }
+        if (!response.ok) {
+          throw new Error(data.message || "Failed to create checkout session");
+        }
 
-      // Redirect to Stripe Checkout
-      if (data.url) {
-        window.location.href = data.url;
+        if (data.url) {
+          window.location.href = data.url;
+        } else {
+          throw new Error("No checkout URL received");
+        }
       } else {
-        throw new Error("No checkout URL received");
+        // Paypack checkout - create order first, then let PaypackPaymentButton handle payment
+        const orderResponse = await fetch("/api/orders", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            ...(token && { Authorization: `Bearer ${token}` }),
+          },
+          body: JSON.stringify({
+            items: items.map((item) => ({
+              productId: item.productId,
+              name: item.name,
+              price: item.price,
+              quantity: item.quantity,
+            })),
+            shippingInfo,
+            totalAmount: total,
+          }),
+        });
+
+        const orderData = await orderResponse.json();
+        if (!orderResponse.ok) {
+          throw new Error(orderData.error || "Failed to create order");
+        }
+
+        console.log('✅ Order created:', orderData);
+        setCurrentOrderId(orderData.data?.id || orderData.id || '');
+
+        // The PaypackPaymentButton will handle the payment initiation
+        toast.success("Order created! Please complete payment below.");
+        setIsProcessing(false); // Allow user to interact with payment button
       }
     } catch (error: any) {
       console.error("Checkout error:", error);
@@ -141,6 +183,10 @@ export default function CheckoutPage() {
       setIsProcessing(false);
     }
   };
+
+  // Remove the old Paypack checkout function since PaypackPaymentButton handles it
+
+  // Remove the old polling function since PaypackPaymentButton handles real-time updates
 
   const handleLoginRedirect = () => {
     // Store current path to redirect back after login
@@ -158,7 +204,7 @@ export default function CheckoutPage() {
 
       {/* Login Required Modal */}
       <Dialog open={showLoginModal} onOpenChange={setShowLoginModal}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="max-w-xs sm:max-w-sm">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Lock className="h-5 w-5 text-blue-600" />
@@ -310,7 +356,7 @@ export default function CheckoutPage() {
                 </CardContent>
               </Card>
 
-              {/* Payment Method Info */}
+              {/* Payment Method */}
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
@@ -318,16 +364,141 @@ export default function CheckoutPage() {
                     Payment Method
                   </CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <div className="flex items-center gap-3 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                    <Lock className="h-5 w-5 text-blue-600" />
-                    <div>
-                      <p className="font-medium text-blue-900">
-                        Secure Payment with Stripe
+                <CardContent className="space-y-4">
+                  {/* Payment Method Selection */}
+                  <div className="space-y-3">
+                    <div 
+                      className={`p-4 border rounded-lg cursor-pointer transition-colors ${
+                        paymentMethod === 'stripe' 
+                          ? 'border-blue-500 bg-blue-50' 
+                          : 'border-gray-200 hover:border-gray-300'
+                      }`}
+                      onClick={() => setPaymentMethod('stripe')}
+                    >
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="radio"
+                          name="paymentMethod"
+                          value="stripe"
+                          checked={paymentMethod === 'stripe'}
+                          onChange={() => setPaymentMethod('stripe')}
+                          className="text-blue-600"
+                        />
+                        <div>
+                          <p className="font-medium">Credit/Debit Card</p>
+                          <p className="text-sm text-gray-600">Pay securely with Stripe</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div 
+                      className={`p-4 border rounded-lg cursor-pointer transition-colors ${
+                        paymentMethod === 'paypack' 
+                          ? 'border-blue-500 bg-blue-50' 
+                          : 'border-gray-200 hover:border-gray-300'
+                      }`}
+                      onClick={() => setPaymentMethod('paypack')}
+                    >
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="radio"
+                          name="paymentMethod"
+                          value="paypack"
+                          checked={paymentMethod === 'paypack'}
+                          onChange={() => setPaymentMethod('paypack')}
+                          className="text-blue-600"
+                        />
+                        <div>
+                          <p className="font-medium">Mobile Money (Paypack)</p>
+                          <p className="text-sm text-gray-600">Pay with MTN Mobile Money or Airtel Money</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Paypack Payment Button */}
+                  {paymentMethod === 'paypack' && currentOrderId && currentOrderId.trim() !== '' && (
+                    <div className="mt-4 p-4 border-2 border-green-500 bg-green-50 rounded-lg">
+                      <h3 className="text-lg font-bold text-green-800 mb-2">🟢 PAYMENT READY - Complete Your Order</h3>
+                      <p className="text-sm text-green-700 mb-4 font-medium">
+                        ✅ Order #{currentOrderId} created successfully!<br/>
+                        💰 Total: RWF {total.toLocaleString()}<br/>
+                        📱 Enter your mobile money number below to pay.
                       </p>
-                      <p className="text-sm text-blue-700">
-                        You'll be redirected to Stripe's secure checkout to
-                        complete your payment
+                      <div className="bg-white p-4 rounded border">
+                        <PaypackPaymentButton
+                          amount={total}
+                          orderId={currentOrderId}
+                          onSuccess={async () => {
+                            console.log("Payment successful, clearing cart and showing success card");
+                            clearCart();
+                            setShowSuccessCard(true);
+                            setPaymentStatus('success');
+                            setShowSuccessModal(false); // Ensure modal is hidden
+                          }}
+                          onError={(error) => {
+                            console.log("Payment error:", error);
+                            setShowSuccessCard(false); // Hide success card if shown
+                            setShowSuccessModal(true);
+                            setPaymentStatus('failed');
+                            // Reset order ID to allow retry
+                            setCurrentOrderId('');
+                          }}
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Success Card */}
+                  {showSuccessCard && paymentStatus === 'success' && (
+                    <div className="mt-4 p-4 border-2 border-green-500 bg-green-50 rounded-lg">
+                      <h3 className="text-lg font-bold text-green-800 mb-2 flex items-center gap-2">
+                        <CheckCircle className="h-5 w-5" />
+                        🎉 PAYMENT SUCCESSFUL!
+                      </h3>
+                      <p className="text-sm text-green-700 mb-4 font-medium">
+                        ✅ Your payment has been processed successfully!<br/>
+                        📦 Order #{currentOrderId} is now confirmed.<br/>
+                        📧 You will receive an order confirmation email shortly.<br/>
+                        🚚 We'll start processing your order right away.
+                      </p>
+                      <div className="flex gap-2">
+                        <Button
+                          onClick={() => {
+                            setShowSuccessCard(false);
+                            router.push('/account/orders');
+                          }}
+                          className="bg-green-600 hover:bg-green-700 text-white"
+                        >
+                          View My Orders
+                        </Button>
+                        <Button
+                          onClick={() => {
+                            setShowSuccessCard(false);
+                            router.push('/');
+                          }}
+                          variant="outline"
+                        >
+                          Continue Shopping
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+
+          
+
+                  {/* Payment Info */}
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 border border-gray-200 rounded-lg">
+                    <Lock className="h-4 w-4 text-gray-600" />
+                    <div>
+                      <p className="text-sm font-medium text-gray-900">
+                        {paymentMethod === 'stripe' ? 'Secure Payment with Stripe' : 'Secure Payment with Paypack'}
+                      </p>
+                      <p className="text-xs text-gray-600">
+                        {paymentMethod === 'stripe' 
+                          ? "You'll be redirected to Stripe's secure checkout"
+                          : "You'll be redirected to complete mobile money payment"
+                        }
                       </p>
                     </div>
                   </div>
@@ -414,13 +585,18 @@ export default function CheckoutPage() {
                     {/* Checkout Button */}
                     <Button
                       onClick={handleCheckout}
-                      disabled={isProcessing}
+                      disabled={isProcessing || (paymentMethod === 'paypack' && currentOrderId !== '')}
                       className="w-full bg-blue-600 hover:bg-blue-700 text-white py-6 text-lg"
                     >
                       {isProcessing ? (
                         <>
                           <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                           Processing...
+                        </>
+                      ) : paymentMethod === 'paypack' && currentOrderId ? (
+                        <>
+                          <Lock className="mr-2 h-5 w-5" />
+                          Order Created - Complete Payment Above
                         </>
                       ) : (
                         <>
@@ -441,6 +617,80 @@ export default function CheckoutPage() {
           </div>
         </div>
       </div>
+
+      {/* Success/Failure Modal */}
+      <Dialog open={showSuccessModal} onOpenChange={setShowSuccessModal}>
+        <DialogContent className="max-w-xs sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              {paymentStatus === 'success' ? (
+                <>
+                  <CheckCircle className="h-5 w-5 text-green-600" />
+                  Payment Successful!
+                </>
+              ) : (
+                <>
+                  <XCircle className="h-5 w-5 text-red-600" />
+                  Payment Failed
+                </>
+              )}
+            </DialogTitle>
+            <DialogDescription>
+              {paymentStatus === 'success'
+                ? "Your payment has been processed successfully. You will receive an order confirmation email shortly."
+                : "There was an issue processing your payment. Please try again or contact support."}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 pt-4">
+            {paymentStatus === 'success' ? (
+              <>
+                <Button
+                  onClick={() => {
+                    setShowSuccessModal(false);
+                    router.push('/account/orders');
+                  }}
+                  className="w-full bg-green-600 hover:bg-green-700"
+                >
+                  View My Orders
+                </Button>
+                <Button
+                  onClick={() => {
+                    setShowSuccessModal(false);
+                    router.push('/');
+                  }}
+                  variant="outline"
+                  className="w-full"
+                >
+                  Continue Shopping
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button
+                  onClick={() => {
+                    setShowSuccessModal(false);
+                    setCurrentOrderId('');
+                  }}
+                  className="w-full bg-blue-600 hover:bg-blue-700"
+                >
+                  Try Again
+                </Button>
+                <Button
+                  onClick={() => {
+                    setShowSuccessModal(false);
+                    router.push('/');
+                  }}
+                  variant="outline"
+                  className="w-full"
+                >
+                  Continue Shopping
+                </Button>
+              </>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+
       <Footer />
     </>
   );

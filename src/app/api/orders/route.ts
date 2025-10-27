@@ -82,57 +82,59 @@ export async function POST(request: NextRequest) {
       return unauthorizedResponse("Authentication required");
     }
 
-    // Get user details from database
-    const user = await prisma.user.findUnique({
-      where: { id: currentUser.userId },
-      select: { name: true, email: true, phone: true },
-    });
+    const body = await request.json();
+    const { items, shippingInfo, totalAmount, shippingAddress, phone, notes } = body;
 
-    if (!user) {
-      return errorResponse("User not found", 404);
-    }
+    // Handle both checkout format and direct order format
+    let orderData;
+    if (shippingInfo) {
+      // Checkout format
+      orderData = {
+        customerName: shippingInfo.fullName,
+        customerEmail: shippingInfo.email,
+        customerPhone: shippingInfo.phone,
+        shippingAddress: `${shippingInfo.address}, ${shippingInfo.city}${
+          shippingInfo.district ? `, ${shippingInfo.district}` : ""
+        }${shippingInfo.postalCode ? `, ${shippingInfo.postalCode}` : ""}`,
+        totalAmount: totalAmount,
+      };
+    } else {
+      // Direct order format
+      const user = await prisma.user.findUnique({
+        where: { id: currentUser.userId },
+        select: { name: true, email: true, phone: true },
+      });
 
-    const validation = createOrderSchema.safeParse(await request.json());
+      if (!user) {
+        return errorResponse("User not found", 404);
+      }
 
-    if (!validation.success) {
-      return errorResponse(validation.error.issues[0].message);
-    }
-
-    const { items, shippingAddress, phone, notes } = validation.data;
-
-    // Fetch products and validate stock
-    const productIds = items.map((item) => item.productId);
-    const products = await prisma.product.findMany({
-      where: { id: { in: productIds } },
-    });
-
-    if (products.length !== productIds.length) {
-      return errorResponse("One or more products not found");
+      orderData = {
+        customerName: user.name || user.email.split('@')[0],
+        customerEmail: user.email,
+        customerPhone: phone || user.phone || 'N/A',
+        shippingAddress: shippingAddress || 'N/A',
+        totalAmount: totalAmount || items.reduce((total: number, item: any) => {
+          return total + item.price * item.quantity;
+        }, 0),
+        notes: notes,
+      };
     }
 
     // Create order with items
     const order = await prisma.order.create({
       data: {
         userId: currentUser.userId,
-        customerName: user.name || user.email.split('@')[0], // Use email username if name is not set
-        customerEmail: user.email,
-        customerPhone: phone || user.phone || 'N/A', // Provide a default value if no phone number is available
-        shippingAddress,
-        notes,
-        totalAmount: items.reduce((total, item) => {
-          const product = products.find((p) => p.id === item.productId);
-          return total + (product?.price || 0) * item.quantity;
-        }, 0),
+        ...orderData,
+        status: "PENDING",
+        paymentStatus: "PENDING",
         orderItems: {
-          create: items.map((item) => {
-            const product = products.find((p) => p.id === item.productId)!;
-            return {
-              productId: item.productId,
-              name: product.name,
-              quantity: item.quantity,
-              price: product.price,
-            };
-          }),
+          create: items.map((item: any) => ({
+            productId: item.productId,
+            name: item.name,
+            quantity: item.quantity,
+            price: item.price,
+          })),
         },
       },
       include: {
@@ -144,7 +146,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    return successResponse(order, 'Order created successfully');
+    return successResponse({ id: order.id, order }, 'Order created successfully');
   } catch (error) {
     console.error('Create order error:', error);
     return errorResponse('Failed to create order', 500);
