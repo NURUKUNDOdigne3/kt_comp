@@ -204,7 +204,7 @@ export default function CheckoutPage() {
 
       {/* Login Required Modal */}
       <Dialog open={showLoginModal} onOpenChange={setShowLoginModal}>
-        <DialogContent className="max-w-xs sm:max-w-sm">
+        <DialogContent className="max-w-xs sm:max-w-[20vw]">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Lock className="h-5 w-5 text-blue-600" />
