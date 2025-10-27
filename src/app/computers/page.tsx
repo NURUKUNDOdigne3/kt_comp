@@ -5,6 +5,9 @@ import FeaturedProductsCarousel from "@/components/FeaturedProductsCarousel";
 import { Suspense } from "react";
 import { prisma } from "@/lib/prisma";
 import Footer from "@/components/Footer";
+import { generateCategoryMetadata } from "@/lib/seo";
+import { Metadata } from "next";
+import Breadcrumbs from "@/components/SEO/Breadcrumbs";
 
 async function getComputerProducts() {
   try {
@@ -41,11 +44,46 @@ async function getComputerProducts() {
   }
 }
 
+export async function generateMetadata(): Promise<Metadata> {
+  try {
+    const category = await prisma.category.findUnique({
+      where: { slug: "computers" },
+    });
+
+    if (!category) {
+      return {
+        title: "Computers & Laptops - KT Computer Supply",
+        description: "Premium computers and laptops from top brands in Rwanda",
+      };
+    }
+
+    const products = await prisma.product.findMany({
+      where: { categoryId: category.id },
+      select: { id: true },
+    });
+
+    return generateCategoryMetadata(category, products);
+  } catch (error) {
+    console.error("Error generating metadata for computers:", error);
+    return {
+      title: "Computers & Laptops - KT Computer Supply",
+      description: "Premium computers and laptops from top brands in Rwanda",
+    };
+  }
+}
+
 export default async function Page() {
   const { featured, all } = await getComputerProducts();
+  const breadcrumbItems = [
+    { name: "Computers & Laptops", href: "/computers" },
+  ];
+
   return (
     <main>
       <Header />
+      <div className="container mx-auto px-4 py-4">
+        <Breadcrumbs items={breadcrumbItems} />
+      </div>
       <Suspense
         fallback={
           <div className="h-screen flex items-center justify-center">

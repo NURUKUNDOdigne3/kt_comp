@@ -2,6 +2,9 @@ import ProductDetails from "@/components/ProductDetails";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { generateProductMetadata } from "@/lib/seo";
+import { ProductSchema } from "@/components/SEO/StructuredData";
+import Breadcrumbs from "@/components/SEO/Breadcrumbs";
 
 // Get product from database
 async function getProduct(id: string) {
@@ -109,24 +112,22 @@ export async function generateMetadata({
   params: Promise<{ id: string }>;
 }): Promise<Metadata> {
   const { id } = await params;
-  const product = await getProduct(id);
+  const rawProduct = await prisma.product.findUnique({
+    where: { id },
+    include: {
+      brand: { select: { name: true, slug: true } },
+      category: { select: { name: true, slug: true } },
+    },
+  });
 
-  if (!product) {
+  if (!rawProduct) {
     return {
       title: "Product Not Found - KT Computer Supply",
       description: "The requested product could not be found.",
     };
   }
 
-  return {
-    title: `${product.name} - KT Computer Supply`,
-    description: product.shortDescription,
-    openGraph: {
-      title: product.name,
-      description: product.shortDescription,
-      images: [product.images[0]],
-    },
-  };
+  return generateProductMetadata(rawProduct);
 }
 
 export default async function ProductPage({ 
@@ -141,7 +142,38 @@ export default async function ProductPage({
     notFound();
   }
 
-  return <ProductDetails product={product} />;
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://ktcomputersupply.vercel.rw";
+  const productUrl = `${baseUrl}/products/${id}`;
+
+  const breadcrumbItems = [
+    { name: product.category, href: `/${product.category.toLowerCase()}` },
+    { name: product.name, href: `/products/${id}` },
+  ];
+
+  return (
+    <div itemScope itemType="https://schema.org/Product">
+      <ProductSchema
+        product={{
+          name: product.name,
+          description: product.description,
+          image: product.images[0],
+          price: product.price,
+          currency: "RWF",
+          availability: product.inStock ? "InStock" : "OutOfStock",
+          brand: product.brand,
+          category: product.category,
+          sku: product.sku,
+          rating: product.rating,
+          reviewCount: product.reviewCount,
+        }}
+        url={productUrl}
+      />
+      <div className="container mx-auto px-4 py-6">
+        <Breadcrumbs items={breadcrumbItems} />
+        <ProductDetails product={product} />
+      </div>
+    </div>
+  );
 }
 
 // Generate static params for all products

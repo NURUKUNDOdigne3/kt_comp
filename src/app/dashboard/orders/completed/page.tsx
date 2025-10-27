@@ -31,7 +31,11 @@ export default function CompletedOrdersPage() {
     );
   }
 
-  if (!data?.orders?.length) {
+  const ordersData = data as { orders: any[]; pagination: any } | undefined;
+  const orders = ordersData?.orders || [];
+  const pagination = ordersData?.pagination;
+
+  if (!orders?.length) {
     return (
       <div className="flex min-h-[400px] flex-col items-center justify-center gap-2">
         <p className="text-muted-foreground">No completed orders found</p>
@@ -56,7 +60,7 @@ export default function CompletedOrdersPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {data.orders.map((order) => (
+            {orders.map((order: any) => (
               <TableRow key={order.id}>
                 <TableCell className="font-medium">
                   {order.orderNumber}
@@ -90,10 +94,10 @@ export default function CompletedOrdersPage() {
           </TableBody>
         </Table>
       </div>
-      {data.pagination.totalPages > 1 && (
+      {pagination && pagination.totalPages > 1 && (
         <Pagination
           page={page}
-          totalPages={data.pagination.totalPages}
+          totalPages={pagination.totalPages}
           onPageChange={setPage}
         />
       )}

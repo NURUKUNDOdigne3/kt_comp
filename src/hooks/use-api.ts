@@ -42,12 +42,14 @@ const fetcher = async (url: string) => {
 export function useApi<T>(url: string | null, config?: SWRConfiguration) {
   const { data, error, isLoading, mutate } = useSWR<{
     success: boolean;
-    data: T;
+    data?: T;
+    products?: any[];
+    pagination?: any;
     message?: string;
   }>(url, fetcher, config);
 
   return {
-    data: data?.data,
+    data: data?.success ? data.data : undefined,
     isLoading,
     isError: error,
     mutate,

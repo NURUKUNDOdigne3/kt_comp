@@ -70,8 +70,7 @@ export default function OrdersPage() {
   const [page, setPage] = useState(1);
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
-  // @ts-ignore
-  const { data, isLoading, mutate } = useOrders(page, 20);
+  const { data, isLoading, mutate } = useOrders({ page, limit: 20 });
 
   const formatCurrency = (value: number) => {
     return `RWF ${value.toLocaleString()}`;
@@ -86,20 +85,20 @@ export default function OrdersPage() {
   };
 
   // Filter orders based on search and status
-  const filteredOrders =
-    data?.orders?.filter((order: any) => {
-      const matchesSearch =
-        order.orderNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        order.user?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        order.user?.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        order.customerName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        order.customerEmail?.toLowerCase().includes(searchQuery.toLowerCase());
+  const orders = data?.orders || [];
+  const filteredOrders = orders.filter((order: any) => {
+    const matchesSearch =
+      order.orderNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      order.user?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      order.user?.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      order.customerName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      order.customerEmail?.toLowerCase().includes(searchQuery.toLowerCase());
 
-      const matchesStatus =
-        statusFilter === "all" || order.status === statusFilter;
+    const matchesStatus =
+      statusFilter === "all" || order.status === statusFilter;
 
-      return matchesSearch && matchesStatus;
-    }) || [];
+    return matchesSearch && matchesStatus;
+  });
 
   const getStatusBadge = (status: string) => {
     switch (status) {
