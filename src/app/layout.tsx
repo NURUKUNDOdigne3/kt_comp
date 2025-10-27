@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Poppins, Roboto } from "next/font/google";
 import "./globals.css";
 import NProgressProvider from "@/components/NProgressProvider";
 import NProgressHandler from "@/components/NProgressHandler";
@@ -8,15 +8,12 @@ import { Toaster } from "@/components/ui/sonner";
 import { CartProvider } from "@/contexts/CartContext";
 import { Analytics } from "@vercel/analytics/next";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const roboto = Roboto({
+  variable: "--font-roboto",
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://ktcomputersupply.vercel.rw"),
@@ -147,9 +144,7 @@ export default function RootLayout({
         <link rel="alternate" hrefLang="x-default" href="https://ktcomputersupply.vercel.rw" />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-        itemScope
-        itemType="https://schema.org/WebPage"
+        className={`${roboto.variable} font-sans antialiased`}
       >
         <CartProvider>
           <Suspense fallback={null}>
