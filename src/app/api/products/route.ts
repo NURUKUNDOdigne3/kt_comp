@@ -66,6 +66,7 @@ export async function GET(request: NextRequest) {
         select: {
           id: true,
           name: true,
+          description: true,
           image: true,
           images: true,
           price: true,
@@ -140,7 +141,9 @@ export async function POST(request: NextRequest) {
       images,
       inStock,
       stockCount,
-      featured
+      featured,
+      rating,
+      reviewCount
     } = body;
 
     const product = await prisma.product.create({
@@ -156,6 +159,8 @@ export async function POST(request: NextRequest) {
         inStock: inStock ?? true,
         stockCount: parseInt(stockCount) || 0,
         featured: featured ?? false,
+        rating: rating ? parseFloat(rating) : 0,
+        reviewCount: reviewCount ? parseInt(reviewCount) : 0,
       },
       include: {
         brand: true,
