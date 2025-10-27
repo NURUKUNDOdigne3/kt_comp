@@ -42,7 +42,7 @@ export default function HeroSection() {
       subtitle: "Be online always and anywhere",
       title: "For All Seasons",
       titleBold: "Any Circumstances",
-      image: "/herosection/phone.png"
+      image: "/herosection/kt_pad.png"
     }
   ]
 
