@@ -19,21 +19,22 @@ import { Dropzone, ImagePreview } from "@/components/ui/dropzone";
 import { useBrands, useCategories } from "@/hooks/use-api";
 
 interface ProductFormData {
-  name: string;
-  slug: string;
-  description: string;
-  price: number;
-  oldPrice?: number;
-  stockCount: number;
-  categoryId: string;
-  brandId: string;
-  image?: string;
-  images: string[];
-  model3dId?: string;
-  badge?: string;
-  inStock: boolean;
-  featured: boolean;
-}
+   name: string;
+   slug: string;
+   description: string;
+   price: number;
+   oldPrice?: number;
+   stockCount: number;
+   categoryId: string;
+   brandId: string;
+   image?: string;
+   images: string[];
+   model3dId?: string;
+   badge?: string;
+   rating?: number;
+   inStock: boolean;
+   featured: boolean;
+ }
 
 interface ProductFormProps {
   product?: any;
@@ -43,6 +44,7 @@ interface ProductFormProps {
 
 export function ProductForm({ product, onSubmit, onCancel }: ProductFormProps) {
   const [images, setImages] = useState<string[]>(product?.images || []);
+  const [rating, setRating] = useState<number>(product?.rating || 0);
   const [uploading, setUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
@@ -63,12 +65,13 @@ export function ProductForm({ product, onSubmit, onCancel }: ProductFormProps) {
       price: product?.price || 0,
       oldPrice: product?.oldPrice || undefined,
       stockCount: product?.stockCount || 0,
-      categoryId: product?.categoryId || "",
-      brandId: product?.brandId || "",
+      categoryId: product?.category?.id || product?.categoryId || "",
+      brandId: product?.brand?.id || product?.brandId || "",
       image: product?.image || "",
       images: product?.images || [],
       model3dId: product?.model3dId || "",
       badge: product?.badge || "",
+      rating: product?.rating || 0,
       inStock: product?.inStock ?? true,
       featured: product?.featured || false,
     },
@@ -79,6 +82,31 @@ export function ProductForm({ product, onSubmit, onCancel }: ProductFormProps) {
   useEffect(() => {
     setValue("images", images);
   }, [images, setValue]);
+
+  // Update form values when product changes
+  useEffect(() => {
+    if (product) {
+      setValue("name", product.name || "");
+      setValue("slug", product.slug || "");
+      setValue("description", product.description || "");
+      setValue("price", product.price || 0);
+      setValue("oldPrice", product.oldPrice || undefined);
+      setValue("stockCount", product.stockCount || 0);
+      setValue("categoryId", product.category?.id || product.categoryId || "");
+      setValue("brandId", product.brand?.id || product.brandId || "");
+      setValue("image", product.image || "");
+      setValue("images", product.images || []);
+      setValue("model3dId", product.model3dId || "");
+      setValue("badge", product.badge || "");
+      setValue("rating", product.rating || 0);
+      setValue("inStock", product.inStock ?? true);
+      setValue("featured", product.featured || false);
+
+      // Update local state
+      setImages(product.images || []);
+      setRating(product.rating || 0);
+    }
+  }, [product, setValue]);
 
   const handleFilesChange = async (files: File[]) => {
     if (!files || files.length === 0) return;
@@ -204,7 +232,7 @@ export function ProductForm({ product, onSubmit, onCancel }: ProductFormProps) {
           <Label htmlFor="categoryId">Category *</Label>
           <Select
             onValueChange={(value) => setValue("categoryId", value)}
-            defaultValue={product?.categoryId}
+            value={watch("categoryId")}
           >
             <SelectTrigger>
               <SelectValue placeholder="Select category" />
@@ -238,7 +266,7 @@ export function ProductForm({ product, onSubmit, onCancel }: ProductFormProps) {
           <Label htmlFor="brandId">Brand *</Label>
           <Select
             onValueChange={(value) => setValue("brandId", value)}
-            defaultValue={product?.brandId}
+            value={watch("brandId")}
           >
             <SelectTrigger>
               <SelectValue placeholder="Select brand" />
@@ -299,24 +327,43 @@ export function ProductForm({ product, onSubmit, onCancel }: ProductFormProps) {
         </div>
       </div>
 
-      {/* Stock */}
-      <div className="space-y-2">
-        <Label htmlFor="stockCount">Stock Quantity *</Label>
-        <Input
-          id="stockCount"
-          type="number"
-          {...register("stockCount", {
-            required: "Stock is required",
-            valueAsNumber: true,
-            min: { value: 0, message: "Stock must be positive" },
-          })}
-          placeholder="0"
-        />
-        {errors.stockCount && (
-          <p className="text-sm text-destructive">
-            {errors.stockCount.message}
-          </p>
-        )}
+      {/* Stock and Rating */}
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="stockCount">Stock Quantity *</Label>
+          <Input
+            id="stockCount"
+            type="number"
+            {...register("stockCount", {
+              required: "Stock is required",
+              valueAsNumber: true,
+              min: { value: 0, message: "Stock must be positive" },
+            })}
+            placeholder="0"
+          />
+          {errors.stockCount && (
+            <p className="text-sm text-destructive">
+              {errors.stockCount.message}
+            </p>
+          )}
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="rating">Rating (0-5)</Label>
+          <Input
+            id="rating"
+            type="number"
+            step="0.1"
+            min="0"
+            max="5"
+            {...register("rating", {
+              valueAsNumber: true,
+              min: { value: 0, message: "Rating must be at least 0" },
+              max: { value: 5, message: "Rating must be at most 5" },
+            })}
+            placeholder="0.0"
+          />
+        </div>
       </div>
 
       {/* 3D Model ID */}
