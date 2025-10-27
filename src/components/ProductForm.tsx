@@ -32,6 +32,7 @@ interface ProductFormData {
    model3dId?: string;
    badge?: string;
    rating?: number;
+   reviewCount?: number;
    inStock: boolean;
    featured: boolean;
  }
@@ -45,6 +46,7 @@ interface ProductFormProps {
 export function ProductForm({ product, onSubmit, onCancel }: ProductFormProps) {
   const [images, setImages] = useState<string[]>(product?.images || []);
   const [rating, setRating] = useState<number>(product?.rating || 0);
+  const [reviewCount, setReviewCount] = useState<number>(product?.reviewCount || 0);
   const [uploading, setUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
@@ -72,6 +74,7 @@ export function ProductForm({ product, onSubmit, onCancel }: ProductFormProps) {
       model3dId: product?.model3dId || "",
       badge: product?.badge || "",
       rating: product?.rating || 0,
+      reviewCount: product?.reviewCount || 0,
       inStock: product?.inStock ?? true,
       featured: product?.featured || false,
     },
@@ -99,12 +102,14 @@ export function ProductForm({ product, onSubmit, onCancel }: ProductFormProps) {
       setValue("model3dId", product.model3dId || "");
       setValue("badge", product.badge || "");
       setValue("rating", product.rating || 0);
+      setValue("reviewCount", product.reviewCount || 0);
       setValue("inStock", product.inStock ?? true);
       setValue("featured", product.featured || false);
 
       // Update local state
       setImages(product.images || []);
       setRating(product.rating || 0);
+      setReviewCount(product.reviewCount || 0);
     }
   }, [product, setValue]);
 
@@ -327,8 +332,8 @@ export function ProductForm({ product, onSubmit, onCancel }: ProductFormProps) {
         </div>
       </div>
 
-      {/* Stock and Rating */}
-      <div className="grid grid-cols-2 gap-4">
+      {/* Stock, Rating and Review Count */}
+      <div className="grid grid-cols-3 gap-4">
         <div className="space-y-2">
           <Label htmlFor="stockCount">Stock Quantity *</Label>
           <Input
@@ -362,6 +367,19 @@ export function ProductForm({ product, onSubmit, onCancel }: ProductFormProps) {
               max: { value: 5, message: "Rating must be at most 5" },
             })}
             placeholder="0.0"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="reviewCount">Review Count</Label>
+          <Input
+            id="reviewCount"
+            type="number"
+            {...register("reviewCount", {
+              valueAsNumber: true,
+              min: { value: 0, message: "Review count must be positive" },
+            })}
+            placeholder="0"
           />
         </div>
       </div>
