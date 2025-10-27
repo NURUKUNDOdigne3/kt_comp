@@ -5,6 +5,9 @@ import { Suspense } from "react";
 import { prisma } from "@/lib/prisma";
 import WelcomeHeroMonitor from "@/components/WelcomeHeroMonitor";
 import Footer from "@/components/Footer";
+import { generateCategoryMetadata } from "@/lib/seo";
+import { Metadata } from "next";
+import Breadcrumbs from "@/components/SEO/Breadcrumbs";
 
 async function getMonitorProducts() {
   try {
@@ -41,11 +44,46 @@ async function getMonitorProducts() {
   }
 }
 
+export async function generateMetadata(): Promise<Metadata> {
+  try {
+    const category = await prisma.category.findUnique({
+      where: { slug: "monitors" },
+    });
+
+    if (!category) {
+      return {
+        title: "Monitors & Displays - KT Computer Supply",
+        description: "High-resolution monitors and displays for work and gaming in Rwanda",
+      };
+    }
+
+    const products = await prisma.product.findMany({
+      where: { categoryId: category.id },
+      select: { id: true },
+    });
+
+    return generateCategoryMetadata(category, products);
+  } catch (error) {
+    console.error("Error generating metadata for monitors:", error);
+    return {
+      title: "Monitors & Displays - KT Computer Supply",
+      description: "High-resolution monitors and displays for work and gaming in Rwanda",
+    };
+  }
+}
+
 export default async function Page() {
   const { featured, all } = await getMonitorProducts();
+  const breadcrumbItems = [
+    { name: "Monitors & Displays", href: "/monitors" },
+  ];
+
   return (
     <main>
       <Header />
+      <div className="container mx-auto px-4 py-4">
+        <Breadcrumbs items={breadcrumbItems} />
+      </div>
       <Suspense
         fallback={
           <div className="h-screen flex items-center justify-center">

@@ -45,10 +45,12 @@ export function BrandMarquee() {
               >
                 <Image
                   src={brand.logo}
-                  alt={brand.name}
+                  alt={`${brand.name} products available at KT Computer Supply Rwanda`}
                   width={120}
                   height={60}
                   className="object-contain max-h-12"
+                  loading="lazy"
+                  quality={80}
                 />
               </div>
             ))}

@@ -292,10 +292,11 @@ export default function Footer() {
           </p>
           <div className="flex items-center gap-3">
             <img
-              src="/cards2.png"
+              src="/cards.png"
               alt="Credit card images"
               width={300}
               height={50}
+              loading="lazy"
             />
           </div>
         </div>
