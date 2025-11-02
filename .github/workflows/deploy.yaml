@@ -23,6 +23,23 @@ jobs:
         run: |
           npm install 
           npm run build  # This will create the dist/ directory
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          NEXTAUTH_URL: ${{ secrets.NEXTAUTH_URL }}
+          NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
+          NEXT_PUBLIC_APP_URL: ${{ secrets.NEXT_PUBLIC_APP_URL }}
+          NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: ${{ secrets.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME }}
+          CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
+          CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
+          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+          NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY }}
+          PAYPACK_CLIENT_ID: ${{ secrets.PAYPACK_CLIENT_ID }}
+          PAYPACK_CLIENT_SECRET: ${{ secrets.PAYPACK_CLIENT_SECRET }}
+          PAYPACK_BASE_URL: ${{ secrets.PAYPACK_BASE_URL }}
+          PAYPACK_WEBHOOK_SECRET: ${{ secrets.PAYPACK_WEBHOOK_SECRET }}
+          NEXT_PUBLIC_SOCKET_URL: ${{ secrets.NEXT_PUBLIC_SOCKET_URL }}
+          NODE_ENV: production
 
       - name: Set up FTP
         run: |
