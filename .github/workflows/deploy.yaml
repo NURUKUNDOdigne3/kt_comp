@@ -20,7 +20,7 @@
 #           cache: 'npm'
 
 #       - name: Create .env file
-#         run: |
+#         run: |  
 #           echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> .env
 #           echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
 #           echo "NEXTAUTH_URL=${{ secrets.NEXTAUTH_URL }}" >> .env
@@ -49,5 +49,5 @@
 
 #       - name: Deploy to FTP
 #         run: |
-#           lftp -e "set ssl:verify-certificate no; mirror -R --overwrite ./build /kt_computer_supply; quit" -u ${{ secrets.FTP_USERNAME }},${{ secrets.FTP_PASSWORD }} ${{ secrets.FTP_HOST }}
+#           lftp -e "set ssl:verify-certificate no; mirror -R --overwrite ./.next /kt_computer_supply; quit" -u ${{ secrets.FTP_USERNAME }},${{ secrets.FTP_PASSWORD }} ${{ secrets.FTP_HOST }}
 #           echo "Deployment completed successfully."
