@@ -22,7 +22,7 @@ const brands = [
 
 export function BrandMarquee() {
   return (
-    <div className="w-full bg-gray-50  overflow-hidden border-y border-gray-200 ">
+    <div className="w-full bg-gray-50 dark:bg-gray-900 overflow-hidden border-y border-gray-200 dark:border-gray-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-6">
         <h2 className="text-center text-sm font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
           Trusted Brands We Carry
@@ -31,8 +31,8 @@ export function BrandMarquee() {
 
       <div className="relative">
         {/* Gradient overlays */}
-        <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-gray-50 to-transparent z-10" />
-        <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-gray-50 to-transparent z-10" />
+        <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-gray-50 dark:from-gray-900 to-transparent z-10" />
+        <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-gray-50 dark:from-gray-900 to-transparent z-10" />
 
         {/* Marquee container */}
         <div className="flex">

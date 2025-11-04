@@ -78,6 +78,8 @@ export function useProducts(params?: {
   }`;
 
   const { data, isLoading, error, mutate } = useSWR(url, fetcher);
+  
+  
   return {
     data: data?.success ? {
       products: data.data?.products || data.products || data.all || [],

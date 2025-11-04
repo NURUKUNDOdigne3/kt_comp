@@ -138,6 +138,8 @@
   }
 }
 
+/* Custom styles */
+
 #active-link {
   border-bottom: 2px solid #3b82f6;
   color: #2563eb;

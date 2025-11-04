@@ -242,7 +242,7 @@ export default async function Page() {
 
       {/* Routers Section */}
       <section
-        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 bg-gray-50  scroll-mt-32"
+        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 bg-gray-50 dark:bg-gray-900 scroll-mt-32"
         id="routers"
       >
         <div className="flex items-end justify-between mb-6">
@@ -312,7 +312,7 @@ export default async function Page() {
 
       {/* Monitors Section */}
       <section
-        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 bg-gray-50 scroll-mt-32"
+        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 bg-gray-50 dark:bg-gray-900 scroll-mt-32"
         id="monitors"
       >
         <div className="flex items-end justify-between mb-6">

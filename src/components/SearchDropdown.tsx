@@ -49,6 +49,7 @@ export default function SearchDropdown({
 
   // Search products when query changes
   useEffect(() => {
+    console.log("useEffect triggered, searchQuery:", searchQuery, "length:", searchQuery.length);
     if (searchQuery.length >= 2) {
       searchProducts(searchQuery);
     } else {
@@ -74,6 +75,7 @@ export default function SearchDropdown({
   }, [isOpen, onClose]);
 
   const searchProducts = async (query: string) => {
+    console.log("searchProducts called with query:", query);
     setLoading(true);
     try {
       const response = await fetch(`/api/products?search=${encodeURIComponent(query)}&limit=6`);
@@ -81,8 +83,10 @@ export default function SearchDropdown({
         const data = await response.json();
         const products = data.success ? (data.data?.products || data.products || []) : [];
         setProducts(products);
+        console.log("Products set:", products.length, "products");
       }
     } catch (error) {
+      console.error("Search error:", error);
     } finally {
       setLoading(false);
     }
