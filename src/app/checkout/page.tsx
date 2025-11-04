@@ -204,7 +204,7 @@ export default function CheckoutPage() {
 
       {/* Login Required Modal */}
       <Dialog open={showLoginModal} onOpenChange={setShowLoginModal}>
-        <DialogContent className="max-w-xs sm:max-w-sm md:max-w-[20vw]">
+        <DialogContent className="max-w-xs sm:max-w-sm md:max-w-[20vw] bg-white">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Lock className="h-5 w-5 text-blue-600" />
@@ -258,7 +258,7 @@ export default function CheckoutPage() {
                     Shipping Information
                   </CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="border-gray-200">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="md:col-span-2">
                       <Label htmlFor="fullName">
