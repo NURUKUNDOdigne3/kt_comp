@@ -1,53 +1,53 @@
-name: Deploy to FTP
+# name: Deploy to FTP
 
-on:
-  push:
-    branches:
-      - main  
+# on:
+#   push:
+#     branches:
+#       - main  
 
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
+# jobs:
+#   deploy:
+#     runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v3
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
+#       - name: Set up Node.js
+#         uses: actions/setup-node@v4
+#         with:
+#           node-version: '20'
+#           cache: 'npm'
 
-      - name: Create .env file
-        run: |
-          echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> .env
-          echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
-          echo "NEXTAUTH_URL=${{ secrets.NEXTAUTH_URL }}" >> .env
-          echo "NEXTAUTH_SECRET=${{ secrets.NEXTAUTH_SECRET }}" >> .env
-          echo "NEXT_PUBLIC_APP_URL=${{ secrets.NEXT_PUBLIC_APP_URL }}" >> .env
-          echo "NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=${{ secrets.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME }}" >> .env
-          echo "CLOUDINARY_API_KEY=${{ secrets.CLOUDINARY_API_KEY }}" >> .env
-          echo "CLOUDINARY_API_SECRET=${{ secrets.CLOUDINARY_API_SECRET }}" >> .env
-          echo "STRIPE_SECRET_KEY=${{ secrets.STRIPE_SECRET_KEY }}" >> .env
-          echo "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=${{ secrets.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY }}" >> .env
-          echo "PAYPACK_CLIENT_ID=${{ secrets.PAYPACK_CLIENT_ID }}" >> .env
-          echo "PAYPACK_CLIENT_SECRET=${{ secrets.PAYPACK_CLIENT_SECRET }}" >> .env
-          echo "PAYPACK_BASE_URL=${{ secrets.PAYPACK_BASE_URL }}" >> .env
-          echo "PAYPACK_WEBHOOK_SECRET=${{ secrets.PAYPACK_WEBHOOK_SECRET }}" >> .env
-          echo "NEXT_PUBLIC_SOCKET_URL=${{ secrets.NEXT_PUBLIC_SOCKET_URL }}" >> .env
-          echo "NODE_ENV=production" >> .env
+#       - name: Create .env file
+#         run: |
+#           echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> .env
+#           echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
+#           echo "NEXTAUTH_URL=${{ secrets.NEXTAUTH_URL }}" >> .env
+#           echo "NEXTAUTH_SECRET=${{ secrets.NEXTAUTH_SECRET }}" >> .env
+#           echo "NEXT_PUBLIC_APP_URL=${{ secrets.NEXT_PUBLIC_APP_URL }}" >> .env
+#           echo "NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=${{ secrets.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME }}" >> .env
+#           echo "CLOUDINARY_API_KEY=${{ secrets.CLOUDINARY_API_KEY }}" >> .env
+#           echo "CLOUDINARY_API_SECRET=${{ secrets.CLOUDINARY_API_SECRET }}" >> .env
+#           echo "STRIPE_SECRET_KEY=${{ secrets.STRIPE_SECRET_KEY }}" >> .env
+#           echo "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=${{ secrets.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY }}" >> .env
+#           echo "PAYPACK_CLIENT_ID=${{ secrets.PAYPACK_CLIENT_ID }}" >> .env
+#           echo "PAYPACK_CLIENT_SECRET=${{ secrets.PAYPACK_CLIENT_SECRET }}" >> .env
+#           echo "PAYPACK_BASE_URL=${{ secrets.PAYPACK_BASE_URL }}" >> .env
+#           echo "PAYPACK_WEBHOOK_SECRET=${{ secrets.PAYPACK_WEBHOOK_SECRET }}" >> .env
+#           echo "NEXT_PUBLIC_SOCKET_URL=${{ secrets.NEXT_PUBLIC_SOCKET_URL }}" >> .env
+#           echo "NODE_ENV=production" >> .env
 
-      - name: Install dependencies and build
-        run: |
-          npm install 
-          npm run build  # This will create the dist/ directory
+#       - name: Install dependencies and build
+#         run: |
+#           npm install 
+#           npm run build  # This will create the dist/ directory
 
-      - name: Set up FTP
-        run: |
-          sudo apt-get install -y lftp
+#       - name: Set up FTP
+#         run: |
+#           sudo apt-get install -y lftp
 
-      - name: Deploy to FTP
-        run: |
-          lftp -e "set ssl:verify-certificate no; mirror -R --overwrite ./build /kt_computer_supply; quit" -u ${{ secrets.FTP_USERNAME }},${{ secrets.FTP_PASSWORD }} ${{ secrets.FTP_HOST }}
-          echo "Deployment completed successfully."
+#       - name: Deploy to FTP
+#         run: |
+#           lftp -e "set ssl:verify-certificate no; mirror -R --overwrite ./build /kt_computer_supply; quit" -u ${{ secrets.FTP_USERNAME }},${{ secrets.FTP_PASSWORD }} ${{ secrets.FTP_HOST }}
+#           echo "Deployment completed successfully."
