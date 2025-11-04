@@ -12,8 +12,6 @@ const getToken = () => {
 // Fetcher function for SWR with Authorization header
 const fetcher = async (url: string) => {
   const token = getToken();
-  // console.log("Token from localStorage:", token);
-
   const headers: HeadersInit = {
     "Content-Type": "application/json",
   };
@@ -81,7 +79,6 @@ export function useProducts(params?: {
 
   const { data, isLoading, error, mutate } = useSWR(url, fetcher);
   
-  console.log('Raw products API response:', data);
   
   return {
     data: data?.success ? {

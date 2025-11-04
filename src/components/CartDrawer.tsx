@@ -22,7 +22,7 @@ export function CartDrawer() {
 
   return (
     <Drawer open={isCartOpen} onOpenChange={setIsCartOpen} direction="right">
-      <DrawerContent>
+      <DrawerContent className="bg-white">
         <div className="mx-auto w-full max-w-2xl">
           <DrawerHeader>
             <div className="flex items-center justify-between">

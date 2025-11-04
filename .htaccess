@@ -1,0 +1,11 @@
+RewriteEngine On
+
+# Proxy all requests to Node.js server
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ http://localhost:3000/$1 [P,L,QSA]
+
+# Enable proxy module
+ProxyPreserveHost On
+ProxyPass / http://localhost:3000/
+ProxyPassReverse / http://localhost:3000/
