@@ -6,7 +6,6 @@ import Image from "next/image";
 import { useCart } from "@/contexts/CartContext";
 import Header from "@/components/Header";
 import {
-  ShoppingCart,
   CreditCard,
   Loader2,
   Lock,
@@ -82,9 +81,9 @@ export default function CheckoutPage() {
     }
   }, [items, router]);
 
-  const tax = totalAmount * 0.18; // 18% VAT
-  const shipping = totalAmount > 100000 ? 0 : 5000; // Free shipping over RWF 100,000, otherwise RWF 5,000
-  const total = totalAmount + tax + shipping;
+  const tax = 0; // No VAT
+  const shipping = 0; // No shipping fee
+  const total = totalAmount; // Only pay for items
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setShippingInfo({
@@ -269,7 +268,7 @@ export default function CheckoutPage() {
                         name="fullName"
                         value={shippingInfo.fullName}
                         onChange={handleInputChange}
-                        placeholder="John Doe"
+                        placeholder="Enter your full name"
                         required
                       />
                     </div>
@@ -284,7 +283,7 @@ export default function CheckoutPage() {
                         type="email"
                         value={shippingInfo.email}
                         onChange={handleInputChange}
-                        placeholder="john@example.com"
+                        placeholder="Enter your email address"
                         required
                       />
                     </div>
@@ -298,9 +297,14 @@ export default function CheckoutPage() {
                         name="phone"
                         value={shippingInfo.phone}
                         onChange={handleInputChange}
-                        placeholder="+250 788 123 456"
+                        placeholder={paymentMethod === 'paypack' ? "Enter your mobile money number (e.g., +250788123456)" : "Enter your phone number"}
                         required
                       />
+                      {paymentMethod === 'paypack' && (
+                        <p className="text-xs text-blue-600 mt-1">
+                          💰 This number will be used for mobile money payment
+                        </p>
+                      )}
                     </div>
 
                     <div className="md:col-span-2">
@@ -312,7 +316,7 @@ export default function CheckoutPage() {
                         name="address"
                         value={shippingInfo.address}
                         onChange={handleInputChange}
-                        placeholder="KG 123 St, Kigali"
+                        placeholder="Enter your complete street address"
                         required
                       />
                     </div>
@@ -326,7 +330,7 @@ export default function CheckoutPage() {
                         name="city"
                         value={shippingInfo.city}
                         onChange={handleInputChange}
-                        placeholder="Kigali"
+                        placeholder="Enter your city"
                         required
                       />
                     </div>
@@ -338,7 +342,7 @@ export default function CheckoutPage() {
                         name="district"
                         value={shippingInfo.district}
                         onChange={handleInputChange}
-                        placeholder="Gasabo"
+                        placeholder="Enter your district (optional)"
                       />
                     </div>
 
@@ -349,7 +353,7 @@ export default function CheckoutPage() {
                         name="postalCode"
                         value={shippingInfo.postalCode}
                         onChange={handleInputChange}
-                        placeholder="Optional"
+                        placeholder="Enter postal code (optional)"
                       />
                     </div>
                   </div>
@@ -427,24 +431,25 @@ export default function CheckoutPage() {
                       </p>
                       <div className="bg-white p-4 rounded border">
                         <PaypackPaymentButton
-                          amount={total}
-                          orderId={currentOrderId}
-                          onSuccess={async () => {
-                            console.log("Payment successful, clearing cart and showing success card");
-                            clearCart();
-                            setShowSuccessCard(true);
-                            setPaymentStatus('success');
-                            setShowSuccessModal(false); // Ensure modal is hidden
-                          }}
-                          onError={(error) => {
-                            console.log("Payment error:", error);
-                            setShowSuccessCard(false); // Hide success card if shown
-                            setShowSuccessModal(true);
-                            setPaymentStatus('failed');
-                            // Reset order ID to allow retry
-                            setCurrentOrderId('');
-                          }}
-                        />
+                            amount={total}
+                            orderId={currentOrderId}
+                            phoneNumber={shippingInfo.phone} // Pass the phone number from shipping form
+                            onSuccess={async () => {
+                              console.log("Payment successful, clearing cart and showing success card");
+                              clearCart();
+                              setShowSuccessCard(true);
+                              setPaymentStatus('success');
+                              setShowSuccessModal(false); // Ensure modal is hidden
+                            }}
+                            onError={(error) => {
+                              console.log("Payment error:", error);
+                              setShowSuccessCard(false); // Hide success card if shown
+                              setShowSuccessModal(true);
+                              setPaymentStatus('failed');
+                              // Reset order ID to allow retry
+                              setCurrentOrderId('');
+                            }}
+                          />
                       </div>
                     </div>
                   )}
@@ -549,26 +554,12 @@ export default function CheckoutPage() {
 
                     {/* Price Breakdown */}
                     <div className="space-y-2">
-                      <div className="flex justify-between text-sm">
-                        <span className="text-gray-600">Subtotal</span>
-                        <span className="font-medium">
-                          RWF {totalAmount.toLocaleString()}
-                        </span>
-                      </div>
-                      <div className="flex justify-between text-sm">
-                        <span className="text-gray-600">Tax (18% VAT)</span>
-                        <span className="font-medium">
-                          RWF {tax.toLocaleString()}
-                        </span>
-                      </div>
+                      
+                
                       <div className="flex justify-between text-sm">
                         <span className="text-gray-600">Shipping</span>
                         <span className="font-medium">
-                          {shipping === 0 ? (
-                            <span className="text-green-600">FREE</span>
-                          ) : (
-                            `RWF ${shipping.toLocaleString()}`
-                          )}
+                          <span className="text-green-600">FREE</span>
                         </span>
                       </div>
 
