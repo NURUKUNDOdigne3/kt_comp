@@ -86,7 +86,12 @@ export default function PaypackPaymentButton({
       const paymentData = await paymentResponse.json();
 
       if (!paymentResponse.ok) {
-        throw new Error(paymentData.error || "Payment initiation failed");
+        // Show the specific error message from Paypack API
+        const errorMessage = paymentData.error || "Payment initiation failed";
+        toast.error(`Payment Error: ${errorMessage}`);
+        onError?.(errorMessage);
+        setIsProcessing(false);
+        return;
       }
 
       const { paymentId: newPaymentId } = paymentData;

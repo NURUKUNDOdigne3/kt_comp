@@ -44,9 +44,18 @@ export async function POST(request: NextRequest) {
       "Error initiating payment:",
       error.response?.data || error.message
     );
+
+    // Extract meaningful error message from Paypack API response
+    let errorMessage = "Failed to initiate payment.";
+    if (error.response?.data?.message) {
+      errorMessage = error.response.data.message;
+    } else if (error.message) {
+      errorMessage = error.message;
+    }
+
     return NextResponse.json(
-      { error: "Failed to initiate payment." },
-      { status: 500 }
+      { error: errorMessage },
+      { status: 400 } // Use 400 for client errors like amount limits
     );
   }
 }
