@@ -43,6 +43,7 @@ export default function CheckoutPage() {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState<'success' | 'failed'>('success');
   const [showSuccessCard, setShowSuccessCard] = useState(false);
+  const [cleanedPhoneNumber, setCleanedPhoneNumber] = useState<string>('');
 
   // Shipping form
   const [shippingInfo, setShippingInfo] = useState({
@@ -105,6 +106,15 @@ export default function CheckoutPage() {
       return;
     }
 
+    // Clean phone number for Paypack (remove +250 prefix if present and ensure it starts with 07)
+    let cleanPhoneNumber = shippingInfo.phone.replace(/^\+250/, '');
+    if (!cleanPhoneNumber.startsWith('07')) {
+      cleanPhoneNumber = '0' + cleanPhoneNumber;
+    }
+
+    // Store the cleaned phone number for use in PaypackPaymentButton
+    setCleanedPhoneNumber(cleanPhoneNumber);
+
     // For Paypack, validation is handled in the PaypackPaymentButton component
 
     setIsProcessing(true);
@@ -128,7 +138,10 @@ export default function CheckoutPage() {
               quantity: item.quantity,
               image: item.image,
             })),
-            shippingInfo,
+            shippingInfo: {
+              ...shippingInfo,
+              phone: cleanPhoneNumber, // Use cleaned phone number for Paypack
+            },
             totalAmount: total,
           }),
         });
@@ -159,7 +172,10 @@ export default function CheckoutPage() {
               price: item.price,
               quantity: item.quantity,
             })),
-            shippingInfo,
+            shippingInfo: {
+              ...shippingInfo,
+              phone: cleanPhoneNumber, // Use cleaned phone number for Paypack
+            },
             totalAmount: total,
           }),
         });
@@ -297,12 +313,12 @@ export default function CheckoutPage() {
                         name="phone"
                         value={shippingInfo.phone}
                         onChange={handleInputChange}
-                        placeholder={paymentMethod === 'paypack' ? "Enter your mobile money number (e.g., +250788123456)" : "Enter your phone number"}
+                        placeholder={paymentMethod === 'paypack' ? "Enter your mobile money number (e.g., +250788123456 or 0788123456)" : "Enter your phone number"}
                         required
                       />
                       {paymentMethod === 'paypack' && (
                         <p className="text-xs text-blue-600 mt-1">
-                          💰 This number will be used for mobile money payment
+                          💰 This number will be used for mobile money payment (+250 or 07 format accepted)
                         </p>
                       )}
                     </div>
@@ -433,7 +449,7 @@ export default function CheckoutPage() {
                         <PaypackPaymentButton
                             amount={total}
                             orderId={currentOrderId}
-                            phoneNumber={shippingInfo.phone} // Pass the phone number from shipping form
+                            phoneNumber={cleanedPhoneNumber} // Pass the cleaned phone number (without +250 prefix)
                             onSuccess={async () => {
                               console.log("Payment successful, clearing cart and showing success card");
                               clearCart();

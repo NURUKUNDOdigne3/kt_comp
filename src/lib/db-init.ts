@@ -1,12 +1,41 @@
-import { PrismaClient } from '@prisma/client'
+import { prisma } from './prisma'
 
-const prisma = new PrismaClient()
+let isConnected = false
+let connectionPromise: Promise<void> | null = null
 
-// Auto-connect when imported
-if (typeof window === 'undefined') {
-  prisma.$connect()
-    .then(() => console.log('✅ Database connected'))
-    .catch(err => console.error('❌ Database connection failed:', err))
+export async function initializeDatabase() {
+  if (isConnected) {
+    return
+  }
+
+  if (connectionPromise) {
+    return connectionPromise
+  }
+
+  connectionPromise = (async () => {
+    try {
+      await prisma.$connect()
+      // Test the connection with a simple query
+      await prisma.$queryRaw`SELECT 1`
+      isConnected = true
+      console.log('✅ Database initialized and connected')
+    } catch (error) {
+      console.error('❌ Database initialization failed:', error)
+      connectionPromise = null
+      throw error
+    }
+  })()
+
+  return connectionPromise
 }
 
-export { prisma }
+export function isDatabaseConnected() {
+  return isConnected
+}
+
+// Auto-initialize on server startup
+if (typeof window === 'undefined') {
+  initializeDatabase().catch(() => {
+    console.log('⚠️ Initial database connection failed, will retry on first request')
+  })
+}

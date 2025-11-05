@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Image from "next/image";
 import Link from "next/link";
+import SafeImage from "./ui/SafeImage";
 import {
   Star,
   ShoppingCart,
@@ -250,13 +250,14 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                       -{discount}%
                     </span>
                   )}
-                  <Image
+                  <SafeImage
                     src={product.images[selectedImage]}
                     alt={product.name}
                     fill
                     className="object-contain"
                     sizes="(max-width: 768px) 100vw, 50vw"
                     priority
+                    fallbackSrc="/placeholder-product.png"
                   />
                 </div>
 
@@ -274,12 +275,13 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                             : "border-gray-200 hover:border-gray-300"
                         )}
                       >
-                        <Image
+                        <SafeImage
                           src={image}
                           alt={`${product.name} ${index + 1}`}
                           fill
                           className="object-contain bg-gray-50"
                           sizes="80px"
+                          fallbackSrc="/placeholder-product.png"
                         />
                       </button>
                     ))}
