@@ -14,7 +14,6 @@ export async function GET(request: NextRequest) {
     const page = parseInt(searchParams.get("page") || "1");
     const skip = (page - 1) * limit;
 
-    console.log('Products API: Query params:', { search, category, brand, categoryId, brandId, featured, limit, page });
 
     const where: any = {};
 
@@ -58,7 +57,6 @@ export async function GET(request: NextRequest) {
       where.inStock = true;
     }
 
-    console.log('Products API: Where clause:', where);
 
     const [products, total] = await Promise.all([
       prisma.product.findMany({
@@ -103,8 +101,6 @@ export async function GET(request: NextRequest) {
       prisma.product.count({ where }),
     ]);
 
-    console.log('Products API: Found products count:', total);
-    console.log('Products API: Products:', products.map(p => ({ id: p.id, name: p.name, brand: p.brand?.name, category: p.category?.name })));
 
     // For category pages, return featured and all products separately
     if (category && !search) {
@@ -131,7 +127,6 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error("Products API error:", error);
     return NextResponse.json(
       { success: false, message: "Failed to fetch products" },
       { status: 500 }

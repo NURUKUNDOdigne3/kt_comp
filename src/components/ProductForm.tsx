@@ -124,7 +124,7 @@ export function ProductForm({ product, onSubmit, onCancel }: ProductFormProps) {
         formData.append("file", file);
         formData.append("folder", "products");
 
-        const token = localStorage.getItem("auth-token");
+        const token = localStorage.getItem("auth_token");
         const response = await fetch("/api/upload", {
           method: "POST",
           headers: {
@@ -144,7 +144,6 @@ export function ProductForm({ product, onSubmit, onCancel }: ProductFormProps) {
       setImages([...images, ...uploadedUrls]);
     } catch (error) {
       console.error("Image upload error:", error);
-      alert("Failed to upload images");
     } finally {
       setUploading(false);
     }

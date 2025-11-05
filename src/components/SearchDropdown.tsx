@@ -51,10 +51,8 @@ export default function SearchDropdown({
   useEffect(() => {
     console.log("useEffect triggered, searchQuery:", searchQuery, "length:", searchQuery.length);
     if (searchQuery.length >= 2) {
-      console.log("Calling searchProducts");
       searchProducts(searchQuery);
     } else {
-      console.log("Clearing products");
       setProducts([]);
     }
   }, [searchQuery]);
@@ -81,10 +79,8 @@ export default function SearchDropdown({
     setLoading(true);
     try {
       const response = await fetch(`/api/products?search=${encodeURIComponent(query)}&limit=6`);
-      console.log("API response status:", response.status);
       if (response.ok) {
         const data = await response.json();
-        console.log("API response data:", data);
         const products = data.success ? (data.data?.products || data.products || []) : [];
         setProducts(products);
         console.log("Products set:", products.length, "products");
@@ -114,13 +110,10 @@ export default function SearchDropdown({
     localStorage.removeItem("recentSearches");
   };
 
-  console.log("SearchDropdown render, isOpen:", isOpen, "searchQuery:", searchQuery, "products length:", products.length);
-  console.log("Products data:", products);
+
   if (!isOpen) {
-    console.log("Dropdown not open, returning null");
     return null;
   }
-  console.log("Dropdown is open, rendering...");
 
   return (
     <div
