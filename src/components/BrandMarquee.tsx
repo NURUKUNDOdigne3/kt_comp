@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import SafeImage from "./ui/SafeImage";
 
 const brands = [
   { name: "Dell", logo: "/brands/dell.png" },
@@ -43,14 +43,13 @@ export function BrandMarquee() {
                 key={`brand-1-${index}`}
                 className="flex items-center justify-center min-w-[120px] h-16 grayscale hover:grayscale-0 transition-all duration-300 opacity-60 hover:opacity-100"
               >
-                <Image
+                <SafeImage
                   src={brand.logo}
                   alt={`${brand.name} products available at KT Computer Supply Rwanda`}
                   width={120}
                   height={60}
                   className="object-contain max-h-12"
-                  loading="lazy"
-                  quality={80}
+                  fallbackSrc="/placeholder-brand.png"
                 />
               </div>
             ))}
@@ -66,12 +65,13 @@ export function BrandMarquee() {
                 key={`brand-2-${index}`}
                 className="flex items-center justify-center min-w-[120px] h-16 grayscale hover:grayscale-0 transition-all duration-300 opacity-60 hover:opacity-100"
               >
-                <Image
+                <SafeImage
                   src={brand.logo}
                   alt={brand.name}
                   width={120}
                   height={60}
                   className="object-contain max-h-12"
+                  fallbackSrc="/placeholder-brand.png"
                 />
               </div>
             ))}

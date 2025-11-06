@@ -134,22 +134,17 @@ export default function ProductsPage() {
     selectedProduct?.id || ""
   );
 
-  console.log('Products Data:', productsData);
   const products = productsData?.products || [];
   const pagination = productsData?.pagination;
-  console.log('Products:', products);
-  console.log('Pagination:', pagination);
 
   // Handlers
   const handleAddProduct = async (data: any) => {
     try {
-      console.log(data);
       await createProduct(data);
       toast.success("Product created successfully");
       setIsAddModalOpen(false);
       refetchProducts();
     } catch (error: any) {
-      console.error("Failed to create product:", error);
       toast.error(error.message || "Failed to create product");
     }
   };
@@ -162,7 +157,6 @@ export default function ProductsPage() {
       setSelectedProduct(null);
       refetchProducts();
     } catch (error: any) {
-      console.error("Failed to update product:", error);
       toast.error(error.message || "Failed to update product");
     }
   };
@@ -180,7 +174,6 @@ export default function ProductsPage() {
       setSelectedProduct(null);
       refetchProducts();
     } catch (error: any) {
-      console.error("Failed to delete product:", error);
       toast.error(error.message || "Failed to delete product");
     }
   };

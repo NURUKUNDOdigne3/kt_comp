@@ -1,11 +1,11 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { Heart, ShoppingCart, Star, Package } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCart } from "@/contexts/CartContext";
 import { toast } from "sonner";
+import SafeImage from "./ui/SafeImage";
 
 export type Product = {
   id: string;
@@ -132,14 +132,13 @@ export default function ProductCard({
             -{discount}%
           </span>
         )}
-        <Image
+        <SafeImage
           src={image || "/placeholder-product.png"}
           alt={`${name} - ${brandName} ${categoryName} available at KT Computer Supply Rwanda`}
           fill
           sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
           className="object-contain h-full transition-transform duration-500 group-hover:scale-105"
-          loading="lazy"
-          quality={85}
+          fallbackSrc="/placeholder-product.png"
         />
 
         {/* Hover actions */}

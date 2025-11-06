@@ -11,6 +11,7 @@ import { getSocket, registerForPaymentUpdates, onPaymentUpdate, offPaymentUpdate
 interface PaypackPaymentButtonProps {
   amount: number;
   orderId: string;
+  phoneNumber?: string; // Optional phone number from shipping form
   onSuccess?: () => void;
   onError?: (error: string) => void;
 }
@@ -18,11 +19,12 @@ interface PaypackPaymentButtonProps {
 export default function PaypackPaymentButton({
   amount,
   orderId,
+  phoneNumber: prefilledPhoneNumber,
   onSuccess,
   onError,
 }: PaypackPaymentButtonProps) {
   const [isProcessing, setIsProcessing] = useState(false);
-  const [phoneNumber, setPhoneNumber] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState(prefilledPhoneNumber || "");
   const [paymentId, setPaymentId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -56,8 +58,12 @@ export default function PaypackPaymentButton({
       return;
     }
 
-    if (!/^07\d{8}$/.test(phoneNumber)) {
-      toast.error("Please enter a valid Rwandan phone number (07XXXXXXXX)");
+    // Clean the phone number - remove any + or spaces
+    const cleanPhoneNumber = phoneNumber.replace(/[\+\s]/g, '');
+
+    // Check if it starts with 07 and is exactly 10 digits total (07 + 8 digits = 10)
+    if (!/^07\d{8}$/.test(cleanPhoneNumber)) {
+      toast.error("Please enter a valid Rwandan phone number (07XXXXXXXX - 10 digits total starting with 07)");
       return;
     }
 
@@ -71,7 +77,7 @@ export default function PaypackPaymentButton({
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          phoneNumber,
+          phoneNumber: cleanPhoneNumber,
           amount,
           orderId, // Include orderId for linking payment to order
         }),
@@ -80,7 +86,12 @@ export default function PaypackPaymentButton({
       const paymentData = await paymentResponse.json();
 
       if (!paymentResponse.ok) {
-        throw new Error(paymentData.error || "Payment initiation failed");
+        // Show the specific error message from Paypack API
+        const errorMessage = paymentData.error || "Payment initiation failed";
+        toast.error(`Payment Error: ${errorMessage}`);
+        onError?.(errorMessage);
+        setIsProcessing(false);
+        return;
       }
 
       const { paymentId: newPaymentId } = paymentData;
@@ -103,21 +114,34 @@ export default function PaypackPaymentButton({
 
   return (
     <div className="space-y-4">
-      <div>
-        <Label htmlFor="paypack-phone">
-          Mobile Money Number <span className="text-red-500">*</span>
-        </Label>
-        <Input
-          id="paypack-phone"
-          value={phoneNumber}
-          onChange={(e) => setPhoneNumber(e.target.value)}
-          placeholder="078XXXXXXX or 073XXXXXXX"
-          disabled={isProcessing}
-        />
-        <p className="text-xs text-gray-500 mt-1">
-          Enter your MTN Mobile Money or Airtel Money number
-        </p>
-      </div>
+      {!prefilledPhoneNumber && (
+        <div>
+          <Label htmlFor="paypack-phone">
+            Mobile Money Number <span className="text-red-500">*</span>
+          </Label>
+          <Input
+            id="paypack-phone"
+            value={phoneNumber}
+            onChange={(e) => setPhoneNumber(e.target.value)}
+            placeholder="07XXXXXXXX (10 digits total)"
+            disabled={isProcessing}
+          />
+          <p className="text-xs text-gray-500 mt-1">
+            Enter your MTN Mobile Money or Airtel Money number (10 digits total starting with 07)
+          </p>
+        </div>
+      )}
+
+      {prefilledPhoneNumber && (
+        <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+          <p className="text-sm text-blue-800">
+            📱 Using phone number: <strong>{prefilledPhoneNumber}</strong>
+          </p>
+          <p className="text-xs text-blue-600 mt-1">
+            This number will be used for your mobile money payment
+          </p>
+        </div>
+      )}
 
       <Button
         onClick={handlePayment}

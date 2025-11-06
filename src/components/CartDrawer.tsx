@@ -17,12 +17,12 @@ import Link from "next/link";
 export function CartDrawer() {
   const { items, itemCount, totalAmount, updateQuantity, removeItem, isCartOpen, setIsCartOpen } = useCart();
   
-  const tax = totalAmount * 0.18; // 18% VAT in Rwanda
-  const total = totalAmount + tax;
+  const tax = 0; // No VAT
+  const total = totalAmount; // Only item prices
 
   return (
     <Drawer open={isCartOpen} onOpenChange={setIsCartOpen} direction="right">
-      <DrawerContent>
+      <DrawerContent className="bg-white">
         <div className="mx-auto w-full max-w-2xl">
           <DrawerHeader>
             <div className="flex items-center justify-between">
@@ -114,15 +114,7 @@ export function CartDrawer() {
           {items.length > 0 && (
             <DrawerFooter>
               <div className="space-y-4">
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span>Subtotal</span>
-                    <span>RWF {totalAmount.toLocaleString()}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span>Tax (18% VAT)</span>
-                    <span>RWF {tax.toLocaleString()}</span>
-                  </div>
+                <div className="space-y-2">                 
                   <div className="flex justify-between text-base font-medium">
                     <span>Total</span>
                     <span>RWF {total.toLocaleString()}</span>
