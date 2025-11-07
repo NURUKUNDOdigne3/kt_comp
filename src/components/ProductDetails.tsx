@@ -175,34 +175,31 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
     fetchReviews();
   }, [product.id]);
 
-  // Get related products
-  const allProducts = [
-    ...products,
-    ...phoneProducts,
-    ...printerProducts,
-    ...routerProducts,
-    ...speakerProducts,
-    ...monitorProducts,
-  ];
-  const relatedProducts = allProducts
-    .filter((p) => p.brand === product.brand && p.id !== product.id)
-    .slice(0, 4)
-    .map((p) => ({
-      ...p,
-      slug: p.id, // Use id as slug
-      images: [p.image], // Convert image to images array
-      brand: {
-        id: p.brand.toLowerCase().replace(/\s+/g, "-"),
-        name: p.brand,
-        slug: p.brand.toLowerCase().replace(/\s+/g, "-"),
-      },
-      // Infer category from product type
-      category: {
-        id: "products",
-        name: "Products",
-        slug: "products",
-      },
-    }));
+  // Get related products from API
+  const [relatedProducts, setRelatedProducts] = useState<any[]>([]);
+  const [isLoadingRelated, setIsLoadingRelated] = useState(false);
+
+  // Fetch related products
+  const fetchRelatedProducts = async () => {
+    setIsLoadingRelated(true);
+    try {
+      const response = await fetch(`/api/products/${product.id}/related`);
+      if (response.ok) {
+        const data = await response.json();
+        setRelatedProducts(data.data || []);
+      }
+    } catch (error) {
+      console.error("Failed to fetch related products:", error);
+    } finally {
+      setIsLoadingRelated(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchRelatedProducts();
+  }, [product.id]);
+
+
 
   const handleReviewSubmitted = () => {
     fetchReviews();
@@ -706,9 +703,27 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
               </div>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {relatedProducts.map((relatedProduct) => (
-                <ProductCard key={relatedProduct.id} product={relatedProduct} />
-              ))}
+              {isLoadingRelated ? (
+                // Loading skeleton
+                Array.from({ length: 4 }).map((_, index) => (
+                  <div key={index} className="animate-pulse">
+                    <div className="aspect-[4/3] bg-gray-200 rounded-2xl mb-4"></div>
+                    <div className="space-y-2">
+                      <div className="h-4 bg-gray-200 rounded"></div>
+                      <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                      <div className="h-6 bg-gray-200 rounded w-1/2"></div>
+                    </div>
+                  </div>
+                ))
+              ) : relatedProducts.length > 0 ? (
+                relatedProducts.map((relatedProduct) => (
+                  <ProductCard key={relatedProduct.id} product={relatedProduct} />
+                ))
+              ) : (
+                <div className="col-span-full text-center py-8">
+                  <p className="text-gray-500">No related products found</p>
+                </div>
+              )}
             </div>
           </div>
         </div>

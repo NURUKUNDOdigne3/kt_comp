@@ -17,7 +17,7 @@ const brands = [
   { name: "Brother", logo: "/brands/brother.png" },
   { name: "TP-Link", logo: "/brands/tp-link.png" },
   // { name: "Cisco", logo: "/brands/cisco.png" },
-  // { name: "Logitech", logo: "/brands/logitech.png" },
+  { name: "Logitech", logo: "/brands/logitech.png" },
 ];
 
 export function BrandMarquee() {
