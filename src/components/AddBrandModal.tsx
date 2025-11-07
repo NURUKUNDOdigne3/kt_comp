@@ -21,7 +21,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Save, X, Image, Plus } from "lucide-react";
+import { Save, X, Image, Plus, Loader2 } from "lucide-react";
+import { Dropzone, ImagePreview } from "@/components/ui/dropzone";
 
 interface AddBrandModalProps {
   open: boolean;
@@ -32,6 +33,7 @@ interface AddBrandModalProps {
     status: string;
     website: string;
     categories: string[];
+    logo?: string;
   }) => void;
 }
 
@@ -40,12 +42,15 @@ export function AddBrandModal({
   onOpenChange,
   onSave,
 }: AddBrandModalProps) {
+  const [logo, setLogo] = useState<string[]>([]);
+  const [uploading, setUploading] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     description: "",
     status: "Active",
     website: "",
     categories: [] as string[],
+    logo: "",
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -58,7 +63,9 @@ export function AddBrandModal({
       status: "Active",
       website: "",
       categories: [],
+      logo: "",
     });
+    setLogo([]);
   };
 
   const handleInputChange = (
@@ -76,6 +83,48 @@ export function AddBrandModal({
         .map((c) => c.trim())
         .filter((c) => c),
     }));
+  };
+
+  const handleLogoUpload = async (files: File[]) => {
+    if (!files || files.length === 0) return;
+
+    setUploading(true);
+
+    try {
+      const uploadPromises = files.map(async (file) => {
+        const formDataUpload = new FormData();
+        formDataUpload.append("file", file);
+        formDataUpload.append("folder", "brands");
+
+        const token = localStorage.getItem("auth_token");
+        const response = await fetch("/api/upload", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formDataUpload,
+        });
+
+        const result = await response.json();
+        if (result.success) {
+          return result.data.url;
+        }
+        throw new Error("Upload failed");
+      });
+
+      const uploadedUrls = await Promise.all(uploadPromises);
+      setLogo(uploadedUrls);
+      setFormData((prev) => ({ ...prev, logo: uploadedUrls[0] || "" }));
+    } catch (error) {
+      console.error("Logo upload error:", error);
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const removeLogo = () => {
+    setLogo([]);
+    setFormData((prev) => ({ ...prev, logo: "" }));
   };
 
   return (
@@ -151,18 +200,23 @@ export function AddBrandModal({
             </div>
             <div className="grid gap-2">
               <Label>Brand Logo</Label>
-              <div className="flex items-center justify-center border-2 border-dashed rounded-lg h-32">
-                <div className="text-center">
-                  <Image className="mx-auto h-8 w-8 text-muted-foreground" />
-                  <p className="text-sm text-muted-foreground mt-2">
-                    Click to upload or drag and drop
-                  </p>
-                  <Button size="sm" className="mt-2" type="button">
-                    <Plus className="mr-2 h-4 w-4" />
-                    Add Logo
-                  </Button>
+              <Dropzone
+                onFilesChange={handleLogoUpload}
+                maxFiles={1}
+                maxSize={5 * 1024 * 1024}
+                accept="image/*"
+                disabled={uploading}
+              />
+
+              {/* Logo Preview */}
+              <ImagePreview images={logo} onRemove={removeLogo} />
+
+              {uploading && (
+                <div className="flex items-center justify-center mt-4">
+                  <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                  <span className="ml-2 text-sm">Uploading...</span>
                 </div>
-              </div>
+              )}
             </div>
           </div>
           <DialogFooter className="mt-4">
