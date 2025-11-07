@@ -68,15 +68,16 @@ export default function BrandsPage() {
   const handleAddBrand = async (newBrand: {
     name: string;
     description?: string;
-    logoUrl?: string;
+    logo?: string;
   }) => {
     try {
       // Transform data to match API schema
       const brandData: any = {
         name: newBrand.name,
         slug: newBrand.name.toLowerCase().replace(/\s+/g, '-'),
+        description: newBrand.description || "",
       };
-      if (newBrand.logoUrl) brandData.logo = newBrand.logoUrl;
+      if (newBrand.logo) brandData.logo = newBrand.logo;
       
       await createBrand(brandData);
       refetchBrands();
@@ -99,7 +100,7 @@ export default function BrandsPage() {
         name: updatedBrand.name,
         slug: updatedBrand.name.toLowerCase().replace(/\s+/g, '-'),
       };
-      if (updatedBrand.logoUrl) brandData.logo = updatedBrand.logoUrl;
+      if (updatedBrand.logo) brandData.logo = updatedBrand.logo;
       
       await updateBrand(brandData);
       refetchBrands();
@@ -130,6 +131,7 @@ export default function BrandsPage() {
 
   // Filter brands based on search query
   const brandsArray = brands || [];
+  console.log(brandsArray);
   const filteredBrands = brandsArray.filter((brand: any) => {
     const matchesSearch =
       brand.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -210,6 +212,7 @@ export default function BrandsPage() {
                   ) : (
                     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                       {filteredBrands.map((brand: any) => (
+                      
                         <Card
                           key={brand.id}
                           className="hover:shadow-md transition-shadow"
@@ -217,9 +220,9 @@ export default function BrandsPage() {
                           <CardContent className="p-6">
                             <div className="flex items-start gap-4">
                               <div className="bg-muted flex h-16 w-16 items-center justify-center rounded-lg">
-                                {brand.logoUrl ? (
+                                {brand.logo ? (
                                   <img
-                                    src={brand.logoUrl}
+                                    src={brand.logo}
                                     alt={brand.name}
                                     className="h-12 w-12 object-contain"
                                   />
