@@ -15,7 +15,7 @@ export interface SEOConfig {
 }
 
 export function generateMetadata(config: SEOConfig): Metadata {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://ktcomputersupply.vercel.rw";
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://www.ktcomputersupplying.com";
   const fullUrl = config.url ? `${baseUrl}${config.url}` : baseUrl;
   const imageUrl = config.image || "/logo.png";
   const fullImageUrl = imageUrl.startsWith("http") ? imageUrl : `${baseUrl}${imageUrl}`;
@@ -72,7 +72,7 @@ export function generateMetadata(config: SEOConfig): Metadata {
 }
 
 export function generateProductMetadata(product: any): Metadata {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://ktcomputersupply.vercel.rw";
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://www.ktcomputersupplying.com";
   const productUrl = `/products/${product.id}`;
   const fullUrl = `${baseUrl}${productUrl}`;
   const imageUrl = product.image || "/logo.png";

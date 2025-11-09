@@ -29,7 +29,7 @@ export default function SEOHead({
   brand,
   category,
 }: SEOHeadProps) {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://ktcomputersupply.vercel.rw";
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://www.ktcomputersupplying.com";
   const fullUrl = url.startsWith("http") ? url : `${baseUrl}${url}`;
   const fullImageUrl = image.startsWith("http") ? image : `${baseUrl}${image}`;
 

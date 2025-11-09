@@ -17,7 +17,7 @@ const roboto = Roboto({
 
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://ktcomputersupply.vercel.rw"),
+  metadataBase: new URL("https://www.ktcomputersupplying.com"),
   title: {
     default: "KT Computer Supply - Premium Electronics in Rwanda",
     template: "%s | KT Computer Supply",
@@ -88,21 +88,21 @@ export const metadata: Metadata = {
     },
   },
   verification: {
-    google: "your-google-verification-code",
-    yandex: "your-yandex-verification-code",
+    google: "google-site-verification-code-here",
+    yandex: "yandex-verification-code-here",
     other: {
-      "msvalidate.01": "your-bing-verification-code",
+      "msvalidate.01": "bing-verification-code-here",
     },
   },
   alternates: {
-    canonical: "https://ktcomputersupply.vercel.rw",
+    canonical: "https://www.ktcomputersupplying.com",
     languages: {
-      "en": "https://ktcomputersupply.vercel.rw",
-      "en-US": "https://ktcomputersupply.vercel.rw",
-      "sw": "https://ktcomputersupply.vercel.rw/sw",
-      "sw-KE": "https://ktcomputersupply.vercel.rw/sw",
-      "fr": "https://ktcomputersupply.vercel.rw/fr",
-      "fr-RW": "https://ktcomputersupply.vercel.rw/fr",
+      "en": "https://www.ktcomputersupplying.com",
+      "en-US": "https://www.ktcomputersupplying.com",
+      "sw": "https://www.ktcomputersupplying.com/sw",
+      "sw-KE": "https://www.ktcomputersupplying.com/sw",
+      "fr": "https://www.ktcomputersupplying.com/fr",
+      "fr-RW": "https://www.ktcomputersupplying.com/fr",
     },
   },
   other: {
@@ -136,13 +136,13 @@ export default function RootLayout({
         <meta name="mobile-web-app-capable" content="yes" />
 
         {/* Hreflang tags for multi-language support */}
-        <link rel="alternate" hrefLang="en" href="https://e3eb07949260.ngrok-free.app" />
-        <link rel="alternate" hrefLang="en-US" href="https://e3eb07949260.ngrok-free.app" />
-        <link rel="alternate" hrefLang="sw" href="https://ktcomputersupply.vercel.rw/sw" />
-        <link rel="alternate" hrefLang="sw-KE" href="https://ktcomputersupply.vercel.rw/sw" />
-        <link rel="alternate" hrefLang="fr" href="https://ktcomputersupply.vercel.rw/fr" />
-        <link rel="alternate" hrefLang="fr-RW" href="https://ktcomputersupply.vercel.rw/fr" />
-        <link rel="alternate" hrefLang="x-default" href="https://ktcomputersupply.vercel.rw" />
+        <link rel="alternate" hrefLang="en" href="https://www.ktcomputersupplying.com" />
+        <link rel="alternate" hrefLang="en-US" href="https://www.ktcomputersupplying.com" />
+        <link rel="alternate" hrefLang="sw" href="https://www.ktcomputersupplying.com/sw" />
+        <link rel="alternate" hrefLang="sw-KE" href="https://www.ktcomputersupplying.com/sw" />
+        <link rel="alternate" hrefLang="fr" href="https://www.ktcomputersupplying.com/fr" />
+        <link rel="alternate" hrefLang="fr-RW" href="https://www.ktcomputersupplying.com/fr" />
+        <link rel="alternate" hrefLang="x-default" href="https://www.ktcomputersupplying.com" />
       </head>
       <body
         className={`${roboto.variable} font-sans antialiased`}

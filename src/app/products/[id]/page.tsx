@@ -142,7 +142,7 @@ export default async function ProductPage({
     notFound();
   }
 
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://ktcomputersupply.vercel.rw";
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://www.ktcomputersupplying.com";
   const productUrl = `${baseUrl}/products/${id}`;
 
   const breadcrumbItems = [
