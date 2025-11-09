@@ -8,6 +8,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { CartProvider } from "@/contexts/CartContext";
 import { FilterProvider } from "@/contexts/FilterContext";
 import { Analytics } from "@vercel/analytics/next";
+import OrganizationSchema from "@/components/SEO/OrganizationSchema";
 
 const roboto = Roboto({
   variable: "--font-roboto",
@@ -42,11 +43,13 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: "https://www.ktcomputersupplying.com/logo.png", type: "image/png" },
-            { url: "https://www.ktcomputersupplying.com/favicon.ico", sizes: "any" },
-
+      { url: "https://www.ktcomputersupplying.com/favicon.ico", sizes: "32x32" },
+      { url: "https://www.ktcomputersupplying.com/logo.png", sizes: "192x192", type: "image/png" },
+      { url: "https://www.ktcomputersupplying.com/logo.png", sizes: "512x512", type: "image/png" },
     ],
-    apple: "https://www.ktcomputersupplying.com/logo.png",
+    apple: [
+      { url: "https://www.ktcomputersupplying.com/logo.png", sizes: "180x180" },
+    ],
     shortcut: "https://www.ktcomputersupplying.com/favicon.ico",
   },
   manifest: "/manifest.json",
@@ -159,6 +162,7 @@ export default function RootLayout({
           </FilterProvider>
         </CartProvider>
         <Analytics />
+        <OrganizationSchema />
       </body>
     </html>
   );
