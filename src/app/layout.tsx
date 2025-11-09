@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   keywords: [
     "computer supply rwanda", "electronics store kigali", "laptop sales rwanda", "computer accessories rwanda",
     "tech solutions rwanda", "IT equipment kigali", "computer parts rwanda", "electronics retailer rwanda",
-    "computer store kigali", "tech shop rwanda", "mobile money payments rwanda", "paypack payments",
+    "computer store kigali", "tech shop rwanda", "mobile money payments rwanda" , "paypack payments",
     "apple products rwanda", "dell laptops rwanda", "hp printers rwanda", "samsung monitors rwanda",
     "gaming laptops rwanda", "office computers rwanda", "networking equipment rwanda", "audio systems rwanda"
   ],
