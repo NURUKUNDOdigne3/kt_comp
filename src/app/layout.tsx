@@ -42,12 +42,12 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: "/logo.png", type: "image/png" },
-            { url: "/favicon.ico", sizes: "any" },
+      { url: "https://www.ktcomputersupplying.com/logo.png", type: "image/png" },
+            { url: "https://www.ktcomputersupplying.com/favicon.ico", sizes: "any" },
 
     ],
-    apple: "/logo.png",
-    shortcut: "/favicon.ico",
+    apple: "https://www.ktcomputersupplying.com/logo.png",
+    shortcut: "https://www.ktcomputersupplying.com/favicon.ico",
   },
   manifest: "/manifest.json",
   openGraph: {
@@ -60,7 +60,7 @@ export const metadata: Metadata = {
     siteName: "KT Computer Supply",
     images: [
       {
-        url: "/logo.png",
+        url: "https://www.ktcomputersupplying.com/logo.png",
         width: 1200,
         height: 630,
         alt: "KT Computer Supply - Premium Electronics & Computer Solutions in Rwanda",
@@ -71,7 +71,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "KT Computer Supply - Premium Electronics in Rwanda",
     description: "Your trusted source for premium electronics, computers, and tech solutions in Rwanda with mobile money payments",
-    images: ["/logo.png"],
+    images: ["https://www.ktcomputersupplying.com/logo.png"],
     creator: "@ktcomputer",
     site: "@ktcomputer",
   },
