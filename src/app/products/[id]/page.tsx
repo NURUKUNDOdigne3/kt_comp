@@ -3,7 +3,7 @@ import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { generateProductMetadata } from "@/lib/seo";
-import { ProductSchema } from "@/components/SEO/StructuredData";
+import { ProductSchema, FAQSchema } from "@/components/SEO/StructuredData";
 import Breadcrumbs from "@/components/SEO/Breadcrumbs";
 
 // Get product from database
@@ -159,6 +159,34 @@ export default async function ProductPage({
     { name: product.name, href: `/products/${id}` },
   ];
 
+  // FAQ data for products
+  const faqQuestions = [
+    {
+      question: `What is the warranty for ${product.name}?`,
+      answer: "All products come with manufacturer warranty. Contact our support team for specific warranty details and terms."
+    },
+    {
+      question: "Do you offer free delivery?",
+      answer: `Free delivery is available for orders over RWF 99,000. For orders under this amount, delivery charges apply based on location within Rwanda.`
+    },
+    {
+      question: "What payment methods do you accept?",
+      answer: "We accept Mobile Money payments (MTN MoMo, Airtel Money), bank transfers, and cash on delivery. PayPack payments are also supported."
+    },
+    {
+      question: "How long does delivery take?",
+      answer: "Standard delivery takes 2-3 business days within Kigali. Express delivery is available for urgent orders. Nationwide delivery is available across Rwanda."
+    },
+    {
+      question: "Can I return or exchange this product?",
+      answer: "We offer a 30-day return policy. Items must be in original condition with all accessories and packaging. Contact our customer service for return procedures."
+    },
+    {
+      question: "Do you provide technical support?",
+      answer: "Yes, we provide free technical support for all products. Our team of experts is available to help with setup, troubleshooting, and product usage."
+    }
+  ];
+
   return (
     <div itemScope itemType="https://schema.org/Product">
       <ProductSchema
@@ -177,6 +205,7 @@ export default async function ProductPage({
         }}
         url={productUrl}
       />
+      <FAQSchema questions={faqQuestions} />
       <div className="container mx-auto px-4 py-6">
         <Breadcrumbs items={breadcrumbItems} />
         <ProductDetails product={product} />

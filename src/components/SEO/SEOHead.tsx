@@ -1,7 +1,5 @@
 "use client";
 
-import Head from "next/head";
-
 interface SEOHeadProps {
   title?: string;
   description?: string;
@@ -33,42 +31,23 @@ export default function SEOHead({
   const fullUrl = url.startsWith("http") ? url : `${baseUrl}${url}`;
   const fullImageUrl = image.startsWith("http") ? image : `${baseUrl}${image}`;
 
+  // Focus on high-value, relevant keywords only
   const defaultKeywords = [
-    // Core Business Keywords
-    "computer supply rwanda", "electronics store kigali", "laptop sales rwanda", "mobile money payments", "paypack rwanda", "tech solutions rwanda", "kigali electronics trading", "rwanda computer supply", "electronics rwanda", "kigali tech store", "computer accessories rwanda", "IT equipment kigali", "computer parts rwanda", "electronics retailer rwanda", "computer store kigali", "tech shop rwanda", "mobile money payments rwanda", "paypack payments", "apple products rwanda", "dell laptops rwanda", "hp printers rwanda", "samsung monitors rwanda", "gaming laptops rwanda", "office computers rwanda", "networking equipment rwanda", "audio systems rwanda",
-    
-    // Product Categories - Computers & Laptops
-    "laptop kigali", "desktop computer rwanda", "gaming laptop kigali", "business laptop rwanda", "student laptop kigali", "workstation rwanda", "ultrabook kigali", "chromebook rwanda", "macbook kigali", "surface laptop rwanda", "2-in-1 laptop kigali", "convertible laptop rwanda", "budget laptop kigali", "premium laptop rwanda", "refurbished laptop kigali", "used computer rwanda", "new laptop kigali", "laptop deals rwanda", "cheap laptop kigali", "expensive laptop rwanda",
-    
-    // Brands - Major Computer Brands
-    "hp laptop kigali", "dell computer rwanda", "lenovo laptop kigali", "asus computer rwanda", "acer laptop kigali", "apple macbook rwanda", "microsoft surface kigali", "toshiba laptop rwanda", "sony computer kigali", "samsung laptop rwanda", "lg computer kigali", "msi gaming laptop rwanda", "alienware kigali", "razer laptop rwanda", "gigabyte computer kigali", "origin pc rwanda", "system76 laptop kigali", "framework laptop rwanda", "purism computer kigali", "pine64 laptop rwanda",
-    
-    // Mobile Phones & Tablets
-    "smartphone kigali", "mobile phone rwanda", "android phone kigali", "iphone rwanda", "samsung galaxy kigali", "huawei phone rwanda", "xiaomi smartphone kigali", "oppo phone rwanda", "vivo smartphone kigali", "oneplus phone rwanda", "google pixel kigali", "nokia phone rwanda", "motorola smartphone kigali", "realme phone rwanda", "infinix smartphone kigali", "tecno phone rwanda", "itel smartphone kigali", "tablet rwanda", "ipad kigali", "android tablet rwanda", "samsung tablet kigali", "huawei tablet rwanda", "lenovo tablet kigali", "microsoft surface tablet rwanda",
-    
-    // Networking Equipment
-    "router kigali", "wifi router rwanda", "wireless router kigali", "mesh router rwanda", "gaming router kigali", "business router rwanda", "modem kigali", "internet modem rwanda", "fiber modem kigali", "adsl modem rwanda", "network switch kigali", "ethernet switch rwanda", "poe switch kigali", "managed switch rwanda", "unmanaged switch kigali", "access point rwanda", "wifi extender kigali", "range extender rwanda", "powerline adapter kigali", "network cable rwanda",
-    
-    // Audio & Visual Equipment
-    "speaker kigali", "bluetooth speaker rwanda", "wireless speaker kigali", "portable speaker rwanda", "home theater speaker kigali", "soundbar rwanda", "subwoofer kigali", "headphone rwanda", "wireless headphone kigali", "gaming headset rwanda", "earbuds kigali", "airpods rwanda", "monitor kigali", "computer monitor rwanda", "gaming monitor kigali", "4k monitor rwanda", "ultrawide monitor kigali", "curved monitor rwanda", "led monitor kigali", "lcd monitor rwanda", "oled monitor kigali", "projector rwanda", "home projector kigali", "business projector rwanda",
-    
-    // Printers & Office Equipment
-    "printer kigali", "inkjet printer rwanda", "laser printer kigali", "multifunction printer rwanda", "all-in-one printer kigali", "photo printer rwanda", "3d printer kigali", "scanner rwanda", "copier kigali", "fax machine rwanda", "shredder kigali", "laminator rwanda", "binding machine kigali", "calculator rwanda", "cash register kigali", "pos system rwanda", "barcode scanner kigali", "label printer rwanda",
-    
-    // Accessories & Peripherals
-    "keyboard kigali", "wireless keyboard rwanda", "gaming keyboard kigali", "mechanical keyboard rwanda", "mouse kigali", "wireless mouse rwanda", "gaming mouse kigali", "trackpad rwanda", "webcam kigali", "usb camera rwanda", "microphone kigali", "usb microphone rwanda", "external hard drive kigali", "ssd rwanda", "usb flash drive kigali", "memory card rwanda", "power bank kigali", "charger rwanda", "cable kigali", "adapter rwanda",
-    
-    // Gaming Equipment
-    "gaming computer kigali", "gaming pc rwanda", "gaming setup kigali", "esports equipment rwanda", "gaming chair kigali", "gaming desk rwanda", "gaming accessories kigali", "console rwanda", "playstation kigali", "xbox rwanda", "nintendo switch kigali", "gaming controller rwanda", "vr headset kigali", "oculus rwanda", "htc vive kigali", "psvr rwanda",
-    
-    // Location-Based Keywords
-    "electronics nyarugenge", "computer shop gasabo", "tech store kicukiro", "laptop dealer remera", "phone shop kimisagara", "computer repair gikondo", "electronics muhanga", "tech store musanze", "computer shop huye", "electronics rubavu", "tech store nyagatare", "computer dealer kayonza", "electronics rwamagana", "tech shop rusizi", "computer store karongi",
-    
-    // Price & Quality Keywords
-    "cheap computer kigali", "affordable laptop rwanda", "budget smartphone kigali", "premium electronics rwanda", "high-end computer kigali", "luxury tech rwanda", "discounted electronics kigali", "sale computer rwanda", "promotion laptop kigali", "clearance electronics rwanda", "wholesale computer kigali", "bulk electronics rwanda", "refurbished computer kigali", "used electronics rwanda", "certified refurbished kigali", "warranty computer rwanda", "guaranteed electronics kigali", "authentic products rwanda",
-    
-    // Business & Professional
-    "business computer kigali", "office laptop rwanda", "corporate electronics kigali", "enterprise computer rwanda", "professional laptop kigali", "workstation rwanda", "server kigali", "network equipment rwanda", "security camera kigali", "cctv system rwanda", "access control kigali", "biometric system rwanda", "time attendance kigali", "pos terminal rwanda", "receipt printer kigali", "cash drawer rwanda",
+    "computer supply rwanda",
+    "electronics store kigali",
+    "laptop sales rwanda",
+    "mobile money payments rwanda",
+    "paypack payments",
+    "tech solutions rwanda",
+    "IT equipment kigali",
+    "computer store kigali",
+    "apple products rwanda",
+    "dell laptops rwanda",
+    "hp printers rwanda",
+    "gaming laptops rwanda",
+    "office computers rwanda",
+    "KT computer supply",
+ 
     
     // Educational & Student
     "student laptop kigali", "school computer rwanda", "educational tablet kigali", "classroom projector rwanda", "interactive whiteboard kigali", "learning software rwanda", "educational app kigali", "student discount rwanda", "university computer kigali", "research laptop rwanda", "thesis computer kigali", "academic software rwanda",
@@ -118,47 +97,52 @@ export default function SEOHead({
     // 200 Kigali-Specific Keywords
     "computer store kigali city", "electronics shop kigali center", "laptop dealer kigali downtown", "tech store kigali mall", "computer repair kigali city", "phone shop kigali market", "electronics kigali rwanda", "computer kigali price", "laptop kigali buy", "smartphone kigali store", "tablet kigali shop", "router kigali dealer", "speaker kigali electronics", "monitor kigali computer", "printer kigali office", "keyboard kigali gaming", "mouse kigali wireless", "headphone kigali audio", "webcam kigali video", "charger kigali mobile", "cable kigali computer", "adapter kigali power", "battery kigali laptop", "memory kigali computer", "storage kigali external", "graphics kigali gaming", "processor kigali intel", "motherboard kigali asus", "cooling kigali computer", "case kigali gaming", "power kigali supply", "network kigali equipment", "security kigali camera", "software kigali microsoft", "antivirus kigali security", "office kigali suite", "design kigali software", "video kigali editing", "photo kigali editor", "music kigali player", "game kigali software", "utility kigali system", "driver kigali update", "backup kigali solution", "recovery kigali data", "optimization kigali system", "cleaning kigali computer", "maintenance kigali laptop", "upgrade kigali hardware", "installation kigali software", "configuration kigali system", "troubleshooting kigali computer", "diagnosis kigali hardware", "testing kigali performance", "benchmarking kigali system", "monitoring kigali network", "scanning kigali security", "protection kigali virus", "encryption kigali data", "compression kigali file", "synchronization kigali data", "streaming kigali media", "recording kigali audio", "capturing kigali screen", "editing kigali document", "processing kigali image", "rendering kigali video", "encoding kigali media", "decoding kigali format", "converting kigali file", "transferring kigali data", "sharing kigali network", "connecting kigali wireless", "pairing kigali bluetooth", "syncing kigali device", "updating kigali firmware", "flashing kigali bios", "overclocking kigali processor", "undervolting kigali cpu", "cooling kigali thermal", "ventilation kigali computer", "airflow kigali case", "temperature kigali monitoring", "voltage kigali regulation", "current kigali protection", "surge kigali protector", "stabilizer kigali voltage", "inverter kigali power", "generator kigali backup", "solar kigali computer", "renewable kigali energy", "sustainable kigali tech", "green kigali computing", "eco kigali electronics", "recycling kigali ewaste", "disposal kigali electronic", "refurbishing kigali computer", "restoration kigali laptop", "renovation kigali electronics", "modernization kigali system", "digitization kigali business", "automation kigali office", "integration kigali system", "migration kigali data", "transformation kigali digital", "innovation kigali technology", "development kigali software", "programming kigali code", "scripting kigali automation", "debugging kigali software", "testing kigali application", "deployment kigali system", "hosting kigali server", "cloud kigali computing", "virtualization kigali server", "containerization kigali app", "orchestration kigali container", "scaling kigali infrastructure", "load kigali balancing", "clustering kigali server", "replication kigali data", "synchronization kigali database", "indexing kigali search", "caching kigali performance", "optimization kigali database", "tuning kigali performance", "profiling kigali application", "monitoring kigali server", "logging kigali system", "alerting kigali notification", "reporting kigali analytics", "dashboard kigali monitoring", "visualization kigali data", "analysis kigali business", "intelligence kigali artificial", "learning kigali machine", "processing kigali natural", "recognition kigali pattern", "classification kigali data", "prediction kigali model", "forecasting kigali trend", "simulation kigali system", "modeling kigali process", "optimization kigali algorithm", "automation kigali workflow", "orchestration kigali process", "integration kigali api", "communication kigali protocol", "messaging kigali system", "notification kigali service", "alerting kigali system", "monitoring kigali infrastructure", "surveillance kigali security", "detection kigali intrusion", "prevention kigali threat", "protection kigali cyber", "defense kigali security", "firewall kigali network", "filtering kigali content", "blocking kigali access", "authentication kigali user", "authorization kigali permission", "encryption kigali communication", "decryption kigali data", "hashing kigali password", "signing kigali digital", "verification kigali identity", "validation kigali certificate", "auditing kigali security", "compliance kigali regulation", "governance kigali data", "policy kigali security", "procedure kigali standard", "protocol kigali communication", "framework kigali development", "architecture kigali system", "design kigali software", "pattern kigali architecture", "methodology kigali development", "practice kigali best", "standard kigali industry", "certification kigali professional", "training kigali technical", "education kigali computer", "course kigali programming", "workshop kigali technology", "seminar kigali digital", "conference kigali tech", "meetup kigali developer", "community kigali tech", "network kigali professional", "association kigali computer", "society kigali technology", "organization kigali digital", "institution kigali education", "academy kigali computer", "school kigali technology", "university kigali computer", "college kigali technical", "institute kigali technology", "center kigali training", "facility kigali computer", "laboratory kigali tech", "studio kigali digital", "workspace kigali creative", "office kigali technology", "headquarters kigali tech", "branch kigali computer", "outlet kigali electronics", "showroom kigali technology", "warehouse kigali computer", "distribution kigali electronics", "logistics kigali technology", "supply kigali computer", "chain kigali electronics", "vendor kigali technology", "supplier kigali computer", "distributor kigali electronics", "retailer kigali technology", "dealer kigali computer", "reseller kigali electronics", "partner kigali technology", "affiliate kigali computer", "agent kigali electronics", "representative kigali technology"
   ];
+ 
 
-  const allKeywords = [...defaultKeywords, ...keywords].join(", ");
+  const allKeywords = [...defaultKeywords, ...keywords].slice(0, 20).join(", ");
+
+  // Return structured data for better SEO
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": type === "product" ? "Product" : "WebPage",
+    "name": title,
+    "description": description,
+    "url": fullUrl,
+    "image": fullImageUrl,
+    ...(type === "product" && price && {
+      "offers": {
+        "@type": "Offer",
+        "price": price,
+        "priceCurrency": currency,
+        "availability": availability === "in_stock" ? "https://schema.org/InStock" : "https://schema.org/OutOfStock"
+      }
+    })
+  };
 
   return (
-    <Head>
-      {/* Basic Meta Tags */}
-      <title>{title}</title>
-      <meta name="description" content={description} />
-      <meta name="keywords" content={allKeywords} />
-      <meta name="author" content="KT Computer Supply" />
-      <meta name="robots" content="index, follow" />
-      <meta name="language" content="English" />
-      <meta name="revisit-after" content="7 days" />
-      
-      {/* Geo Tags */}
-      <meta name="geo.region" content="RW" />
-      <meta name="geo.placename" content="Kigali" />
-      <meta name="geo.position" content="-1.9441;30.0619" />
-      <meta name="ICBM" content="-1.9441, 30.0619" />
-      
-      {/* Open Graph */}
-      <meta property="og:type" content={type} />
+    <>
+      {/* Essential Meta Tags */}
+      <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+      <meta name="theme-color" content="#1f2937" />
+      <meta name="apple-mobile-web-app-capable" content="yes" />
+      <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+      <meta name="apple-mobile-web-app-title" content="KT Computer Supply" />
+      <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+      <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+      <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+      <link rel="manifest" href="/manifest.json" />
+      <link rel="canonical" href={fullUrl} />
+
+      {/* Open Graph Meta Tags */}
       <meta property="og:title" content={title} />
       <meta property="og:description" content={description} />
       <meta property="og:image" content={fullImageUrl} />
       <meta property="og:url" content={fullUrl} />
+      <meta property="og:type" content={type} />
       <meta property="og:site_name" content="KT Computer Supply" />
       <meta property="og:locale" content="en_US" />
-      
-      {/* Product-specific Open Graph */}
-      {type === "product" && price && (
-        <>
-          <meta property="product:price:amount" content={price.toString()} />
-          <meta property="product:price:currency" content={currency} />
-          {availability && <meta property="product:availability" content={availability} />}
-          {brand && <meta property="product:brand" content={brand} />}
-          {category && <meta property="product:category" content={category} />}
-        </>
-      )}
-      
-      {/* Twitter Card */}
+
+      {/* Twitter Card Meta Tags */}
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:title" content={title} />
       <meta name="twitter:description" content={description} />
@@ -166,36 +150,53 @@ export default function SEOHead({
       <meta name="twitter:creator" content="@ktcomputer" />
       <meta name="twitter:site" content="@ktcomputer" />
 
-      {/* Pinterest Rich Pins */}
-      <meta property="pinterest-rich-pin" content="true" />
-      <meta property="pin:description" content={description} />
-      <meta property="pin:url" content={fullUrl} />
-      <meta property="pin:media" content={fullImageUrl} />
+      {/* Additional SEO Meta Tags */}
+      <meta name="keywords" content={allKeywords} />
+      <meta name="author" content="KT Computer Supply" />
+      <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+      <meta name="googlebot" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
 
-      {/* LinkedIn */}
-      <meta property="og:image:width" content="1200" />
-      <meta property="og:image:height" content="630" />
-      <meta property="og:image:alt" content={title} />
-      
-      {/* Canonical URL */}
-      <link rel="canonical" href={fullUrl} />
-      
-      {/* Preconnect to external domains */}
-      <link rel="preconnect" href="https://fonts.googleapis.com" />
-      <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-      <link rel="dns-prefetch" href="https://payments.paypack.rw" />
-      <link rel="dns-prefetch" href="https://api.stripe.com" />
-      
-      {/* Mobile Optimization */}
-      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <meta name="mobile-web-app-capable" content="yes" />
-      <meta name="apple-mobile-web-app-capable" content="yes" />
-      <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-      <meta name="theme-color" content="#3b82f6" />
-      
-      {/* Favicon */}
-      <link rel="icon" href="/favicon.ico" />
-      <link rel="apple-touch-icon" href="/logo.png" />
-    </Head>
+      {/* Hreflang for future multi-language support */}
+      <link rel="alternate" hrefLang="en" href={fullUrl} />
+      <link rel="alternate" hrefLang="en-us" href={fullUrl} />
+      <link rel="alternate" hrefLang="x-default" href={fullUrl} />
+
+      {/* Social Media Links */}
+      <link rel="me" href="https://twitter.com/ktcomputer" />
+      <link rel="me" href="https://facebook.com/ktcomputersupply" />
+
+      {/* Structured Data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            ...structuredData,
+            "@context": "https://schema.org",
+            "publisher": {
+              "@type": "Organization",
+              "name": "KT Computer Supply",
+              "url": baseUrl,
+              "logo": `${baseUrl}/logo.png`,
+              "sameAs": [
+                "https://twitter.com/ktcomputer",
+                "https://facebook.com/ktcomputersupply",
+                `${baseUrl}/about`
+              ]
+            },
+            "contactPoint": {
+              "@type": "ContactPoint",
+              "telephone": "+250-788-123-456",
+              "contactType": "customer service",
+              "areaServed": "RW",
+              "availableLanguage": "en"
+            },
+            "areaServed": {
+              "@type": "Country",
+              "name": "Rwanda"
+            }
+          }),
+        }}
+      />
+    </>
   );
 }

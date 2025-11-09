@@ -25,11 +25,11 @@ export const metadata: Metadata = {
   },
   description: "KT Computer Supply - Your trusted source for premium electronics, computers, and tech solutions in Rwanda. Best prices, fast delivery, expert support.",
   keywords: [
-    "computer supply rwanda", "electronics store kigali", "laptop sales rwanda", "computer accessories rwanda",
-    "tech solutions rwanda", "IT equipment kigali", "computer parts rwanda", "electronics retailer rwanda",
-    "computer store kigali", "tech shop rwanda", "mobile money payments rwanda" , "paypack payments",
-    "apple products rwanda", "dell laptops rwanda", "hp printers rwanda", "samsung monitors rwanda",
-    "gaming laptops rwanda", "office computers rwanda", "networking equipment rwanda", "audio systems rwanda"
+    "computer supply rwanda", "electronics store kigali", "laptop sales rwanda", 
+    "tech solutions rwanda", "IT equipment kigali", "computer store kigali", 
+    "mobile money payments rwanda", "paypack payments rwanda",
+    "apple products rwanda", "dell laptops rwanda", "hp printers rwanda",
+    "gaming laptops rwanda", "office computers rwanda", "KT computer supply"
   ],
   authors: { name: "KT Computer Supply" },
   creator: "KT Computer Supply",
