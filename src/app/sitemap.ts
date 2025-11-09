@@ -3,7 +3,6 @@ import { prisma } from "@/lib/prisma";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://www.ktcomputersupplying.com";
-  console.log("This is the base url", baseUrl);
   
   // Static pages
   const staticPages = [
