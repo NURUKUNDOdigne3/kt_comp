@@ -7,7 +7,6 @@ import { BrandMarquee } from "@/components/BrandMarquee";
 import { prisma } from "@/lib/prisma";
 import Footer from "@/components/Footer";
 import { OrganizationSchema, WebsiteSchema, LocalBusinessSchema, FAQSchema } from "@/components/SEO/StructuredData";
-import KigaliElectronicsContent from "@/components/KigaliElectronicsContent";
 
 async function getProductsByCategory(categorySlug: string, limit: number = 8) {
   try {
