@@ -85,15 +85,7 @@ export default async function Page() {
       <div className="container mx-auto px-4 py-4">
         <Breadcrumbs items={breadcrumbItems} />
       </div>
-      <Suspense
-        fallback={
-          <div className="h-screen flex items-center justify-center">
-            <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-blue-500"></div>
-          </div>
-        }
-      >
-        <WelcomeHeroPhone />
-      </Suspense>
+      
 
       {/* <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12" id="shop">
         <div className="flex items-end justify-between">
@@ -137,6 +129,16 @@ export default async function Page() {
           </div>
         )}
       </div>
+
+      <Suspense
+        fallback={
+          <div className="h-screen flex items-center justify-center">
+            <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-blue-500"></div>
+          </div>
+        }
+      >
+        <WelcomeHeroPhone />
+      </Suspense>
 
       <Footer />
     </main>

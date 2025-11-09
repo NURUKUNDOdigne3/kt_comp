@@ -174,7 +174,7 @@ export default function Footer() {
                 <p className="mt-4 mb-1">
                   <span className="font-semibold -gray-700">24/7 Free Call:</span>
                 </p>
-                <p className="font-bold -[#0B1A2D]">+250 788 123 456</p>
+                <p className="font-bold -[#0B1A2D]">+250 788 353 267</p>
               </div>
               <div className="flex items-center gap-3 mt-6">
                 {socialLinks.map(({ icon, href, label, color }) => (
@@ -266,11 +266,11 @@ export default function Footer() {
           <p className="text-sm text-gray-500">
             Gadgets Shop © 2025 All Rights Reserved.
           </p>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center rounded-full overflow-hidden">
             <img
-              src="/cards.png"
-              alt="Credit card images"
-              width={300}
+              src="/momo.png"
+              alt="payment methods"
+              width={50}
               height={50}
               loading="lazy"
             />

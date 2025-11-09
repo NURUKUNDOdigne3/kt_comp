@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { gsap } from "gsap";
@@ -18,10 +19,12 @@ import {
 } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { CartDrawer } from "./CartDrawer";
-import { brandData } from "../lib/brands";
+import { useBrands } from "@/hooks/use-api";
+import { useProducts } from "@/hooks/use-api";
 import { useCart } from "@/contexts/CartContext";
 import { useFilter } from "@/contexts/FilterContext";
 import SearchDropdown from "./SearchDropdown";
+import { Brand } from "@prisma/client";
 
 const categories = [
   { name: "All", href: "/", scrollTo: null, active: true },
@@ -31,6 +34,8 @@ const categories = [
   { name: "Routers", href: "/routers", scrollTo: "routers", active: false },
   { name: "Speakers", href: "/speakers", scrollTo: "speakers", active: false },
   { name: "Monitors", href: "/monitors", scrollTo: "monitors", active: false },
+  { name: "Phones", href: "/phones", scrollTo: "phones", active: false },
+  { name: "Accessories", href: "/accessories", scrollTo: "accessories", active: false },
 ];
 
 // Brand data with categories
@@ -131,7 +136,9 @@ export default function Header() {
         "Printers": "printers",
         "Monitors": "monitors",
         "Speakers": "speakers",
-        "Routers": "routers"
+        "Routers": "routers",
+
+        
       };
       
       const scrollId = categoryMap[categoryName];
@@ -161,15 +168,40 @@ export default function Header() {
   };
 
   const currentCategory = getCurrentCategory();
+  const { data: brandsData } = useBrands();
+  const { data: productsData } = useProducts({ category: currentCategory !== "all" ? currentCategory : undefined });
 
-  // Filter brands based on current category
-  const filteredBrandData =
-    currentCategory === "all"
-      ? brandData
-      : brandData.filter((brand) => brand.categories.includes(currentCategory));
+  // Get brands that have products in current category
+  const filteredBrandData = React.useMemo(() => {
+    if (!brandsData) return [];
+    
+    if (currentCategory === "all") {
+      return brandsData.map((brand: any) => ({
+        name: brand.name,
+        href: `/brands/${brand.slug}`,
+        logo: `/brands/${brand.slug}.png`,
+      }));
+    }
+    
+    // Get unique brands from products in current category
+    const categoryBrands = productsData?.products?.reduce((acc: any[], product: any) => {
+      const existingBrand = acc.find(b => b.slug === product.brand.slug);
+      if (!existingBrand) {
+        acc.push({
+          name: product.brand.name,
+          href: `/brands/${product.brand.slug}`,
+          logo: `/brands/${product.brand.slug}.png`,
+          slug: product.brand.slug
+        });
+      }
+      return acc;
+    }, []) || [];
+    
+    return categoryBrands;
+  }, [brandsData, productsData, currentCategory]);
 
   // Map brands with dynamic href and active state
-  const brands = filteredBrandData.map((brand) => {
+  const brands = filteredBrandData.map((brand:any) => {
     const brandSlug = brand.href.split("/").pop();
     let href = brand.href; // Default to brand page
     let active = false;
@@ -598,7 +630,7 @@ export default function Header() {
         >
           <div className="px-4 sm:px-6 lg:px-8">
             <div className="flex space-x-3 md:space-x-4 h-12 items-center">
-              {brands.map((brand) => {
+              {brands.map((brand:any) => {
                 const isActive = brand.active;
                 return (
                   <Link

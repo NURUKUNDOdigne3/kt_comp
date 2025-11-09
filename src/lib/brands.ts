@@ -41,7 +41,7 @@ export const brandData = [
     name: "Apple",
     href: "/brands/apple",
     logo: "/brands/apple.png",
-    categories: ["computers", "tablets"],
+    categories: ["computers", "tablets", "phones"],
   },
   {
     name: "Asus",
@@ -113,13 +113,13 @@ export const brandData = [
     name: "Samsung",
     href: "/brands/samsung",
     logo: "/brands/samsung.png",
-    categories: ["monitors"],
+    categories: ["monitors", "phones"],
   },
   {
     name: "Sony",
     href: "/brands/sony",
     logo: "/brands/sony.png",
-    categories: ["speakers"],
+    categories: ["speakers", "phones"],
   },
   {
     name: "TP-Link",
