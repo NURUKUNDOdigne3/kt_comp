@@ -112,22 +112,31 @@ export async function generateMetadata({
   params: Promise<{ id: string }>;
 }): Promise<Metadata> {
   const { id } = await params;
-  const rawProduct = await prisma.product.findUnique({
-    where: { id },
-    include: {
-      brand: { select: { name: true, slug: true } },
-      category: { select: { name: true, slug: true } },
-    },
-  });
+  
+  try {
+    const rawProduct = await prisma.product.findUnique({
+      where: { id },
+      include: {
+        brand: { select: { name: true, slug: true } },
+        category: { select: { name: true, slug: true } },
+      },
+    });
 
-  if (!rawProduct) {
+    if (!rawProduct) {
+      return {
+        title: "Product Not Found - KT Computer Supply",
+        description: "The requested product could not be found.",
+      };
+    }
+
+    return generateProductMetadata(rawProduct);
+  } catch (error) {
+    console.error("Error generating metadata:", error);
     return {
-      title: "Product Not Found - KT Computer Supply",
-      description: "The requested product could not be found.",
+      title: "Product - KT Computer Supply",
+      description: "Premium electronics and computer supplies in Rwanda.",
     };
   }
-
-  return generateProductMetadata(rawProduct);
 }
 
 export default async function ProductPage({ 
@@ -142,7 +151,7 @@ export default async function ProductPage({
     notFound();
   }
 
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://ktcomputersupply.vercel.rw";
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://www.ktcomputersupplying.com";
   const productUrl = `${baseUrl}/products/${id}`;
 
   const breadcrumbItems = [
@@ -178,10 +187,15 @@ export default async function ProductPage({
 
 // Generate static params for all products
 export async function generateStaticParams() {
+  // Skip static generation during build if database is unavailable
+  if (process.env.NODE_ENV === 'production' && process.env.SKIP_BUILD_STATIC_GENERATION) {
+    return [];
+  }
+  
   try {
     const products = await prisma.product.findMany({
       select: { id: true },
-      take: 100, // Limit for build performance
+      take: 50, // Reduced for faster builds
     });
 
     return products.map((product) => ({

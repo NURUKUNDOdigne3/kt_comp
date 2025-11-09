@@ -131,7 +131,7 @@ export function LoginFormWithHookForm({
           <div className="bg-muted relative hidden md:block">
             <img
               src="/placeholder.svg"
-              alt="Image"
+              alt="KT Computer Supply - Premium Electronics in Rwanda"
               className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
             />
           </div>
