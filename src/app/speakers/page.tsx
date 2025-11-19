@@ -3,22 +3,46 @@
 import Header from "@/components/Header";
 import ProductCard from "@/components/ProductCard";
 import Footer from "@/components/Footer";
+import { Pagination } from "@/components/ui/pagination";
 import Breadcrumbs from "@/components/SEO/Breadcrumbs";
 import { useFilter } from "@/contexts/FilterContext";
 import { useProducts } from "@/hooks/use-api";
+import { usePagination } from "@/hooks/use-pagination";
 
 export default function Page() {
   const { selectedBrand } = useFilter();
-  const { data, isLoading } = useProducts({ category: "speakers" });
+  const {
+    currentPage,
+    handlePageChange,
+    cachePage,
+    getDisplayData,
+    resetPageChanging,
+    isLoadingCurrentPage,
+  } = usePagination();
+
+  const { data, isLoading } = useProducts({
+    category: "speakers",
+    page: currentPage,
+    limit: 24
+  });
 
   const breadcrumbItems = [
     { name: "Speakers & Audio", href: "/speakers" },
   ];
 
-  const products = data?.products || [];
+  // Cache pages as they load
+  cachePage(currentPage, data);
+
+  // Use cached data when available, fallback to fresh data
+  const displayData = getDisplayData(data);
+  const products = displayData?.products || [];
+  const pagination = displayData?.pagination;
   const filteredProducts = selectedBrand
     ? products.filter((p: any) => p.brand.slug === selectedBrand)
     : products;
+
+  // Reset page changing state when data loads
+  resetPageChanging(isLoading);
 
   return (
     <main>
@@ -62,7 +86,7 @@ export default function Page() {
             </p>
           </div>
         </div>
-        {isLoading ? (
+        {isLoadingCurrentPage(isLoading) ? (
           <div className="flex flex-col items-center justify-center py-12 text-center">
             <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500"></div>
             <p className="mt-4 text-gray-500">Loading products...</p>
@@ -79,6 +103,15 @@ export default function Page() {
               No speakers available at the moment.
             </p>
           </div>
+        )}
+
+        {/* Pagination */}
+        {pagination && pagination.totalPages > 1 && !isLoadingCurrentPage(isLoading) && (
+          <Pagination
+            page={pagination.page}
+            totalPages={pagination.totalPages}
+            onPageChange={handlePageChange}
+          />
         )}
       </div>
       <Footer />

@@ -111,6 +111,12 @@ export async function GET(request: NextRequest) {
         success: true,
         featured: featuredProducts,
         all: allProducts,
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages: Math.ceil(total / limit),
+        },
       });
     }
 

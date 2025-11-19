@@ -176,9 +176,10 @@ export async function generateStaticParams() {
       brand: brand.slug,
     }));
   } catch (error) {
-    console.error("Error generating static params:", error);
+    console.warn("Database not available during build, skipping static generation for brands");
     return [];
   }
 }
 
 export const dynamicParams = true; // Fallback for non-pre-rendered brands
+export const dynamic = 'force-dynamic'; // Force dynamic rendering if static generation fails

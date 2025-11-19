@@ -173,7 +173,7 @@ export default async function Page() {
       </section>
 
       {/* Phones Section */}
-      {/* <div
+      <div
         className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 bg-gray-50 dark:bg-gray-900"
         id="phones"
       >
@@ -203,7 +203,7 @@ export default async function Page() {
             </p>
           </div>
         )}
-      </div> */}
+      </div>
 
       {/* Printers Section */}
       <section
