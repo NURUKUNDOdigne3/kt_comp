@@ -3,7 +3,7 @@ import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { generateProductMetadata } from "@/lib/seo";
-import { ProductSchema } from "@/components/SEO/StructuredData";
+import { ProductSchema, FAQSchema } from "@/components/SEO/StructuredData";
 import Breadcrumbs from "@/components/SEO/Breadcrumbs";
 
 // Get product from database
@@ -112,22 +112,31 @@ export async function generateMetadata({
   params: Promise<{ id: string }>;
 }): Promise<Metadata> {
   const { id } = await params;
-  const rawProduct = await prisma.product.findUnique({
-    where: { id },
-    include: {
-      brand: { select: { name: true, slug: true } },
-      category: { select: { name: true, slug: true } },
-    },
-  });
+  
+  try {
+    const rawProduct = await prisma.product.findUnique({
+      where: { id },
+      include: {
+        brand: { select: { name: true, slug: true } },
+        category: { select: { name: true, slug: true } },
+      },
+    });
 
-  if (!rawProduct) {
+    if (!rawProduct) {
+      return {
+        title: "Product Not Found - KT Computer Supply",
+        description: "The requested product could not be found.",
+      };
+    }
+
+    return generateProductMetadata(rawProduct);
+  } catch (error) {
+    console.error("Error generating metadata:", error);
     return {
-      title: "Product Not Found - KT Computer Supply",
-      description: "The requested product could not be found.",
+      title: "Product - KT Computer Supply",
+      description: "Premium electronics and computer supplies in Rwanda.",
     };
   }
-
-  return generateProductMetadata(rawProduct);
 }
 
 export default async function ProductPage({ 
@@ -142,12 +151,40 @@ export default async function ProductPage({
     notFound();
   }
 
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://ktcomputersupply.vercel.rw";
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://www.ktcomputersupplying.com";
   const productUrl = `${baseUrl}/products/${id}`;
 
   const breadcrumbItems = [
     { name: product.category, href: `/${product.category.toLowerCase()}` },
     { name: product.name, href: `/products/${id}` },
+  ];
+
+  // FAQ data for products
+  const faqQuestions = [
+    {
+      question: `What is the warranty for ${product.name}?`,
+      answer: "All products come with manufacturer warranty. Contact our support team for specific warranty details and terms."
+    },
+    {
+      question: "Do you offer free delivery?",
+      answer: `Free delivery is available for orders over RWF 99,000. For orders under this amount, delivery charges apply based on location within Rwanda.`
+    },
+    {
+      question: "What payment methods do you accept?",
+      answer: "We accept Mobile Money payments (MTN MoMo, Airtel Money), bank transfers, and cash on delivery. PayPack payments are also supported."
+    },
+    {
+      question: "How long does delivery take?",
+      answer: "Standard delivery takes 2-3 business days within Kigali. Express delivery is available for urgent orders. Nationwide delivery is available across Rwanda."
+    },
+    {
+      question: "Can I return or exchange this product?",
+      answer: "We offer a 30-day return policy. Items must be in original condition with all accessories and packaging. Contact our customer service for return procedures."
+    },
+    {
+      question: "Do you provide technical support?",
+      answer: "Yes, we provide free technical support for all products. Our team of experts is available to help with setup, troubleshooting, and product usage."
+    }
   ];
 
   return (
@@ -168,6 +205,7 @@ export default async function ProductPage({
         }}
         url={productUrl}
       />
+      <FAQSchema questions={faqQuestions} />
       <div className="container mx-auto px-4 py-6">
         <Breadcrumbs items={breadcrumbItems} />
         <ProductDetails product={product} />
@@ -178,10 +216,15 @@ export default async function ProductPage({
 
 // Generate static params for all products
 export async function generateStaticParams() {
+  // Skip static generation during build if database is unavailable
+  if (process.env.NODE_ENV === 'production' && process.env.SKIP_BUILD_STATIC_GENERATION) {
+    return [];
+  }
+  
   try {
     const products = await prisma.product.findMany({
       select: { id: true },
-      take: 100, // Limit for build performance
+      take: 50, // Reduced for faster builds
     });
 
     return products.map((product) => ({

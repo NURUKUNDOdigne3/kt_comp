@@ -2,10 +2,9 @@ import { MetadataRoute } from "next";
 import { prisma } from "@/lib/prisma";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://ktcomputersupply.vercel.rw";
-  console.log("This is the base url", baseUrl);
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://www.ktcomputersupplying.com";
   
-  // Static pages
+  // Static pages - comprehensive list of all available routes
   const staticPages = [
     {
       url: baseUrl,
@@ -13,6 +12,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "daily" as const,
       priority: 1,
     },
+    // Product category pages
     {
       url: `${baseUrl}/computers`,
       lastModified: new Date(),
@@ -56,17 +56,56 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.8,
     },
     {
+      url: `${baseUrl}/accessories`,
+      lastModified: new Date(),
+      changeFrequency: "daily" as const,
+      priority: 0.8,
+    },
+    // Brand and search pages
+    {
       url: `${baseUrl}/brands`,
       lastModified: new Date(),
       changeFrequency: "weekly" as const,
       priority: 0.8,
     },
     {
+      url: `${baseUrl}/search`,
+      lastModified: new Date(),
+      changeFrequency: "weekly" as const,
+      priority: 0.7,
+    },
+    // Checkout and account pages
+    {
       url: `${baseUrl}/checkout`,
       lastModified: new Date(),
       changeFrequency: "monthly" as const,
       priority: 0.7,
     },
+    {
+      url: `${baseUrl}/checkout/cancel`,
+      lastModified: new Date(),
+      changeFrequency: "monthly" as const,
+      priority: 0.5,
+    },
+    {
+      url: `${baseUrl}/checkout/paypack-return`,
+      lastModified: new Date(),
+      changeFrequency: "monthly" as const,
+      priority: 0.5,
+    },
+    {
+      url: `${baseUrl}/checkout/paypack-waiting`,
+      lastModified: new Date(),
+      changeFrequency: "monthly" as const,
+      priority: 0.5,
+    },
+    {
+      url: `${baseUrl}/checkout/success`,
+      lastModified: new Date(),
+      changeFrequency: "monthly" as const,
+      priority: 0.5,
+    },
+    // Authentication pages
     {
       url: `${baseUrl}/auth/login`,
       lastModified: new Date(),
@@ -79,6 +118,21 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "monthly" as const,
       priority: 0.6,
     },
+    // Account pages
+    {
+      url: `${baseUrl}/account`,
+      lastModified: new Date(),
+      changeFrequency: "monthly" as const,
+      priority: 0.6,
+    },
+    // Test pages (only in development)
+    ...(process.env.NODE_ENV === 'development' ? [{
+      url: `${baseUrl}/test-paypack`,
+      lastModified: new Date(),
+      changeFrequency: "monthly" as const,
+      priority: 0.1,
+    }] : []),
+    // Legal pages
     {
       url: `${baseUrl}/privacy`,
       lastModified: new Date(),

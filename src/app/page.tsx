@@ -65,8 +65,8 @@ export default async function Page() {
     <main itemScope itemType="https://schema.org/Store">
       <OrganizationSchema
         name="KT Computer Supply"
-        url="https://ktcomputersupply.vercel.rw"
-        logo="https://ktcomputersupply.vercel.rw/logo.png"
+        url="https://www.ktcomputersupplying.com"
+        logo="https://www.ktcomputersupplying.com/logo.png"
         description="Premium electronics and computer solutions provider in Rwanda"
         address={{
           streetAddress: "Kigali, Rwanda",
@@ -80,13 +80,13 @@ export default async function Page() {
       />
       <WebsiteSchema
         name="KT Computer Supply"
-        url="https://ktcomputersupply.vercel.rw"
+        url="https://www.ktcomputersupplying.com"
         description="Premium electronics and computer solutions in Rwanda"
-        searchUrl="https://ktcomputersupply.vercel.rw/search"
+        searchUrl="https://www.ktcomputersupplying.com/search"
       />
       <LocalBusinessSchema
         name="KT Computer Supply"
-        url="https://ktcomputersupply.vercel.rw"
+        url="https://www.ktcomputersupplying.com"
         description="Your trusted source for premium electronics, computers, and tech solutions in Rwanda. We offer high-quality products, expert service, and competitive prices with fast delivery across Kigali and Rwanda."
         address={{
           streetAddress: "Kigali, Rwanda",
@@ -106,7 +106,7 @@ export default async function Page() {
           "Sa 09:00-16:00",
         ]}
         priceRange="$$"
-        image="https://ktcomputersupply.vercel.rw/logo.png"
+        image="https://www.ktcomputersupplying.com/logo.png"
       />
       <FAQSchema
         questions={[
@@ -345,9 +345,11 @@ export default async function Page() {
         )}
       </section>
 
+   
+
       {/* Brand Marquee */}
       <BrandMarquee />
-    
+
       <Footer />
     </main>
   );

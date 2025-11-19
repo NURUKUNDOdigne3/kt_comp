@@ -668,7 +668,7 @@ export default function Header() {
                 className="inline-flex items-center px-3 py-1.5 rounded-full border border-gray-200 text-sm font-medium text-gray-600 hover:text-blue-600 hover:border-blue-200 hover:bg-blue-50 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                 aria-label="View all brands"
               >
-                More
+                View All Brands
               </Link>
             </div>
           </div>

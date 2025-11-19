@@ -14,7 +14,7 @@ interface BreadcrumbsProps {
 }
 
 export default function Breadcrumbs({ items }: BreadcrumbsProps) {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://ktcomputersupply.vercel.rw";
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://ktcomputersupplying.com";
   
   const breadcrumbItems = [
     { name: "Home", url: baseUrl },
