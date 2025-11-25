@@ -1,83 +1,50 @@
+"use client";
+
 import Header from "@/components/Header";
 import ProductCard from "@/components/ProductCard";
-import FeaturedProductsCarousel from "@/components/FeaturedProductsCarousel";
 import { Suspense } from "react";
 import WelcomeHeroPhone from "@/components/WelcomeHeroPhone";
-import { prisma } from "@/lib/prisma";
 import Footer from "@/components/Footer";
-import { generateCategoryMetadata } from "@/lib/seo";
-import { Metadata } from "next";
+import { Pagination } from "@/components/ui/pagination";
 import Breadcrumbs from "@/components/SEO/Breadcrumbs";
+import { useFilter } from "@/contexts/FilterContext";
+import { useProducts } from "@/hooks/use-api";
+import { usePagination } from "@/hooks/use-pagination";
 
-async function getPhoneProducts() {
-  try {
-    const category = await prisma.category.findUnique({
-      where: { slug: "phones" },
-    });
+export default function Page() {
+  const { selectedBrand } = useFilter();
+  const {
+    currentPage,
+    handlePageChange,
+    cachePage,
+    getDisplayData,
+    resetPageChanging,
+    isLoadingCurrentPage,
+  } = usePagination();
 
-    if (!category) return { featured: [], all: [] };
-
-    const [featured, all] = await Promise.all([
-      prisma.product.findMany({
-        where: { categoryId: category.id, featured: true },
-        include: {
-          brand: { select: { id: true, name: true, slug: true, logo: true } },
-          category: { select: { id: true, name: true, slug: true } },
-        },
-        take: 8,
-        orderBy: { createdAt: "desc" },
-      }),
-      prisma.product.findMany({
-        where: { categoryId: category.id },
-        include: {
-          brand: { select: { id: true, name: true, slug: true, logo: true } },
-          category: { select: { id: true, name: true, slug: true } },
-        },
-        orderBy: { createdAt: "desc" },
-      }),
-    ]);
-
-    return { featured, all };
-  } catch (error) {
-    console.error("Error fetching phone products:", error);
-    return { featured: [], all: [] };
-  }
-}
-
-export async function generateMetadata(): Promise<Metadata> {
-  try {
-    const category = await prisma.category.findUnique({
-      where: { slug: "phones" },
-    });
-
-    if (!category) {
-      return {
-        title: "Smartphones - KT Computer Supply",
-        description: "Latest smartphones from top brands in Rwanda",
-      };
-    }
-
-    const products = await prisma.product.findMany({
-      where: { categoryId: category.id },
-      select: { id: true },
-    });
-
-    return generateCategoryMetadata(category, products);
-  } catch (error) {
-    console.error("Error generating metadata for phones:", error);
-    return {
-      title: "Smartphones - KT Computer Supply",
-      description: "Latest smartphones from top brands in Rwanda",
-    };
-  }
-}
-
-export default async function Page() {
-  const { featured, all } = await getPhoneProducts();
+  const { data, isLoading } = useProducts({
+    category: "phones",
+    page: currentPage,
+    limit: 24
+  });
 
   const breadcrumbItems = [
     { name: "Smartphones", href: "/phones" },
   ];
+
+  // Cache pages as they load
+  cachePage(currentPage, data);
+
+  // Use cached data when available, fallback to fresh data
+  const displayData = getDisplayData(data);
+  const products = displayData?.products || [];
+  const pagination = displayData?.pagination;
+  const filteredProducts = selectedBrand
+    ? products.filter((p: any) => p.brand.slug === selectedBrand)
+    : products;
+
+  // Reset page changing state when data loads
+  resetPageChanging(isLoading);
 
   return (
     <main>
@@ -86,59 +53,50 @@ export default async function Page() {
         <Breadcrumbs items={breadcrumbItems} />
       </div>
       
-
-      {/* <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12" id="shop">
-        <div className="flex items-end justify-between">
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900">
-              Featured Phones
-            </h2>
-            <p className="text-sm text-gray-600">
-              Curated picks from top brands
-            </p>
-          </div>
-        </div>
-        {featured.length > 0 ? (
-          <FeaturedProductsCarousel products={featured} />
-        ) : (
-          <div className="flex flex-col items-center justify-center py-12 text-center">
-            <p className="text-gray-500">No featured phones available.</p>
-          </div>
-        )}
-      </div> */}
-
       <div
         className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12"
         id="all-products"
       >
         <div className="flex items-end justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">All Phones</h2>
-            <p className="text-sm text-gray-600">Browse the full catalog</p>
+            <h2 className="text-2xl font-bold text-gray-900">
+              {selectedBrand ? `${selectedBrand.charAt(0).toUpperCase() + selectedBrand.slice(1)} Phones` : 'All Phones'}
+            </h2>
+            <p className="text-sm text-gray-600">
+              {selectedBrand ? `Phones from ${selectedBrand.charAt(0).toUpperCase() + selectedBrand.slice(1)}` : 'Browse the full catalog'}
+            </p>
           </div>
         </div>
-        {all.length > 0 ? (
+        {isLoadingCurrentPage(isLoading) ? (
+          <div className="flex flex-col items-center justify-center py-12 text-center">
+            <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500"></div>
+            <p className="mt-4 text-gray-500">Loading products...</p>
+          </div>
+        ) : filteredProducts.length > 0 ? (
           <div className="mt-8 grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {all.map((p) => (
+            {filteredProducts.map((p: any) => (
               <ProductCard key={p.id} product={p} />
             ))}
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center py-12 text-center">
-            <p className="text-gray-500">No phones available at the moment.</p>
+            <p className="text-gray-500">
+              No phones available at the moment.
+            </p>
           </div>
+        )}
+
+        {/* Pagination */}
+        {pagination && pagination.totalPages > 1 && !isLoadingCurrentPage(isLoading) && (
+          <Pagination
+            page={pagination.page}
+            totalPages={pagination.totalPages}
+            onPageChange={handlePageChange}
+          />
         )}
       </div>
 
-      <Suspense
-        fallback={
-          <div className="h-screen flex items-center justify-center">
-            <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-blue-500"></div>
-          </div>
-        }
-      >
-        <WelcomeHeroPhone />
-      </Suspense>
+      <WelcomeHeroPhone />
 
       <Footer />
     </main>
