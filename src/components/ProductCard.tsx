@@ -66,7 +66,7 @@ export default function ProductCard({
       ? product.category
       : product.category?.name || "Products";
   const image =
-    product.images?.[0] || product.image || "/placeholder-product.png";
+    product.images?.[0] || product.image || "/placeholder-product.jpg";
   const price = product.price;
   const oldPrice = product.compareAtPrice || product.oldPrice;
   const priceFormatted =

@@ -23,6 +23,13 @@ const nextConfig: NextConfig = {
     formats: ['image/webp', 'image/avif'],
   },
   serverExternalPackages: ['socket.io', 'socket.io-client'],
+  webpack: (config) => {
+    config.module.rules.push({
+      test: /\.(gltf|glb|bin)$/,
+      type: 'asset/resource',
+    });
+    return config;
+  },
 };
 
 export default nextConfig;

@@ -1,0 +1,1 @@
+This file tests if the models/phones directory is accessible from the web server.
