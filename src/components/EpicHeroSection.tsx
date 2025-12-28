@@ -123,7 +123,7 @@ export default function HeroSection() {
         initial={{ opacity: 0, scale: 0 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 1, duration: 0.5 }}
-        href="https://wa.me/250793095605"
+        href="https://wa.me/250788353267"
         target="_blank"
         rel="noopener noreferrer"
         className="fixed bottom-8 left-8 w-16 h-16 bg-[#25D366] hover:bg-[#128C7E] rounded-full flex items-center justify-center shadow-lg z-50 transition-colors"
